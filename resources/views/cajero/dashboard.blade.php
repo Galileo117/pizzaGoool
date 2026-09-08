@@ -1,15 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Panel de Cajero</title>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body>
-    <h1>Panel de Cajero</h1>
+<body class="bg-gray-100">
+    <div class="p-8">
+        <h1 class="text-2xl font-bold">Panel de Cajero</h1>
+        <p>Bienvenido, aquí gestionarás los pedidos en tiempo real.</p>
+    </div>
 </body>
 
 </html>

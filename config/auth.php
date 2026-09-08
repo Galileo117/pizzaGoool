@@ -1,8 +1,5 @@
 <?php
 
-use App\Models\User;
-use App\Models\Usuario;
-
 return [
 
     /*
@@ -65,13 +62,9 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => env(App\Models\Usuario::class),
+            'model' => App\Models\Usuario::class,
+            // 'username' => 'email', // No es necesario agregarlo porque ya usamos 'email'
         ],
-
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
     ],
 
     /*

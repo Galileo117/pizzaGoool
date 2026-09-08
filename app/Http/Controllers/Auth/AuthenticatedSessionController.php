@@ -25,21 +25,23 @@ class AuthenticatedSessionController extends Controller
     public function store(LoginRequest $request): RedirectResponse
     {
         $request->authenticate();
-
         $request->session()->regenerate();
 
-        // Redirigir según el rol del usuario
         $usuario = Auth::user();
 
-        if ($usuario->rol === 'admin') {
-            return redirect()->intended(route('admin.dashboard'));
-        } elseif ($usuario->rol === 'cajero') {
-            return redirect()->intended(route('cajero.dashboard'));
-        } elseif ($usuario->rol === 'repartidor') {
-            return redirect()->intended(route('repartidor.dashboard'));
+        if ($usuario?->rol === 'admin') {
+            return redirect()->route('admin.dashboard');
         }
 
-        return redirect()->intended(route('cliente.home'));
+        if ($usuario?->rol === 'cajero') {
+            return redirect()->route('cajero.dashboard');
+        }
+
+        if ($usuario?->rol === 'repartidor') {
+            return redirect()->route('repartidor.dashboard');
+        }
+
+        return redirect()->route('cliente.home');
     }
 
     /**

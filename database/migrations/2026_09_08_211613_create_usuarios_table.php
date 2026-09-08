@@ -11,8 +11,8 @@ return new class extends Migration
         Schema::create('usuarios', function (Blueprint $table) {
             $table->id();
             $table->string('nombre');
-            $table->string('correo')->unique();
-            $table->string('password'); // Campo obligatorio para autenticación de Laravel
+            $table->string('email')->unique(); // <-- AHORA ES EMAIL
+            $table->string('password');
             $table->string('rol'); // admin, cajero, repartidor, cliente
             $table->string('telefono')->nullable();
             $table->timestamps();
