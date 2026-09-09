@@ -1,189 +1,434 @@
 <x-guest-layout>
 
-    {{-- ==============================================================
-         ENCABEZADO DEL FORMULARIO
-    ============================================================== --}}
-    <div class="mb-6 text-center">
-        <div class="flex items-center justify-center gap-2 mb-2">
-            <i class="fa-solid fa-user-plus text-goool-yellow text-2xl" aria-hidden="true"></i>
-            <h2 class="text-2xl font-extrabold text-goool-green dark:text-white">
-                Crear Cuenta en <span class="text-goool-yellow">Pizza Goool</span>
-            </h2>
-        </div>
-        <p class="text-sm text-gray-500 dark:text-gray-400">
-            Regístrate para disfrutar de las mejores pizzas con pasión por el fútbol
-        </p>
+    {{-- LOGO --}}
+    <div class="mb-5 flex justify-center">
+
+        <a href="{{ url('/') }}">
+
+            <img
+                src="{{ asset('img/logo.png') }}"
+                alt="Pizza Goool"
+                class="h-20 w-20 object-contain sm:h-22 sm:w-22"
+            >
+
+        </a>
+
     </div>
 
-    {{-- ==============================================================
-         FORMULARIO DE REGISTRO
-    ============================================================== --}}
-    <form method="POST" action="{{ route('register') }}" class="space-y-4">
+
+    {{-- ENCABEZADO --}}
+    <div class="mb-7 text-center">
+
+        <h1
+            class="text-2xl font-extrabold
+                   tracking-tight
+                   text-gray-900
+                   sm:text-3xl"
+        >
+            Crear tu cuenta
+        </h1>
+
+        <p class="mt-3 text-sm leading-6 text-gray-500 sm:text-base">
+
+            Únete a la familia de
+            <span class="font-semibold text-goool-green">
+                Pizza Goool
+            </span>
+
+        </p>
+
+    </div>
+
+
+    {{-- FORMULARIO --}}
+    <form
+        method="POST"
+        action="{{ route('register') }}"
+        class="space-y-4"
+    >
+
         @csrf
 
-        {{-- Nombre completo --}}
+
+        {{-- NOMBRE --}}
         <div>
-            <x-input-label for="name" :value="__('Nombre Completo')" class="text-sm font-semibold text-gray-700 dark:text-gray-300" />
-            <div class="relative mt-1">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <i class="fa-solid fa-user text-gray-400" aria-hidden="true"></i>
+
+            <label
+                for="name"
+                class="mb-2 block text-sm font-bold text-gray-800"
+            >
+                Nombre completo
+            </label>
+
+            <div class="relative">
+
+                <div
+                    class="pointer-events-none
+                           absolute inset-y-0 left-0
+                           flex items-center pl-4"
+                >
+                    <i class="fa-solid fa-user text-gray-400"></i>
                 </div>
-                <x-text-input id="name"
-                    class="block w-full pl-10 pr-3 py-2.5 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-goool-green focus:ring-2 focus:ring-goool-green/20 dark:focus:ring-goool-yellow/20 transition-all duration-200 dark:bg-gray-700 dark:text-white"
+
+                <input
+                    id="name"
                     type="text"
                     name="name"
-                    :value="old('name')"
+                    value="{{ old('name') }}"
                     required
                     autofocus
                     autocomplete="name"
-                    placeholder="Tu nombre completo" />
+                    placeholder="Tu nombre completo"
+                    class="block h-14 w-full
+                           rounded-xl
+                           border border-gray-200
+                           bg-gray-50
+                           pl-11 pr-4
+                           text-base text-gray-900
+                           placeholder:text-gray-400
+                           outline-none
+                           transition
+                           focus:border-goool-green
+                           focus:bg-white
+                           focus:ring-4
+                           focus:ring-goool-green/10"
+                >
+
             </div>
-            <x-input-error :messages="$errors->get('name')" class="mt-1.5 text-sm" />
+
+            @error('name')
+
+                <p class="mt-2 flex items-center gap-2 text-sm font-medium text-red-600">
+
+                    <i class="fa-solid fa-circle-exclamation"></i>
+
+                    {{ $message }}
+
+                </p>
+
+            @enderror
+
         </div>
 
-        {{-- Correo electrónico --}}
+
+        {{-- EMAIL --}}
         <div>
-            <x-input-label for="email" :value="__('Correo Electrónico')" class="text-sm font-semibold text-gray-700 dark:text-gray-300" />
-            <div class="relative mt-1">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <i class="fa-solid fa-envelope text-gray-400" aria-hidden="true"></i>
+
+            <label
+                for="email"
+                class="mb-2 block text-sm font-bold text-gray-800"
+            >
+                Correo electrónico
+            </label>
+
+            <div class="relative">
+
+                <div
+                    class="pointer-events-none
+                           absolute inset-y-0 left-0
+                           flex items-center pl-4"
+                >
+                    <i class="fa-solid fa-envelope text-gray-400"></i>
                 </div>
-                <x-text-input id="email"
-                    class="block w-full pl-10 pr-3 py-2.5 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-goool-green focus:ring-2 focus:ring-goool-green/20 dark:focus:ring-goool-yellow/20 transition-all duration-200 dark:bg-gray-700 dark:text-white"
+
+                <input
+                    id="email"
                     type="email"
                     name="email"
-                    :value="old('email')"
+                    value="{{ old('email') }}"
                     required
                     autocomplete="username"
-                    placeholder="tu@email.com" />
+                    placeholder="tu@email.com"
+                    class="block h-14 w-full
+                           rounded-xl
+                           border border-gray-200
+                           bg-gray-50
+                           pl-11 pr-4
+                           text-base text-gray-900
+                           placeholder:text-gray-400
+                           outline-none
+                           transition
+                           focus:border-goool-green
+                           focus:bg-white
+                           focus:ring-4
+                           focus:ring-goool-green/10"
+                >
+
             </div>
-            <x-input-error :messages="$errors->get('email')" class="mt-1.5 text-sm" />
+
+            @error('email')
+
+                <p class="mt-2 flex items-center gap-2 text-sm font-medium text-red-600">
+
+                    <i class="fa-solid fa-circle-exclamation"></i>
+
+                    {{ $message }}
+
+                </p>
+
+            @enderror
+
         </div>
 
-        {{-- Teléfono (opcional) --}}
+
+        {{-- TELEFONO --}}
         <div>
-            <x-input-label for="telefono" :value="__('Teléfono (opcional)')" class="text-sm font-semibold text-gray-700 dark:text-gray-300" />
-            <div class="relative mt-1">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <i class="fa-solid fa-phone text-gray-400" aria-hidden="true"></i>
+
+            <label
+                for="telefono"
+                class="mb-2 block text-sm font-bold text-gray-800"
+            >
+                Teléfono
+                <span class="font-normal text-gray-400">
+                    (opcional)
+                </span>
+            </label>
+
+            <div class="relative">
+
+                <div
+                    class="pointer-events-none
+                           absolute inset-y-0 left-0
+                           flex items-center pl-4"
+                >
+                    <i class="fa-solid fa-phone text-gray-400"></i>
                 </div>
-                <x-text-input id="telefono"
-                    class="block w-full pl-10 pr-3 py-2.5 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-goool-green focus:ring-2 focus:ring-goool-green/20 dark:focus:ring-goool-yellow/20 transition-all duration-200 dark:bg-gray-700 dark:text-white"
-                    type="tel"
+
+                <input
+                    id="telefono"
+                    type="text"
                     name="telefono"
-                    :value="old('telefono')"
-                    placeholder="Ej: 71234567" />
+                    value="{{ old('telefono') }}"
+                    autocomplete="tel"
+                    placeholder="71234567"
+                    class="block h-14 w-full
+                           rounded-xl
+                           border border-gray-200
+                           bg-gray-50
+                           pl-11 pr-4
+                           text-base text-gray-900
+                           placeholder:text-gray-400
+                           outline-none
+                           transition
+                           focus:border-goool-green
+                           focus:bg-white
+                           focus:ring-4
+                           focus:ring-goool-green/10"
+                >
+
             </div>
-            <x-input-error :messages="$errors->get('telefono')" class="mt-1.5 text-sm" />
+
         </div>
 
-        {{-- Contraseña --}}
+
+        {{-- PASSWORD --}}
         <div>
-            <x-input-label for="password" :value="__('Contraseña')" class="text-sm font-semibold text-gray-700 dark:text-gray-300" />
-            <div class="relative mt-1">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <i class="fa-solid fa-lock text-gray-400" aria-hidden="true"></i>
+
+            <label
+                for="password"
+                class="mb-2 block text-sm font-bold text-gray-800"
+            >
+                Contraseña
+            </label>
+
+            <div class="relative">
+
+                <div
+                    class="pointer-events-none
+                           absolute inset-y-0 left-0
+                           flex items-center pl-4"
+                >
+                    <i class="fa-solid fa-lock text-gray-400"></i>
                 </div>
-                <x-text-input id="password"
-                    class="block w-full pl-10 pr-10 py-2.5 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-goool-green focus:ring-2 focus:ring-goool-green/20 dark:focus:ring-goool-yellow/20 transition-all duration-200 dark:bg-gray-700 dark:text-white"
+
+                <input
+                    id="password"
                     type="password"
                     name="password"
                     required
                     autocomplete="new-password"
-                    placeholder="Mínimo 8 caracteres" />
-                <button type="button"
-                        id="togglePassword"
-                        class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-goool-green rounded-lg"
-                        aria-label="Mostrar contraseña">
-                    <i class="fa-solid fa-eye" id="toggleIcon" aria-hidden="true"></i>
+                    placeholder="Mínimo 8 caracteres"
+                    class="block h-14 w-full
+                           rounded-xl
+                           border border-gray-200
+                           bg-gray-50
+                           pl-11 pr-12
+                           text-base text-gray-900
+                           placeholder:text-gray-400
+                           outline-none
+                           transition
+                           focus:border-goool-green
+                           focus:bg-white
+                           focus:ring-4
+                           focus:ring-goool-green/10"
+                >
+
+                <button
+                    type="button"
+                    onclick="togglePassword('password', this)"
+                    class="absolute inset-y-0 right-0
+                           flex items-center
+                           px-4
+                           text-gray-400
+                           hover:text-gray-600"
+                >
+                    <i class="fa-solid fa-eye"></i>
                 </button>
+
             </div>
-            <div class="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
-                <i class="fa-solid fa-info-circle" aria-hidden="true"></i>
-                La contraseña debe tener al menos 8 caracteres
-            </div>
-            <x-input-error :messages="$errors->get('password')" class="mt-1.5 text-sm" />
+
+            @error('password')
+
+                <p class="mt-2 flex items-center gap-2 text-sm font-medium text-red-600">
+
+                    <i class="fa-solid fa-circle-exclamation"></i>
+
+                    {{ $message }}
+
+                </p>
+
+            @enderror
+
         </div>
 
-        {{-- Confirmar contraseña --}}
+
+        {{-- CONFIRMAR PASSWORD --}}
         <div>
-            <x-input-label for="password_confirmation" :value="__('Confirmar Contraseña')" class="text-sm font-semibold text-gray-700 dark:text-gray-300" />
-            <div class="relative mt-1">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <i class="fa-solid fa-shield-check text-gray-400" aria-hidden="true"></i>
+
+            <label
+                for="password_confirmation"
+                class="mb-2 block text-sm font-bold text-gray-800"
+            >
+                Confirmar contraseña
+            </label>
+
+            <div class="relative">
+
+                <div
+                    class="pointer-events-none
+                           absolute inset-y-0 left-0
+                           flex items-center pl-4"
+                >
+                    <i class="fa-solid fa-lock text-gray-400"></i>
                 </div>
-                <x-text-input id="password_confirmation"
-                    class="block w-full pl-10 pr-3 py-2.5 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-goool-green focus:ring-2 focus:ring-goool-green/20 dark:focus:ring-goool-yellow/20 transition-all duration-200 dark:bg-gray-700 dark:text-white"
+
+                <input
+                    id="password_confirmation"
                     type="password"
                     name="password_confirmation"
                     required
                     autocomplete="new-password"
-                    placeholder="Repite tu contraseña" />
+                    placeholder="Repite tu contraseña"
+                    class="block h-14 w-full
+                           rounded-xl
+                           border border-gray-200
+                           bg-gray-50
+                           pl-11 pr-12
+                           text-base text-gray-900
+                           placeholder:text-gray-400
+                           outline-none
+                           transition
+                           focus:border-goool-green
+                           focus:bg-white
+                           focus:ring-4
+                           focus:ring-goool-green/10"
+                >
+
+                <button
+                    type="button"
+                    onclick="togglePassword('password_confirmation', this)"
+                    class="absolute inset-y-0 right-0
+                           flex items-center
+                           px-4
+                           text-gray-400
+                           hover:text-gray-600"
+                >
+                    <i class="fa-solid fa-eye"></i>
+                </button>
+
             </div>
-            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-1.5 text-sm" />
+
         </div>
 
-        {{-- Términos y condiciones --}}
-        <div class="flex items-start gap-2 pt-1">
-            <input id="terms"
-                   type="checkbox"
-                   name="terms"
-                   required
-                   class="mt-0.5 w-4 h-4 rounded border-2 border-gray-300 dark:border-gray-600 text-goool-green focus:ring-goool-green focus:ring-offset-2 dark:focus:ring-goool-yellow transition-all duration-200 cursor-pointer">
-            <label for="terms" class="text-xs text-gray-600 dark:text-gray-400 cursor-pointer">
-                Acepto los
-                <a href="#" class="text-goool-green hover:text-goool-green-dark dark:text-goool-yellow dark:hover:text-yellow-400 font-medium transition-colors duration-200">
-                    Términos y Condiciones
-                </a>
-                y la
-                <a href="#" class="text-goool-green hover:text-goool-green-dark dark:text-goool-yellow dark:hover:text-yellow-400 font-medium transition-colors duration-200">
-                    Política de Privacidad
-                </a>
-            </label>
+
+        {{-- BOTÓN --}}
+        <div class="pt-2">
+
+            <button
+                type="submit"
+                class="flex h-14 w-full
+                       items-center justify-center
+                       gap-2
+                       rounded-xl
+                       bg-goool-green
+                       px-5
+                       text-base font-bold
+                       text-white
+                       shadow-lg shadow-goool-green/15
+                       transition
+                       hover:bg-goool-green-dark
+                       hover:shadow-xl
+                       focus:outline-none
+                       focus:ring-4
+                       focus:ring-goool-green/20
+                       active:scale-[0.99]"
+            >
+
+                <i class="fa-solid fa-user-plus"></i>
+
+                Crear cuenta
+
+            </button>
+
         </div>
 
-        {{-- Botón de envío --}}
-        <x-primary-button class="w-full justify-center py-3 text-base font-bold bg-goool-green hover:bg-goool-green-dark focus:ring-2 focus:ring-goool-green focus:ring-offset-2 dark:focus:ring-goool-yellow transition-all duration-200 rounded-xl shadow-md hover:shadow-lg active:scale-[0.98]">
-            <i class="fa-solid fa-user-plus mr-2" aria-hidden="true"></i>
-            {{ __('Crear Cuenta') }}
-        </x-primary-button>
 
-        {{-- Enlace de inicio de sesión --}}
-        <div class="text-center pt-2">
-            <p class="text-sm text-gray-500 dark:text-gray-400">
+        {{-- LOGIN --}}
+        <div class="pt-3 text-center">
+
+            <p class="text-sm text-gray-500 sm:text-base">
+
                 ¿Ya tienes una cuenta?
-                <a href="{{ route('login') }}" class="font-semibold text-goool-green hover:text-goool-green-dark dark:text-goool-yellow dark:hover:text-yellow-400 transition-colors duration-200">
-                    Inicia sesión aquí
+
+                <a
+                    href="{{ route('login') }}"
+                    class="font-bold
+                           text-goool-green
+                           transition
+                           hover:text-goool-green-dark"
+                >
+                    Inicia sesión
                 </a>
+
             </p>
+
         </div>
+
     </form>
 
-    {{-- ==============================================================
-         SCRIPT PARA MOSTRAR/OCULTAR CONTRASEÑA
-    ============================================================== --}}
+
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const togglePassword = document.getElementById('togglePassword');
-            const passwordInput = document.getElementById('password');
-            const toggleIcon = document.getElementById('toggleIcon');
+        function togglePassword(inputId, button) {
 
-            if (togglePassword && passwordInput) {
-                togglePassword.addEventListener('click', function() {
-                    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-                    passwordInput.setAttribute('type', type);
+            const input = document.getElementById(inputId);
+            const icon = button.querySelector('i');
 
-                    // Cambiar el icono
-                    if (type === 'text') {
-                        toggleIcon.classList.remove('fa-eye');
-                        toggleIcon.classList.add('fa-eye-slash');
-                    } else {
-                        toggleIcon.classList.remove('fa-eye-slash');
-                        toggleIcon.classList.add('fa-eye');
-                    }
-                });
+            if (input.type === 'password') {
+
+                input.type = 'text';
+
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+
+            } else {
+
+                input.type = 'password';
+
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+
             }
-        });
+        }
     </script>
 
-</x-guest-layout>   
+</x-guest-layout>

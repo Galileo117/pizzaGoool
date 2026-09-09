@@ -1,105 +1,123 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    {{-- Meta tags para SEO y redes sociales --}}
-    <meta name="description" content="Pizza Goool - Autenticación para acceder a la mejor experiencia en pizzas con pasión por el fútbol">
-    <meta name="theme-color" content="#1B5E20">
+    <title>{{ config('app.name', 'Pizza Goool') }}</title>
 
-    <title>{{ config('app.name', 'Pizza Goool') }} - @yield('title', 'Autenticación')</title>
+    {{-- Font Awesome --}}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
-    {{-- Fuentes --}}
-    <link rel="preconnect" href="https://fonts.bunny.net" crossorigin>
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
-
-    {{-- Font Awesome para iconos --}}
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
-        integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/..." crossorigin="anonymous" referrerpolicy="no-referrer">
-
-    {{-- Scripts de Vite --}}
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-
-    {{-- Estilos específicos por página --}}
-    @stack('styles')
 </head>
 
-<body class="font-sans text-gray-900 antialiased bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 min-h-screen flex items-center justify-center p-4">
+<body class="min-h-screen bg-gray-50 antialiased">
 
-    <div class="w-full max-w-md">
+    <main class="relative min-h-screen overflow-hidden">
 
-        {{-- Logo y marca --}}
-        <div class="text-center mb-8">
-            <a href="/" class="inline-block transition-transform duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-goool-yellow focus:ring-offset-2 focus:ring-offset-white rounded-full" aria-label="Volver al inicio">
-                <div class="relative">
-                    <x-application-logo class="w-20 h-20 mx-auto text-goool-green dark:text-goool-yellow" />
+        {{-- =========================
+            DECORACIÓN DE FONDO
+        ========================== --}}
 
-                    {{-- Badge decorativo --}}
-                    <span class="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-goool-yellow text-[8px] font-bold text-goool-green-dark shadow-lg">
-                        <i class="fa-solid fa-pizza-slice" aria-hidden="true"></i>
-                    </span>
-                </div>
-            </a>
-
-            <h1 class="mt-3 text-2xl font-extrabold tracking-tight text-goool-green dark:text-white">
-                Pizza <span class="text-goool-yellow">Goool</span>
-            </h1>
-
-            <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                @yield('subtitle', 'Accede a tu cuenta para disfrutar de las mejores pizzas')
-            </p>
+        {{-- Mancha verde superior izquierda --}}
+        <div
+            class="pointer-events-none absolute -left-32 -top-32
+                   h-80 w-80 rounded-full
+                   bg-goool-green/10
+                   blur-3xl">
         </div>
 
-        {{-- Tarjeta del formulario --}}
-        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden border border-gray-100 dark:border-gray-700 transition-all duration-300">
+        {{-- Mancha amarilla inferior derecha --}}
+        <div
+            class="pointer-events-none absolute -bottom-40 -right-40
+                   h-96 w-96 rounded-full
+                   bg-goool-yellow/10
+                   blur-3xl">
+        </div>
 
-            {{-- Cabecera decorativa --}}
-            <div class="h-1.5 bg-gradient-to-r from-goool-green via-goool-yellow to-goool-orange"></div>
-
-            {{-- Contenido --}}
-            <div class="p-6 sm:p-8">
-                {{ $slot }}
-            </div>
-
-            {{-- Pie de la tarjeta --}}
-            <div class="border-t border-gray-100 dark:border-gray-700 px-6 py-4 bg-gray-50/50 dark:bg-gray-900/50">
-                <div class="flex flex-col items-center gap-2 text-xs text-gray-500 dark:text-gray-400 sm:flex-row sm:justify-between">
-
-                    <span class="flex items-center gap-1.5">
-                        <i class="fa-regular fa-lock" aria-hidden="true"></i>
-                        <span>Conexión segura</span>
-                    </span>
-
-                    <span class="hidden sm:inline" aria-hidden="true">•</span>
-
-                    <span class="flex items-center gap-1.5">
-                        <i class="fa-regular fa-circle-question" aria-hidden="true"></i>
-                        <a href="#" class="hover:text-goool-green dark:hover:text-goool-yellow transition-colors duration-200">
-                            ¿Necesitas ayuda?
-                        </a>
-                    </span>
-                </div>
+        {{-- Patrón de puntos --}}
+        <div
+            class="pointer-events-none absolute right-6 top-8
+                   hidden h-32 w-32
+                   opacity-40
+                   sm:block">
+            <div class="grid grid-cols-6 gap-3">
+                @for ($i = 0; $i < 36; $i++)
+                    <div class="h-1.5 w-1.5 rounded-full bg-goool-green/30"></div>
+                @endfor
             </div>
         </div>
 
-        {{-- Enlaces adicionales --}}
-        <div class="mt-6 text-center text-xs text-gray-500 dark:text-gray-400">
-            <span>¿Eres nuevo?</span>
-            <a href="{{ route('register') }}" class="font-medium text-goool-green dark:text-goool-yellow hover:underline transition-colors duration-200">
-                Crear cuenta
-            </a>
-            <span class="mx-2" aria-hidden="true">|</span>
-            <a href="{{ route('cliente.home') }}" class="hover:text-goool-green dark:hover:text-goool-yellow transition-colors duration-200">
-                <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
-                Volver al inicio
-            </a>
-        </div>
-    </div>
 
-    {{-- Scripts específicos por página --}}
-    @stack('scripts')
+        {{-- =========================
+            CONTENEDOR PRINCIPAL
+        ========================== --}}
+
+        <div
+            class="relative z-10
+                   flex min-h-screen
+                   items-center justify-center
+                   px-4 py-8
+                   sm:px-6
+                   sm:py-12">
+
+            <div class="w-full max-w-md">
+
+                {{-- =========================
+                    TARJETA
+                ========================== --}}
+
+                <div
+                    class="overflow-hidden
+                           rounded-3xl
+                           border border-gray-200/80
+                           bg-white
+                           shadow-xl shadow-gray-900/5">
+
+                    {{-- Contenido --}}
+                    <div class="px-6 py-8
+                               sm:px-10 sm:py-10">
+
+                        {{ $slot }}
+
+                    </div>
+
+
+                    {{-- =========================
+                        DETALLE INFERIOR
+                    ========================== --}}
+
+                    <div class="relative h-4 overflow-hidden">
+
+                        <div
+                            class="absolute -bottom-8 left-0
+                                   h-16 w-full
+                                   rounded-[50%]
+                                   bg-goool-green/80">
+                        </div>
+
+                    </div>
+
+                </div>
+                <div class="mt-5 text-center">
+
+                    <p class="text-xs text-gray-400">
+                        © {{ date('Y') }} Pizza Goool
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
 
 </body>
+
 </html>
