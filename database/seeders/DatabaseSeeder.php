@@ -2,24 +2,98 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Usuario;
+use App\Models\Categoria;
+use App\Models\Producto;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        // User::factory(10)->create();
+        // Crear Usuarios de prueba
+        Usuario::create([
+            'nombre' => 'Admin Pizza Goool',
+            'email' => 'admin@goool.com',
+            'password' => Hash::make('12345678'),
+            'rol' => 'admin',
+            'telefono' => '71234567'
+        ]);
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        Usuario::create([
+            'nombre' => 'Cajero Juan',
+            'email' => 'cajero@goool.com',
+            'password' => Hash::make('12345678'),
+            'rol' => 'cajero',
+            'telefono' => '71234568'
+        ]);
+
+        Usuario::create([
+            'nombre' => 'Repartidor Carlos',
+            'email' => 'repartidor@goool.com',
+            'password' => Hash::make('12345678'),
+            'rol' => 'repartidor',
+            'telefono' => '71234569'
+        ]);
+
+        Usuario::create([
+            'nombre' => 'Cliente Maria',
+            'email' => 'cliente@goool.com',
+            'password' => Hash::make('12345678'),
+            'rol' => 'cliente',
+            'telefono' => '71234570'
+        ]);
+
+        // Crear Categorías
+        $pizzas = Categoria::create(['nombre' => 'Pizzas', 'descripcion' => 'Pizzas artesanales al horno de leña']);
+        $bebidas = Categoria::create(['nombre' => 'Bebidas', 'descripcion' => 'Refrescos y bebidas heladas']);
+        $promos = Categoria::create(['nombre' => 'Promociones', 'descripcion' => 'Combos especiales']);
+
+        // Crear Productos (Pizzas)
+        Producto::create([
+            'categoria_id' => $pizzas->id,
+            'nombre' => 'Pizza Napolitana',
+            'descripcion' => 'Salsa de tomate, mozzarella, aceitunas y orégano.',
+            'precio' => 45.00,
+            'imagen' => null,
+            'disponible' => true
+        ]);
+
+        Producto::create([
+            'categoria_id' => $pizzas->id,
+            'nombre' => 'Pizza Pepperoni',
+            'descripcion' => 'Salsa de tomate, mozzarella y pepperoni.',
+            'precio' => 55.00,
+            'imagen' => null,
+            'disponible' => true
+        ]);
+
+        Producto::create([
+            'categoria_id' => $pizzas->id,
+            'nombre' => 'Pizza Hawaiana',
+            'descripcion' => 'Salsa de tomate, mozzarella, jamón y piña.',
+            'precio' => 50.00,
+            'imagen' => null,
+            'disponible' => true
+        ]);
+
+        Producto::create([
+            'categoria_id' => $bebidas->id,
+            'nombre' => 'Coca-Cola 500ml',
+            'descripcion' => 'Bebida gaseosa helada.',
+            'precio' => 10.00,
+            'imagen' => null,
+            'disponible' => true
+        ]);
+
+        Producto::create([
+            'categoria_id' => $promos->id,
+            'nombre' => 'Combo Familiar',
+            'descripcion' => '2 pizzas medianas + 1 gaseosa 1.5L.',
+            'precio' => 90.00,
+            'imagen' => null,
+            'disponible' => true
         ]);
     }
 }

@@ -1,12 +1,18 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Cliente\CatalogoController;
 use Illuminate\Support\Facades\Route;
 
 // Página principal (para clientes)
 Route::get('/', function () {
     return view('welcome');
 })->name('cliente.home');
+
+// Rutas para el Cliente
+Route::middleware(['auth', 'role:cliente'])->group(function () {
+    Route::get('/catalogo', [CatalogoController::class, 'index'])->name('cliente.catalogo');
+});
 
 // Rutas para el Admin
 Route::middleware(['auth', 'role:admin'])->group(function () {

@@ -1,32 +1,26 @@
-<!DOCTYPE html>
-<html lang="es">
+@extends('layouts.app')
 
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Pizza Goool | Gestión de Pedidos y Delivery</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
+@section('title', 'Inicio - Pizza Goool')
 
-<body class="bg-gray-100">
-    <div class="min-h-screen flex flex-col items-center justify-center">
-        <div class="bg-white p-8 rounded-lg shadow-lg text-center max-w-md">
-            <h1 class="text-4xl font-bold text-green-700">🍕 Pizza Goool</h1>
-            <p class="text-gray-600 mt-4">Sistema Web para la Gestión de Pedidos y Delivery</p>
+@section('content')
+    <div class="max-w-7xl mx-auto px-4 py-12">
+        <div class="text-center mb-12">
+            <h1 class="text-5xl font-bold text-green-700">¡Un golazo de sabor!</h1>
+            <p class="text-gray-600 mt-4">Pide tu pizza favorita y recíbela en la puerta de tu casa.</p>
 
-            <div class="mt-8 space-y-4">
-                <a href="{{ route('login') }}"
-                    class="block w-full py-3 bg-green-700 text-white font-bold rounded-lg hover:bg-green-800">
-                    Iniciar Sesión
+            @auth
+                @if (auth()->user()->rol === 'cliente')
+                    <a href="{{ route('cliente.catalogo') }}"
+                        class="mt-6 inline-block bg-yellow-500 text-white font-bold py-3 px-6 rounded-lg hover:bg-yellow-600">
+                        Ver Catálogo
+                    </a>
+                @endif
+            @else
+                <a href="{{ route('register') }}"
+                    class="mt-6 inline-block bg-yellow-500 text-white font-bold py-3 px-6 rounded-lg hover:bg-yellow-600">
+                    Crear Cuenta
                 </a>
-
-                <!-- Si quieres que los clientes se registren desde aquí, descomenta esto: -->
-                <!-- <a href="{{ route('register') }}" class="block w-full py-3 bg-yellow-500 text-white font-bold rounded-lg hover:bg-yellow-600">
-                    Registrarse
-                </a> -->
-            </div>
+            @endauth
         </div>
     </div>
-</body>
-
-</html>
+@endsection
