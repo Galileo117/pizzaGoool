@@ -1,78 +1,83 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Http\Controllers\Cliente;
 
+use App\Http\Controllers\Controller;
 use App\Models\Producto;
-use Livewire\Component;
+use Illuminate\Http\Request;
 
-class CarritoCompras extends Component
+class CatalogoController extends Controller
 {
-    public $carrito = [];
-    public $total = 0;
-    public $cantidad = 1;
-
-    public function mount()
+    public function index()
     {
-        // Cargar el carrito desde la sesión al iniciar
-        $this->carrito = session()->get('carrito', []);
-        $this->calcularTotal();
+        $productos = Producto::where('disponible', true)
+            ->with('categoria')
+            ->paginate(8);
+            
+        $carrito = session('carrito', []);
+        $total = $this->calcularTotal($carrito);
+
+        return view('cliente.catalogo', compact('productos', 'carrito', 'total'));
     }
 
-    public function agregarAlCarrito($productoId)
+    public function agregarAlCarrito(Request $request, $productoId)
     {
         $producto = Producto::findOrFail($productoId);
+        $carrito = session()->get('carrito', []);
 
-        // Si el producto ya está en el carrito, aumentar la cantidad
-        if (isset($this->carrito[$productoId])) {
-            $this->carrito[$productoId]['cantidad']++;
+        if (isset($carrito[$productoId])) {
+            $carrito[$productoId]['cantidad']++;
         } else {
-            // Si no está, agregarlo
-            $this->carrito[$productoId] = [
+            $carrito[$productoId] = [
                 'producto_id' => $producto->id,
                 'nombre' => $producto->nombre,
+                'descripcion' => $producto->descripcion,
                 'precio' => $producto->precio,
                 'cantidad' => 1,
                 'imagen' => $producto->imagen,
             ];
         }
 
-        // Guardar en sesión
-        session()->put('carrito', $this->carrito);
-        $this->calcularTotal();
-    }
+        session()->put('carrito', $carrito);
 
-    public function quitarDelCarrito($productoId)
-    {
-        unset($this->carrito[$productoId]);
-        session()->put('carrito', $this->carrito);
-        $this->calcularTotal();
-    }
-
-    public function actualizarCantidad($productoId, $cantidad)
-    {
-        if ($cantidad <= 0) {
-            $this->quitarDelCarrito($productoId);
-            return;
-        }
-
-        $this->carrito[$productoId]['cantidad'] = $cantidad;
-        session()->put('carrito', $this->carrito);
-        $this->calcularTotal();
-    }
-
-    public function calcularTotal()
-    {
-        $this->total = 0;
-        foreach ($this->carrito as $item) {
-            $this->total += $item['precio'] * $item['cantidad'];
-        }
-    }
-
-    public function render()
-    {
-        // Mostrar solo los productos disponibles
-        return view('livewire.carrito-compras', [
-            'productos' => Producto::where('disponible', true)->get(), // Usamos get() en lugar de paginate()
+        return response()->json([
+            'success' => true,
+            'message' => 'Producto agregado al carrito',
+            'carrito' => $carrito,
+            'total' => $this->calcularTotal($carrito),
+            'cantidad_items' => count($carrito)
         ]);
+    }
+
+    public function guardarCarrito(Request $request)
+    {
+        $carrito = $request->input('carrito', []);
+        
+        $carritoSesion = [];
+        foreach ($carrito as $item) {
+            $carritoSesion[$item['id']] = [
+                'producto_id' => $item['id'],
+                'nombre' => $item['nombre'],
+                'precio' => $item['precio'],
+                'cantidad' => $item['cantidad'],
+                'imagen' => $item['imagen'] ?? null,
+            ];
+        }
+        
+        session()->put('carrito', $carritoSesion);
+
+        return response()->json([
+            'success' => true,
+            'carrito' => $carritoSesion
+        ]);
+    }
+
+    private function calcularTotal($carrito)
+    {
+        $total = 0;
+        foreach ($carrito as $item) {
+            $total += $item['precio'] * $item['cantidad'];
+        }
+        return $total;
     }
 }
