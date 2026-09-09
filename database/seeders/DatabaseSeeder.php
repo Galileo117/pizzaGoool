@@ -13,7 +13,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // Crear Usuarios de prueba
-        Usuario::create([
+        Usuario::updateOrCreate(['email' => 'admin@goool.com'], [
             'nombre' => 'Admin Pizza Goool',
             'email' => 'admin@goool.com',
             'password' => Hash::make('12345678'),
@@ -21,7 +21,7 @@ class DatabaseSeeder extends Seeder
             'telefono' => '71234567'
         ]);
 
-        Usuario::create([
+        Usuario::updateOrCreate(['email' => 'cajero@goool.com'], [
             'nombre' => 'Cajero Juan',
             'email' => 'cajero@goool.com',
             'password' => Hash::make('12345678'),
@@ -29,7 +29,7 @@ class DatabaseSeeder extends Seeder
             'telefono' => '71234568'
         ]);
 
-        Usuario::create([
+        Usuario::updateOrCreate(['email' => 'repartidor@goool.com'], [
             'nombre' => 'Repartidor Carlos',
             'email' => 'repartidor@goool.com',
             'password' => Hash::make('12345678'),
@@ -37,7 +37,7 @@ class DatabaseSeeder extends Seeder
             'telefono' => '71234569'
         ]);
 
-        Usuario::create([
+        Usuario::updateOrCreate(['email' => 'cliente@goool.com'], [
             'nombre' => 'Cliente Maria',
             'email' => 'cliente@goool.com',
             'password' => Hash::make('12345678'),
@@ -46,12 +46,12 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // Crear Categorías
-        $pizzas = Categoria::create(['nombre' => 'Pizzas', 'descripcion' => 'Pizzas artesanales al horno de leña']);
-        $bebidas = Categoria::create(['nombre' => 'Bebidas', 'descripcion' => 'Refrescos y bebidas heladas']);
-        $promos = Categoria::create(['nombre' => 'Promociones', 'descripcion' => 'Combos especiales']);
+        $pizzas = Categoria::updateOrCreate(['nombre' => 'Pizzas'], ['descripcion' => 'Pizzas artesanales al horno de leña']);
+        $bebidas = Categoria::updateOrCreate(['nombre' => 'Bebidas'], ['descripcion' => 'Refrescos y bebidas heladas']);
+        $promos = Categoria::updateOrCreate(['nombre' => 'Promociones'], ['descripcion' => 'Combos especiales']);
 
         // Crear Productos (Pizzas)
-        Producto::create([
+        Producto::updateOrCreate(['nombre' => 'Pizza Napolitana'], [
             'categoria_id' => $pizzas->id,
             'nombre' => 'Pizza Napolitana',
             'descripcion' => 'Salsa de tomate, mozzarella, aceitunas y orégano.',
@@ -60,7 +60,7 @@ class DatabaseSeeder extends Seeder
             'disponible' => true
         ]);
 
-        Producto::create([
+        Producto::updateOrCreate(['nombre' => 'Pizza Pepperoni'], [
             'categoria_id' => $pizzas->id,
             'nombre' => 'Pizza Pepperoni',
             'descripcion' => 'Salsa de tomate, mozzarella y pepperoni.',
@@ -69,7 +69,7 @@ class DatabaseSeeder extends Seeder
             'disponible' => true
         ]);
 
-        Producto::create([
+        Producto::updateOrCreate(['nombre' => 'Pizza Hawaiana'], [
             'categoria_id' => $pizzas->id,
             'nombre' => 'Pizza Hawaiana',
             'descripcion' => 'Salsa de tomate, mozzarella, jamón y piña.',
@@ -78,7 +78,7 @@ class DatabaseSeeder extends Seeder
             'disponible' => true
         ]);
 
-        Producto::create([
+        Producto::updateOrCreate(['nombre' => 'Coca-Cola 500ml'], [
             'categoria_id' => $bebidas->id,
             'nombre' => 'Coca-Cola 500ml',
             'descripcion' => 'Bebida gaseosa helada.',
@@ -87,7 +87,7 @@ class DatabaseSeeder extends Seeder
             'disponible' => true
         ]);
 
-        Producto::create([
+        Producto::updateOrCreate(['nombre' => 'Combo Familiar'], [
             'categoria_id' => $promos->id,
             'nombre' => 'Combo Familiar',
             'descripcion' => '2 pizzas medianas + 1 gaseosa 1.5L.',
