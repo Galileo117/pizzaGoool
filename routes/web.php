@@ -3,12 +3,16 @@
 use App\Http\Controllers\Cliente\CatalogoController;
 use App\Http\Controllers\Cliente\PedidoController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\InicioController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', [CatalogoController::class, 'welcome'])->name('cliente.home');
+// Página principal
+Route::get('/', [InicioController::class, 'index'])->name('cliente.home');
 
+// Catálogo público (cualquiera puede ver los productos, pero solo clientes compran)
 Route::get('/catalogo', [CatalogoController::class, 'index'])->name('cliente.catalogo');
 
+// Rutas protegidas para Clientes
 Route::middleware(['auth', 'role:cliente'])->group(function () {
 
     Route::post('/catalogo/agregar/{productoId}', [CatalogoController::class, 'agregarAlCarrito'])
@@ -54,24 +58,28 @@ Route::middleware(['auth', 'role:cliente'])->group(function () {
         ->name('cliente.cancelar_pedido');
 });
 
+// Rutas protegidas para Admin
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin', function () {
         return view('admin.dashboard');
     })->name('admin.dashboard');
 });
 
+// Rutas protegidas para Cajero
 Route::middleware(['auth', 'role:cajero'])->group(function () {
     Route::get('/cajero', function () {
         return view('cajero.dashboard');
     })->name('cajero.dashboard');
 });
 
+// Rutas protegidas para Repartidor
 Route::middleware(['auth', 'role:repartidor'])->group(function () {
     Route::get('/repartidor', function () {
         return view('repartidor.dashboard');
     })->name('repartidor.dashboard');
 });
 
+// Rutas de perfil (de Breeze)
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
