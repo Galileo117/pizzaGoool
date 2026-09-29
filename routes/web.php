@@ -73,10 +73,12 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 });
 
 // Rutas protegidas para Cajero
-Route::middleware(['auth', 'role:cajero'])->group(function () {
-    Route::get('/cajero', function () {
-        return view('cajero.dashboard');
-    })->name('cajero.dashboard');
+Route::middleware(['auth', 'role:cajero'])->prefix('cajero')->name('cajero.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\Cajero\DashboardController::class, 'index'])->name('dashboard');
+    Route::get('pedidos', [\App\Http\Controllers\Cajero\PedidoController::class, 'index'])->name('pedidos.index');
+    Route::get('pedidos/{pedido}', [\App\Http\Controllers\Cajero\PedidoController::class, 'show'])->name('pedidos.show');
+    Route::patch('pedidos/{pedido}/estado', [\App\Http\Controllers\Cajero\PedidoController::class, 'cambiarEstado'])->name('pedidos.cambiar_estado');
+    Route::patch('pedidos/{pedido}/asignar-repartidor', [\App\Http\Controllers\Cajero\PedidoController::class, 'asignarRepartidor'])->name('pedidos.asignar_repartidor');
 });
 
 // Rutas protegidas para Repartidor

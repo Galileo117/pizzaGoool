@@ -13,6 +13,7 @@ class Pedido extends Model
 
     protected $fillable = [
         'usuario_id',
+        'repartidor_id',
         'total',
         'estado',
         'metodo_pago',
@@ -27,15 +28,21 @@ class Pedido extends Model
         return $this->belongsTo(Usuario::class, 'usuario_id');
     }
 
+    // Relación: Un pedido puede tener un repartidor asignado
+    public function repartidor()
+    {
+        return $this->belongsTo(Usuario::class, 'repartidor_id');
+    }
+
     // Relación: Un pedido tiene muchos detalles
     public function detallePedidos()
     {
-        return $this->hasMany(DetallePedido::class, 'pedido_id');
+        return $this->hasMany(DetallePedido::class);
     }
 
     // Relación: Un pedido tiene un pago asociado
     public function pago()
     {
-        return $this->hasOne(Pago::class, 'pedido_id');
+        return $this->hasOne(Pago::class);
     }
 }

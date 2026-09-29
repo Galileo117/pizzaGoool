@@ -21,9 +21,6 @@
 
     <main class="relative min-h-screen overflow-hidden">
 
-        {{-- =========================
-            DECORACIÓN DE FONDO
-        ========================== --}}
 
         {{-- Mancha verde superior izquierda --}}
         <div
