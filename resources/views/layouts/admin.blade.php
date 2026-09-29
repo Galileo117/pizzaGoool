@@ -57,6 +57,10 @@
                     <i class="fa-solid fa-users"></i>
                     Usuarios
                 </a>
+                <a href="{{ route('admin.reportes.index') }}"
+                    class="flex items-center gap-3 px-4 py-3 rounded-lg {{ request()->routeIs('admin.reportes.*') ? 'bg-goool-green-dark font-bold' : 'hover:bg-goool-green-dark' }} transition">
+                    <i class="fa-solid fa-chart-line"></i> Reportes
+                </a>
             </nav>
 
             <!-- Cerrar sesión -->

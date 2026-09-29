@@ -70,6 +70,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::resource('categorias', CategoriaController::class);
     Route::get('pedidos', [AdminPedidoController::class, 'index'])->name('pedidos.index');
     Route::get('usuarios', [UsuarioController::class, 'index'])->name('usuarios.index');
+    Route::get('reportes', [\App\Http\Controllers\Admin\ReporteController::class, 'index'])->name('reportes.index');
+    Route::get('reportes/pdf', [\App\Http\Controllers\Admin\ReporteController::class, 'pdf'])->name('reportes.pdf');
 });
 
 // Rutas protegidas para Cajero
@@ -96,4 +98,4 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
