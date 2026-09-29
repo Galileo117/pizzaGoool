@@ -4,6 +4,11 @@ use App\Http\Controllers\Cliente\CatalogoController;
 use App\Http\Controllers\Cliente\PedidoController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\InicioController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\ProductoController;
+use App\Http\Controllers\Admin\CategoriaController;
+use App\Http\Controllers\Admin\PedidoController as AdminPedidoController;
+use App\Http\Controllers\Admin\UsuarioController;
 use Illuminate\Support\Facades\Route;
 
 // Página principal
@@ -59,10 +64,12 @@ Route::middleware(['auth', 'role:cliente'])->group(function () {
 });
 
 // Rutas protegidas para Admin
-Route::middleware(['auth', 'role:admin'])->group(function () {
-    Route::get('/admin', function () {
-        return view('admin.dashboard');
-    })->name('admin.dashboard');
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+    Route::resource('productos', ProductoController::class);
+    Route::resource('categorias', CategoriaController::class);
+    Route::get('pedidos', [AdminPedidoController::class, 'index'])->name('pedidos.index');
+    Route::get('usuarios', [UsuarioController::class, 'index'])->name('usuarios.index');
 });
 
 // Rutas protegidas para Cajero

@@ -1,0 +1,85 @@
+@extends('layouts.admin')
+
+@section('title', 'Pedidos - Panel de Administración')
+@section('page_title', 'Gestión de Pedidos')
+
+@section('content')
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h2 class="text-xl font-bold text-goool-green-dark">Listado de Pedidos</h2>
+            <p class="text-gray-600 text-sm">Visualiza todos los pedidos del sistema.</p>
+        </div>
+
+        <!-- Filtro por estado -->
+        <form method="GET" action="{{ route('admin.pedidos.index') }}" class="flex items-center gap-2">
+            <select name="estado" class="border border-gray-300 rounded-lg p-2 text-sm focus:border-goool-green focus:outline-none">
+                <option value="">Todos los estados</option>
+                <option value="pendiente" {{ request('estado') == 'pendiente' ? 'selected' : '' }}>Pendiente</option>
+                <option value="preparacion" {{ request('estado') == 'preparacion' ? 'selected' : '' }}>En Preparación</option>
+                <option value="listo" {{ request('estado') == 'listo' ? 'selected' : '' }}>Listo</option>
+                <option value="en_reparto" {{ request('estado') == 'en_reparto' ? 'selected' : '' }}>En Reparto</option>
+                <option value="entregado" {{ request('estado') == 'entregado' ? 'selected' : '' }}>Entregado</option>
+                <option value="cancelado" {{ request('estado') == 'cancelado' ? 'selected' : '' }}>Cancelado</option>
+            </select>
+            <button type="submit" class="bg-goool-green text-white px-4 py-2 rounded-lg text-sm hover:bg-goool-green-dark transition">
+                <i class="fa-solid fa-filter"></i> Filtrar
+            </button>
+        </form>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200">
+        <table class="w-full text-sm">
+            <thead class="bg-gray-50 border-b border-gray-200">
+                <tr>
+                    <th class="px-4 py-3 text-left font-semibold text-gray-600"># Pedido</th>
+                    <th class="px-4 py-3 text-left font-semibold text-gray-600">Cliente</th>
+                    <th class="px-4 py-3 text-left font-semibold text-gray-600">Total</th>
+                    <th class="px-4 py-3 text-left font-semibold text-gray-600">Método Pago</th>
+                    <th class="px-4 py-3 text-center font-semibold text-gray-600">Estado</th>
+                    <th class="px-4 py-3 text-left font-semibold text-gray-600">Fecha</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                @forelse($pedidos as $pedido)
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-4 py-3 font-bold text-goool-green">#{{ str_pad($pedido->id, 6, '0', STR_PAD_LEFT) }}</td>
+                        <td class="px-4 py-3 text-gray-700">{{ $pedido->usuario->nombre ?? 'N/A' }}</td>
+                        <td class="px-4 py-3 font-bold text-gray-800">Bs. {{ number_format($pedido->total, 2) }}</td>
+                        <td class="px-4 py-3 text-gray-600">
+                            <i class="fa-solid {{ $pedido->metodo_pago === 'qr' ? 'fa-qrcode' : 'fa-money-bill-wave' }} text-goool-green"></i>
+                            {{ ucfirst($pedido->metodo_pago) }}
+                        </td>
+                        <td class="px-4 py-3 text-center">
+                            @php
+                                $colores = [
+                                    'pendiente' => 'bg-yellow-100 text-yellow-700',
+                                    'preparacion' => 'bg-blue-100 text-blue-700',
+                                    'listo' => 'bg-green-100 text-green-700',
+                                    'en_reparto' => 'bg-purple-100 text-purple-700',
+                                    'entregado' => 'bg-gray-100 text-gray-700',
+                                    'cancelado' => 'bg-red-100 text-red-700',
+                                ];
+                                $color = $colores[$pedido->estado] ?? 'bg-gray-100 text-gray-700';
+                            @endphp
+                            <span class="{{ $color }} text-xs font-bold px-2 py-1 rounded-full">
+                                {{ ucfirst(str_replace('_', ' ', $pedido->estado)) }}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3 text-gray-500 text-xs">{{ $pedido->created_at->format('d/m/Y H:i') }}</td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="6" class="px-4 py-8 text-center text-gray-400">
+                            <i class="fa-solid fa-receipt text-4xl mb-2"></i>
+                            <p>No hay pedidos registrados.</p>
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+
+        <div class="px-4 py-3 border-t border-gray-200">
+            {{ $pedidos->links() }}
+        </div>
+    </div>
+@endsection
