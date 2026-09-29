@@ -3,10 +3,9 @@
 @section('title', 'Catálogo - Pizza Goool')
 
 @section('content')
-    {{-- Contenedor principal con patrón decorativo --}}
     <div class="relative overflow-hidden">
 
-        {{-- Patrón de puntos: Arriba derecha --}}
+        {{-- Patrón decorativo --}}
         <div class="pointer-events-none absolute right-4 top-12 hidden h-24 w-24 opacity-20 sm:block">
             <div class="grid grid-cols-6 gap-3">
                 @for ($i = 0; $i < 36; $i++)
@@ -15,18 +14,9 @@
             </div>
         </div>
 
-        {{-- Patrón de puntos: Abajo izquierda --}}
-        <div class="pointer-events-none absolute bottom-12 left-4 hidden h-24 w-24 opacity-20 sm:block">
-            <div class="grid grid-cols-6 gap-3">
-                @for ($i = 0; $i < 36; $i++)
-                    <div class="h-1.5 w-1.5 rounded-full bg-goool-yellow/50"></div>
-                @endfor
-            </div>
-        </div>
-
         <div class="max-w-7xl mx-auto px-4 py-6 sm:py-8 lg:py-10 relative z-10">
 
-            {{-- Encabezado del catálogo --}}
+            {{-- Encabezado --}}
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
                 <div>
                     <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-goool-green flex items-center gap-3">
@@ -49,13 +39,85 @@
                 </a>
             </div>
 
+            {{-- Barra de búsqueda y filtros --}}
+            <div class="bg-white rounded-2xl shadow-md border border-gray-100 p-4 sm:p-6 mb-8">
+
+                <form method="GET" action="{{ route('cliente.catalogo') }}" class="space-y-4">
+
+                    {{-- Búsqueda --}}
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <i class="fa-solid fa-search text-gray-400"></i>
+                        </div>
+                        <input type="text" name="buscar" value="{{ request('buscar') }}"
+                            placeholder="Buscar pizza, bebida..."
+                            class="w-full border-2 border-gray-200 rounded-xl pl-12 pr-4 py-3 focus:border-goool-green focus:ring-2 focus:ring-goool-green/20 transition-all duration-200">
+                    </div>
+
+                    {{-- Filtros --}}
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+
+                        {{-- Categoría --}}
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Categoría</label>
+                            <select name="categoria" class="w-full border-2 border-gray-200 rounded-xl p-3 focus:border-goool-green focus:outline-none">
+                                <option value="">Todas las categorías</option>
+                                @foreach($categorias as $cat)
+                                    <option value="{{ $cat->id }}" {{ request('categoria') == $cat->id ? 'selected' : '' }}>
+                                        {{ $cat->nombre }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        {{-- Ordenamiento --}}
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Ordenar por</label>
+                            <select name="orden" class="w-full border-2 border-gray-200 rounded-xl p-3 focus:border-goool-green focus:outline-none">
+                                <option value="recientes" {{ request('orden') == 'recientes' ? 'selected' : '' }}>Más recientes</option>
+                                <option value="precio_asc" {{ request('orden') == 'precio_asc' ? 'selected' : '' }}>Precio: menor a mayor</option>
+                                <option value="precio_desc" {{ request('orden') == 'precio_desc' ? 'selected' : '' }}>Precio: mayor a menor</option>
+                                <option value="nombre" {{ request('orden') == 'nombre' ? 'selected' : '' }}>Nombre (A-Z)</option>
+                            </select>
+                        </div>
+
+                        {{-- Botón --}}
+                        <div class="flex items-end gap-2">
+                            <button type="submit" class="flex-1 bg-goool-green text-white font-bold py-3 rounded-xl hover:bg-goool-green-dark transition">
+                                <i class="fa-solid fa-filter"></i> Filtrar
+                            </button>
+                            @if(request()->hasAny(['buscar', 'categoria', 'orden']))
+                                <a href="{{ route('cliente.catalogo') }}" class="bg-gray-200 text-gray-700 font-bold py-3 px-4 rounded-xl hover:bg-gray-300 transition">
+                                    <i class="fa-solid fa-times"></i>
+                                </a>
+                            @endif
+                        </div>
+
+                    </div>
+                </form>
+
+                {{-- Resultados --}}
+                @if(request()->hasAny(['buscar', 'categoria']))
+                    <div class="mt-4 pt-4 border-t border-gray-100 flex items-center gap-2 text-sm text-gray-600">
+                        <i class="fa-solid fa-circle-info text-goool-green"></i>
+                        <span>
+                            Mostrando <strong>{{ $productos->total() }}</strong> resultado(s)
+                            @if(request('buscar'))
+                                para "<strong>{{ request('buscar') }}</strong>"
+                            @endif
+                        </span>
+                    </div>
+                @endif
+            </div>
+
             {{-- Grid de productos --}}
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
                 @forelse ($productos as $producto)
                     <div class="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-goool-yellow group" data-producto-id="{{ $producto->id }}">
                         <div class="relative h-44 sm:h-48 bg-gradient-to-br from-goool-green-light/20 to-goool-green-light/5 flex items-center justify-center overflow-hidden">
                             @if ($producto->imagen)
-                                <img src="{{ asset('storage/' . $producto->imagen) }}" alt="{{ $producto->nombre }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">
+                                <img src="{{ asset('storage/' . $producto->imagen) }}" alt="{{ $producto->nombre }}"
+                                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">
                             @else
                                 <i class="fa-solid fa-pizza-slice text-6xl sm:text-7xl text-goool-green/20 group-hover:scale-110 transition-transform duration-300"></i>
                             @endif
@@ -67,6 +129,13 @@
                             @else
                                 <span class="absolute top-3 right-3 bg-red-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-md flex items-center gap-1">
                                     <i class="fa-solid fa-circle-xmark"></i> Agotado
+                                </span>
+                            @endif
+
+                            {{-- Categoría badge --}}
+                            @if($producto->categoria)
+                                <span class="absolute top-3 left-3 bg-white/90 text-goool-green-dark text-[10px] font-bold px-2.5 py-1 rounded-full shadow-md">
+                                    {{ $producto->categoria->nombre }}
                                 </span>
                             @endif
                         </div>
@@ -112,16 +181,20 @@
                     </div>
                 @empty
                     <div class="col-span-full text-center py-16">
-                        <i class="fa-solid fa-plate-wheat text-6xl text-gray-300 mb-4"></i>
-                        <p class="text-gray-400 text-lg font-medium">No hay productos disponibles</p>
-                        <p class="text-gray-300 text-sm mt-1">Vuelve más tarde para ver nuestras novedades.</p>
+                        <i class="fa-solid fa-search text-6xl text-gray-300 mb-4"></i>
+                        <p class="text-gray-500 text-lg font-medium">No encontramos productos</p>
+                        <p class="text-gray-400 text-sm mt-1">Prueba con otros filtros o términos de búsqueda.</p>
+                        <a href="{{ route('cliente.catalogo') }}" class="inline-block mt-6 bg-goool-green text-white font-bold px-6 py-3 rounded-xl hover:bg-goool-green-dark transition">
+                            <i class="fa-solid fa-redo"></i> Ver todo el catálogo
+                        </a>
                     </div>
                 @endforelse
             </div>
 
+            {{-- Paginación --}}
             @if (method_exists($productos, 'links'))
                 <div class="mt-8 sm:mt-10">
-                    {{ $productos->links() }}
+                    {{ $productos->appends(request()->query())->links() }}
                 </div>
             @endif
 

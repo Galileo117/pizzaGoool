@@ -12,27 +12,45 @@
     </div>
 
     <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6">
-        <form action="{{ route('admin.categorias.update', $categoria->id) }}" method="POST" class="space-y-5">
+        <form action="{{ route('admin.categorias.update', $categoria->id) }}" method="POST" class="space-y-5"
+            id="form-categoria">
             @csrf
             @method('PUT')
 
             <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-1">Nombre <span class="text-red-500">*</span></label>
-                <input type="text" name="nombre" value="{{ old('nombre', $categoria->nombre) }}" required class="w-full border border-gray-300 rounded-lg p-3 focus:border-goool-green focus:outline-none">
-                @error('nombre') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Nombre <span
+                        class="text-red-500">*</span></label>
+                <input type="text" name="nombre" value="{{ old('nombre', $categoria->nombre) }}" required
+                    class="w-full border border-gray-300 rounded-lg p-3 focus:border-goool-green focus:outline-none">
+                @error('nombre')
+                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                @enderror
             </div>
 
             <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-1">Descripción</label>
-                <textarea name="descripcion" rows="3" class="w-full border border-gray-300 rounded-lg p-3 focus:border-goool-green focus:outline-none">{{ old('descripcion', $categoria->descripcion) }}</textarea>
-                @error('descripcion') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                <textarea name="descripcion" rows="3"
+                    class="w-full border border-gray-300 rounded-lg p-3 focus:border-goool-green focus:outline-none">{{ old('descripcion', $categoria->descripcion) }}</textarea>
+                @error('descripcion')
+                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                @enderror
             </div>
 
             <div class="pt-4 border-t border-gray-200">
-                <button type="submit" class="bg-goool-green text-white font-bold px-6 py-3 rounded-lg hover:bg-goool-green-dark transition">
+                <button type="submit"
+                    class="bg-goool-green text-white font-bold px-6 py-3 rounded-lg hover:bg-goool-green-dark transition">
                     <i class="fa-solid fa-save"></i> Actualizar Categoría
                 </button>
             </div>
         </form>
     </div>
+
+    <script>
+        document.getElementById('form-categoria').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
+                e.preventDefault();
+                return false;
+            }
+        });
+    </script>
 @endsection

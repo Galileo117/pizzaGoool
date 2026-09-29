@@ -27,12 +27,13 @@ class ProductoController extends Controller
         $request->validate([
             'categoria_id' => 'required|exists:categorias,id',
             'nombre' => 'required|string|max:255',
-            'descripcion' => 'required|string',
+            'descripcion' => 'nullable|string',
             'precio' => 'required|numeric|min:0',
             'imagen' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         $data = $request->only(['categoria_id', 'nombre', 'descripcion', 'precio']);
+        $data['descripcion'] = $request->descripcion ?? '';
         $data['disponible'] = $request->has('disponible') ? true : false;
 
         if ($request->hasFile('imagen')) {
@@ -56,12 +57,13 @@ class ProductoController extends Controller
         $request->validate([
             'categoria_id' => 'required|exists:categorias,id',
             'nombre' => 'required|string|max:255',
-            'descripcion' => 'required|string',
+            'descripcion' => 'nullable|string',
             'precio' => 'required|numeric|min:0',
             'imagen' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         $data = $request->only(['categoria_id', 'nombre', 'descripcion', 'precio']);
+        $data['descripcion'] = $request->descripcion ?? '';
         $data['disponible'] = $request->has('disponible') ? true : false;
 
         if ($request->hasFile('imagen')) {

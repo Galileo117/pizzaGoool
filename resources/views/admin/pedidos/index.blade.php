@@ -4,15 +4,14 @@
 @section('page_title', 'Gestión de Pedidos')
 
 @section('content')
-    <div class="flex justify-between items-center mb-6">
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
             <h2 class="text-xl font-bold text-goool-green-dark">Listado de Pedidos</h2>
             <p class="text-gray-600 text-sm">Visualiza todos los pedidos del sistema.</p>
         </div>
 
-        <!-- Filtro por estado -->
-        <form method="GET" action="{{ route('admin.pedidos.index') }}" class="flex items-center gap-2">
-            <select name="estado" class="border border-gray-300 rounded-lg p-2 text-sm focus:border-goool-green focus:outline-none">
+        <form method="GET" action="{{ route('admin.pedidos.index') }}" class="flex items-center gap-2 w-full sm:w-auto">
+            <select name="estado" class="flex-1 sm:flex-none border border-gray-300 rounded-lg p-2 text-sm focus:border-goool-green focus:outline-none">
                 <option value="">Todos los estados</option>
                 <option value="pendiente" {{ request('estado') == 'pendiente' ? 'selected' : '' }}>Pendiente</option>
                 <option value="preparacion" {{ request('estado') == 'preparacion' ? 'selected' : '' }}>En Preparación</option>
@@ -21,13 +20,14 @@
                 <option value="entregado" {{ request('estado') == 'entregado' ? 'selected' : '' }}>Entregado</option>
                 <option value="cancelado" {{ request('estado') == 'cancelado' ? 'selected' : '' }}>Cancelado</option>
             </select>
-            <button type="submit" class="bg-goool-green text-white px-4 py-2 rounded-lg text-sm hover:bg-goool-green-dark transition">
+            <button type="submit" class="bg-goool-green text-white px-4 py-2 rounded-lg text-sm hover:bg-goool-green-dark transition whitespace-nowrap">
                 <i class="fa-solid fa-filter"></i> Filtrar
             </button>
         </form>
     </div>
 
-    <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200">
+    {{-- Tabla (escritorio) --}}
+    <div class="hidden md:block bg-white rounded-xl shadow-md overflow-hidden border border-gray-200">
         <table class="w-full text-sm">
             <thead class="bg-gray-50 border-b border-gray-200">
                 <tr>
@@ -77,9 +77,58 @@
                 @endforelse
             </tbody>
         </table>
+        <div class="px-4 py-3 border-t border-gray-200">{{ $pedidos->links() }}</div>
+    </div>
 
-        <div class="px-4 py-3 border-t border-gray-200">
-            {{ $pedidos->links() }}
-        </div>
+    {{-- Tarjetas (móvil) --}}
+    <div class="md:hidden space-y-4">
+        @forelse($pedidos as $pedido)
+            <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200">
+                <div class="bg-goool-green px-4 py-3 flex justify-between items-center">
+                    <div>
+                        <p class="text-white font-bold text-sm">#{{ str_pad($pedido->id, 6, '0', STR_PAD_LEFT) }}</p>
+                        <p class="text-gray-200 text-xs">{{ $pedido->created_at->format('d/m/Y H:i') }}</p>
+                    </div>
+                    @php
+                        $colores = [
+                            'pendiente' => 'bg-yellow-400 text-yellow-900',
+                            'preparacion' => 'bg-blue-400 text-blue-900',
+                            'listo' => 'bg-green-400 text-green-900',
+                            'en_reparto' => 'bg-purple-400 text-purple-900',
+                            'entregado' => 'bg-gray-300 text-gray-800',
+                            'cancelado' => 'bg-red-400 text-red-900',
+                        ];
+                        $color = $colores[$pedido->estado] ?? 'bg-gray-300 text-gray-800';
+                    @endphp
+                    <span class="{{ $color }} text-xs font-bold px-2 py-1 rounded-full">
+                        {{ ucfirst(str_replace('_', ' ', $pedido->estado)) }}
+                    </span>
+                </div>
+
+                <div class="p-4 space-y-2 text-sm">
+                    <div class="flex justify-between">
+                        <span class="text-gray-500 font-semibold">Cliente</span>
+                        <span class="font-bold text-gray-800">{{ $pedido->usuario->nombre ?? 'N/A' }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-500 font-semibold">Total</span>
+                        <span class="font-bold text-goool-green">Bs. {{ number_format($pedido->total, 2) }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-500 font-semibold">Pago</span>
+                        <span class="text-gray-700">
+                            <i class="fa-solid {{ $pedido->metodo_pago === 'qr' ? 'fa-qrcode' : 'fa-money-bill-wave' }} text-goool-green"></i>
+                            {{ ucfirst($pedido->metodo_pago) }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        @empty
+            <div class="bg-white rounded-xl shadow-md p-8 text-center text-gray-400 border border-gray-200">
+                <i class="fa-solid fa-receipt text-4xl mb-2"></i>
+                <p>No hay pedidos registrados.</p>
+            </div>
+        @endforelse
+        <div class="mt-4">{{ $pedidos->links() }}</div>
     </div>
 @endsection

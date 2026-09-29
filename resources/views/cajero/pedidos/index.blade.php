@@ -4,16 +4,15 @@
 @section('page_title', 'Gestionar Pedidos')
 
 @section('content')
-    <div class="flex justify-between items-center mb-6">
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
             <h2 class="text-xl font-bold text-goool-green-dark">Listado de Pedidos</h2>
             <p class="text-gray-600 text-sm">Visualiza y actualiza el estado de los pedidos.</p>
         </div>
 
-        <!-- Filtro por estado -->
-        <form method="GET" action="{{ route('cajero.pedidos.index') }}" class="flex items-center gap-2">
+        <form method="GET" action="{{ route('cajero.pedidos.index') }}" class="flex items-center gap-2 w-full sm:w-auto">
             <select name="estado"
-                class="border border-gray-300 rounded-lg p-2 text-sm focus:border-goool-green focus:outline-none">
+                class="flex-1 sm:flex-none border border-gray-300 rounded-lg p-2 text-sm focus:border-goool-green focus:outline-none">
                 <option value="">Todos (activos)</option>
                 <option value="pendiente" {{ request('estado') == 'pendiente' ? 'selected' : '' }}>Pendientes</option>
                 <option value="preparacion" {{ request('estado') == 'preparacion' ? 'selected' : '' }}>En Preparación
@@ -24,13 +23,14 @@
                 <option value="cancelado" {{ request('estado') == 'cancelado' ? 'selected' : '' }}>Cancelados</option>
             </select>
             <button type="submit"
-                class="bg-goool-green text-white px-4 py-2 rounded-lg text-sm hover:bg-goool-green-dark transition">
+                class="bg-goool-green text-white px-4 py-2 rounded-lg text-sm hover:bg-goool-green-dark transition whitespace-nowrap">
                 <i class="fa-solid fa-filter"></i> Filtrar
             </button>
         </form>
     </div>
 
-    <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200">
+    {{-- Tabla (escritorio) --}}
+    <div class="hidden md:block bg-white rounded-xl shadow-md overflow-hidden border border-gray-200">
         <table class="w-full text-sm">
             <thead class="bg-gray-50 border-b border-gray-200">
                 <tr>
@@ -89,9 +89,65 @@
                 @endforelse
             </tbody>
         </table>
+        <div class="px-4 py-3 border-t border-gray-200">{{ $pedidos->links() }}</div>
+    </div>
 
-        <div class="px-4 py-3 border-t border-gray-200">
-            {{ $pedidos->links() }}
-        </div>
+    {{-- Tarjetas (móvil) --}}
+    <div class="md:hidden space-y-4">
+        @forelse($pedidos as $pedido)
+            <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200">
+                <div class="bg-goool-green px-4 py-3 flex justify-between items-center">
+                    <div>
+                        <p class="text-white font-bold text-sm">#{{ str_pad($pedido->id, 6, '0', STR_PAD_LEFT) }}</p>
+                        <p class="text-gray-200 text-xs">{{ $pedido->created_at->format('d/m/Y H:i') }}</p>
+                    </div>
+                    @php
+                        $colores = [
+                            'pendiente' => 'bg-yellow-400 text-yellow-900',
+                            'preparacion' => 'bg-blue-400 text-blue-900',
+                            'listo' => 'bg-green-400 text-green-900',
+                            'en_reparto' => 'bg-purple-400 text-purple-900',
+                            'entregado' => 'bg-gray-300 text-gray-800',
+                            'cancelado' => 'bg-red-400 text-red-900',
+                        ];
+                        $color = $colores[$pedido->estado] ?? 'bg-gray-300 text-gray-800';
+                    @endphp
+                    <span class="{{ $color }} text-xs font-bold px-2 py-1 rounded-full">
+                        {{ ucfirst(str_replace('_', ' ', $pedido->estado)) }}
+                    </span>
+                </div>
+
+                <div class="p-4 space-y-2 text-sm">
+                    <div class="flex justify-between">
+                        <span class="text-gray-500 font-semibold">Cliente</span>
+                        <span class="font-bold text-gray-800">{{ $pedido->usuario->nombre ?? 'N/A' }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-500 font-semibold">Total</span>
+                        <span class="font-bold text-goool-green">Bs. {{ number_format($pedido->total, 2) }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-500 font-semibold">Tipo</span>
+                        <span class="text-gray-700">
+                            <i
+                                class="fa-solid {{ $pedido->tipo_entrega === 'contraentrega' ? 'fa-truck-fast' : 'fa-store' }} text-goool-green"></i>
+                            {{ $pedido->tipo_entrega === 'contraentrega' ? 'Delivery' : 'Recoger' }}
+                        </span>
+                    </div>
+                </div>
+                <div class="border-t border-gray-100 px-4 py-3">
+                    <a href="{{ route('cajero.pedidos.show', $pedido->id) }}"
+                        class="block w-full bg-goool-green text-white text-center font-bold py-2.5 rounded-lg hover:bg-goool-green-dark transition">
+                        <i class="fa-solid fa-eye"></i> Ver Detalle
+                    </a>
+                </div>
+            </div>
+        @empty
+            <div class="bg-white rounded-xl shadow-md p-8 text-center text-gray-400 border border-gray-200">
+                <i class="fa-solid fa-receipt text-4xl mb-2"></i>
+                <p>No hay pedidos para mostrar.</p>
+            </div>
+        @endforelse
+        <div class="mt-4">{{ $pedidos->links() }}</div>
     </div>
 @endsection

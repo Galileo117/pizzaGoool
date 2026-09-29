@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Cliente;
 
 use App\Http\Controllers\Controller;
+use App\Models\Categoria;
 use App\Models\Producto;
 use Illuminate\Http\Request;
 
@@ -21,17 +22,49 @@ class CatalogoController extends Controller
         return view('welcome', compact('productos', 'carrito', 'cantidadItems'));
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $productos = Producto::where('disponible', true)
-            ->with('categoria')
-            ->paginate(8);
+        $query = Producto::where('disponible', true)->with('categoria');
 
+        // Filtro por categoría
+        if ($request->filled('categoria')) {
+            $query->where('categoria_id', $request->categoria);
+        }
+
+        // Búsqueda por nombre o descripción
+        if ($request->filled('buscar')) {
+            $busqueda = $request->buscar;
+            $query->where(function ($q) use ($busqueda) {
+                $q->where('nombre', 'LIKE', "%{$busqueda}%")
+                    ->orWhere('descripcion', 'LIKE', "%{$busqueda}%");
+            });
+        }
+
+        // Ordenamiento
+        $orden = $request->input('orden', 'recientes');
+        switch ($orden) {
+            case 'precio_asc':
+                $query->orderBy('precio', 'asc');
+                break;
+            case 'precio_desc':
+                $query->orderBy('precio', 'desc');
+                break;
+            case 'nombre':
+                $query->orderBy('nombre', 'asc');
+                break;
+            default:
+                $query->orderBy('created_at', 'desc');
+                break;
+        }
+
+        $productos = $query->paginate(12);
+
+        $categorias = Categoria::all();
         $carrito = session()->get('carrito', []);
         $total = $this->calcularTotal($carrito);
         $cantidadItems = $this->contarItems($carrito);
 
-        return view('cliente.catalogo', compact('productos', 'carrito', 'total', 'cantidadItems'));
+        return view('cliente.catalogo', compact('productos', 'categorias', 'carrito', 'total', 'cantidadItems'));
     }
 
     public function agregarAlCarrito(Request $request, $productoId)
@@ -48,7 +81,6 @@ class CatalogoController extends Controller
         $carrito = session()->get('carrito', []);
 
         if (isset($carrito[$productoId])) {
-            // Si ya existe, aumentamos (con límite de 20)
             $carrito[$productoId]['cantidad'] = min($carrito[$productoId]['cantidad'] + 1, 20);
         } else {
             $carrito[$productoId] = [

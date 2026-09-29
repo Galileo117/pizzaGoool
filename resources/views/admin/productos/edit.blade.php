@@ -12,7 +12,7 @@
     </div>
 
     <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6">
-        <form action="{{ route('admin.productos.update', $producto->id) }}" method="POST" enctype="multipart/form-data" class="space-y-5">
+        <form action="{{ route('admin.productos.update', $producto->id) }}" method="POST" enctype="multipart/form-data" class="space-y-5" id="form-producto">
             @csrf
             @method('PUT')
 
@@ -36,15 +36,22 @@
             </div>
 
             <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-1">Descripción <span class="text-red-500">*</span></label>
-                <textarea name="descripcion" rows="3" required class="w-full border border-gray-300 rounded-lg p-3 focus:border-goool-green focus:outline-none">{{ old('descripcion', $producto->descripcion) }}</textarea>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Descripción</label>
+                <textarea name="descripcion" rows="3" class="w-full border border-gray-300 rounded-lg p-3 focus:border-goool-green focus:outline-none">{{ old('descripcion', $producto->descripcion) }}</textarea>
                 @error('descripcion') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Precio (Bs.) <span class="text-red-500">*</span></label>
-                    <input type="number" step="0.01" name="precio" value="{{ old('precio', $producto->precio) }}" required class="w-full border border-gray-300 rounded-lg p-3 focus:border-goool-green focus:outline-none">
+                    <input type="number" 
+                           step="0.01" 
+                           min="0" 
+                           name="precio" 
+                           value="{{ old('precio', $producto->precio) }}" 
+                           required 
+                           onwheel="this.blur()"
+                           class="w-full border border-gray-300 rounded-lg p-3 focus:border-goool-green focus:outline-none">
                     @error('precio') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
 
@@ -55,18 +62,16 @@
                 </div>
             </div>
 
-            <!-- Vista previa de la imagen -->
             <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
                 <p class="text-sm font-semibold text-gray-700 mb-3">
                     <i class="fa-solid fa-image text-goool-green"></i> Vista previa de la imagen:
                 </p>
-                
-                <div class="flex items-start gap-6">
-                    <!-- Imagen actual -->
+
+                <div class="flex items-start gap-6 flex-wrap">
                     <div class="text-center">
                         <p class="text-xs text-gray-500 mb-2 font-semibold">Imagen actual</p>
                         @if($producto->imagen)
-                            <img src="{{ asset('storage/' . $producto->imagen) }}" alt="{{ $producto->nombre }}" 
+                            <img src="{{ asset('storage/' . $producto->imagen) }}" alt="{{ $producto->nombre }}"
                                  class="w-32 h-32 rounded-lg object-cover border-2 border-gray-300 shadow-sm">
                         @else
                             <div class="w-32 h-32 rounded-lg bg-gray-100 flex items-center justify-center border-2 border-dashed border-gray-300">
@@ -76,12 +81,10 @@
                         @endif
                     </div>
 
-                    <!-- Flecha -->
                     <div class="flex items-center h-32">
                         <i class="fa-solid fa-arrow-right text-gray-400 text-2xl"></i>
                     </div>
 
-                    <!-- Nueva imagen (previsualización) -->
                     <div class="text-center">
                         <p class="text-xs text-gray-500 mb-2 font-semibold">Nueva imagen</p>
                         <div id="preview-container" class="w-32 h-32 rounded-lg bg-gray-100 flex items-center justify-center border-2 border-dashed border-gray-300 overflow-hidden">
@@ -106,8 +109,14 @@
         </form>
     </div>
 
-    <!-- Script para la vista previa -->
     <script>
+        document.getElementById('form-producto').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
+                e.preventDefault();
+                return false;
+            }
+        });
+
         document.getElementById('imagen').addEventListener('change', function(event) {
             const file = event.target.files[0];
             const previewImage = document.getElementById('preview-image');
