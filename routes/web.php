@@ -82,10 +82,11 @@ Route::middleware(['auth', 'role:cajero'])->prefix('cajero')->name('cajero.')->g
 });
 
 // Rutas protegidas para Repartidor
-Route::middleware(['auth', 'role:repartidor'])->group(function () {
-    Route::get('/repartidor', function () {
-        return view('repartidor.dashboard');
-    })->name('repartidor.dashboard');
+Route::middleware(['auth', 'role:repartidor'])->prefix('repartidor')->name('repartidor.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\Repartidor\DashboardController::class, 'index'])->name('dashboard');
+    Route::get('pedidos', [\App\Http\Controllers\Repartidor\PedidoController::class, 'index'])->name('pedidos.index');
+    Route::get('pedidos/{pedido}', [\App\Http\Controllers\Repartidor\PedidoController::class, 'show'])->name('pedidos.show');
+    Route::patch('pedidos/{pedido}/entregado', [\App\Http\Controllers\Repartidor\PedidoController::class, 'marcarEntregado'])->name('pedidos.marcar_entregado');
 });
 
 // Rutas de perfil (de Breeze)
