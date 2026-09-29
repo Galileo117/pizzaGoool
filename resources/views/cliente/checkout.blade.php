@@ -4,22 +4,6 @@
 
 @push('styles')
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <style>
-        #mapa {
-            height: 320px;
-            width: 100%;
-            border-radius: 12px;
-            z-index: 1;
-        }
-
-        #mapa-container {
-            display: none;
-        }
-
-        #mapa-container.visible {
-            display: block;
-        }
-    </style>
 @endpush
 
 @section('content')
@@ -230,7 +214,7 @@
             </div>
 
             {{-- Dirección de entrega (solo delivery) --}}
-            <div id="direccion_contraentrega" class="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden" style="display: none;">
+            <div id="direccion_contraentrega" class="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden hidden">
                 <div class="bg-goool-orange px-5 sm:px-6 py-4">
                     <h2 class="text-white font-bold text-lg flex items-center gap-2">
                         <i class="fa-solid fa-location-dot"></i> Dirección de Entrega
@@ -256,12 +240,12 @@
                             placeholder="Ej: Piso 2, portón verde">
                     </div>
 
-                    <div id="mapa-container">
+                    <div id="mapa-container" class="hidden">
                         <label class="block text-sm font-semibold text-gray-700 mb-1.5">
                             <i class="fa-solid fa-map-location-dot text-goool-green"></i>
                             Marca tu ubicación en el mapa (opcional pero recomendado)
                         </label>
-                        <div id="mapa" class="border-2 border-gray-200"></div>
+                        <div id="mapa" class="h-80 w-full rounded-xl border-2 border-gray-200 z-0"></div>
                         <p class="text-xs text-gray-500 mt-2">
                             <i class="fa-solid fa-circle-info"></i>
                             Toca el mapa para marcar la ubicación exacta. Ayudará al repartidor a llegar más rápido.
@@ -308,26 +292,20 @@
 @push('scripts')
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // Variables globales del mapa
         let map, marker, mapaInicializado = false;
 
-        /**
-         * Muestra u oculta la sección del QR.
-         */
         function toggleQR(mostrar) {
             const seccionQR = document.getElementById('seccion-qr');
             if (!seccionQR) return;
 
             if (mostrar) {
                 seccionQR.classList.remove('hidden');
+                setTimeout(detectarDispositivo, 50);
             } else {
                 seccionQR.classList.add('hidden');
             }
         }
 
-        /**
-         * Descarga la imagen del QR.
-         */
         function descargarQR() {
             const imagen = document.getElementById('imagen-qr-pago');
             if (!imagen) {
@@ -349,9 +327,6 @@
             }
         }
 
-        /**
-         * Detecta si el usuario está en móvil y muestra las instrucciones correctas.
-         */
         function detectarDispositivo() {
             const esMovil = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
@@ -369,9 +344,6 @@
             }
         }
 
-        /**
-         * Inicializa el mapa de Leaflet.
-         */
         function inicializarMapa() {
             if (mapaInicializado) return;
             mapaInicializado = true;
@@ -379,7 +351,6 @@
             const mapaElement = document.getElementById('mapa');
             if (!mapaElement) return;
 
-            // Coordenadas por defecto: La Paz, Bolivia
             const latInicial = -16.5;
             const lngInicial = -68.15;
 
@@ -389,6 +360,14 @@
                 attribution: '© OpenStreetMap contributors',
                 maxZoom: 19
             }).addTo(map);
+
+            const latGuardada = document.getElementById('latitud').value;
+            const lngGuardada = document.getElementById('longitud').value;
+
+            if (latGuardada && lngGuardada) {
+                marker = L.marker([latGuardada, lngGuardada], { draggable: true }).addTo(map);
+                map.setView([latGuardada, lngGuardada], 16);
+            }
 
             map.on('click', function(e) {
                 const { lat, lng } = e.latlng;
@@ -401,23 +380,55 @@
 
                 document.getElementById('latitud').value = lat;
                 document.getElementById('longitud').value = lng;
+                localStorage.setItem('checkout_latitud', lat);
+                localStorage.setItem('checkout_longitud', lng);
+
+                obtenerDireccion(lat, lng);
 
                 marker.on('dragend', function() {
                     const pos = marker.getLatLng();
                     document.getElementById('latitud').value = pos.lat;
                     document.getElementById('longitud').value = pos.lng;
+                    localStorage.setItem('checkout_latitud', pos.lat);
+                    localStorage.setItem('checkout_longitud', pos.lng);
+
+                    obtenerDireccion(pos.lat, pos.lng);
                 });
             });
         }
 
-        /**
-         * Inicializa todos los eventos cuando el DOM está listo.
-         */
+        function obtenerDireccion(lat, lng) {
+            const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1&accept-language=es`;
+
+            fetch(url, {
+                headers: {
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.display_name) {
+                    const inputDireccion = document.getElementById('direccion');
+
+                    if (!inputDireccion.value || inputDireccion.dataset.auto === 'true') {
+                        inputDireccion.value = data.display_name;
+                        inputDireccion.dataset.auto = 'true';
+                        localStorage.setItem('checkout_direccion', data.display_name);
+
+                        if (typeof mostrarToast === 'function') {
+                            mostrarToast('Dirección detectada automáticamente.', 'success');
+                        }
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error al obtener la dirección:', error);
+            });
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
-            // Detectar móvil/escritorio
             detectarDispositivo();
 
-            // Toggle dirección de entrega
             const radiosEntrega = document.querySelectorAll('input[name="tipo_entrega"]');
             const divDireccion = document.getElementById('direccion_contraentrega');
             const mapaContainer = document.getElementById('mapa-container');
@@ -425,17 +436,71 @@
             function toggleDireccion() {
                 const selected = document.querySelector('input[name="tipo_entrega"]:checked');
                 if (selected && selected.value === 'contraentrega') {
-                    divDireccion.style.display = 'block';
-                    mapaContainer.classList.add('visible');
+                    divDireccion.classList.remove('hidden');
+                    mapaContainer.classList.remove('hidden');
                     setTimeout(inicializarMapa, 100);
                 } else {
-                    divDireccion.style.display = 'none';
-                    mapaContainer.classList.remove('visible');
+                    divDireccion.classList.add('hidden');
+                    mapaContainer.classList.add('hidden');
                 }
             }
 
             radiosEntrega.forEach(r => r.addEventListener('change', toggleDireccion));
+
+            const tipoEntregaGuardado = localStorage.getItem('checkout_tipo_entrega');
+            const metodoPagoGuardado = localStorage.getItem('checkout_metodo_pago');
+            const direccionGuardada = localStorage.getItem('checkout_direccion');
+            const referenciaGuardada = localStorage.getItem('checkout_referencia');
+            const latitudGuardada = localStorage.getItem('checkout_latitud');
+            const longitudGuardada = localStorage.getItem('checkout_longitud');
+
+            if (tipoEntregaGuardado) {
+                const radio = document.querySelector(`input[name="tipo_entrega"][value="${tipoEntregaGuardado}"]`);
+                if (radio) radio.checked = true;
+            }
+
+            if (metodoPagoGuardado) {
+                const radio = document.querySelector(`input[name="metodo_pago"][value="${metodoPagoGuardado}"]`);
+                if (radio) radio.checked = true;
+            }
+
+            if (direccionGuardada) {
+                const inputDir = document.getElementById('direccion');
+                inputDir.value = direccionGuardada;
+                inputDir.dataset.auto = 'true';
+            }
+            if (referenciaGuardada) document.getElementById('referencia').value = referenciaGuardada;
+            if (latitudGuardada) document.getElementById('latitud').value = latitudGuardada;
+            if (longitudGuardada) document.getElementById('longitud').value = longitudGuardada;
+
             toggleDireccion();
+            if (metodoPagoGuardado === 'qr') toggleQR(true);
+
+            radiosEntrega.forEach(r => {
+                r.addEventListener('change', () => localStorage.setItem('checkout_tipo_entrega', r.value));
+            });
+
+            document.querySelectorAll('input[name="metodo_pago"]').forEach(r => {
+                r.addEventListener('change', () => localStorage.setItem('checkout_metodo_pago', r.value));
+            });
+
+            document.getElementById('direccion')?.addEventListener('input', (e) => {
+                e.target.dataset.auto = 'false';
+                localStorage.setItem('checkout_direccion', e.target.value);
+            });
+
+            document.getElementById('referencia')?.addEventListener('input', (e) => {
+                localStorage.setItem('checkout_referencia', e.target.value);
+            });
+
+            document.getElementById('form-checkout')?.addEventListener('submit', () => {
+                localStorage.removeItem('checkout_tipo_entrega');
+                localStorage.removeItem('checkout_metodo_pago');
+                localStorage.removeItem('checkout_direccion');
+                localStorage.removeItem('checkout_referencia');
+                localStorage.removeItem('checkout_latitud');
+                localStorage.removeItem('checkout_longitud');
+            });
         });
     </script>
 @endpush

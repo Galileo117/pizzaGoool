@@ -25,9 +25,7 @@
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Detalle del pedido -->
         <div class="lg:col-span-2 space-y-6">
-            <!-- Cabecera del pedido -->
             <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200">
                 <div class="bg-goool-green px-6 py-4">
                     <div class="flex justify-between items-center">
@@ -46,7 +44,6 @@
                     </div>
                 </div>
 
-                <!-- Detalle de productos -->
                 <div class="p-6">
                     <h3 class="text-gray-500 text-sm font-semibold mb-4 uppercase tracking-wider">
                         <i class="fa-solid fa-list"></i> Detalle del Pedido
@@ -70,7 +67,6 @@
                 </div>
             </div>
 
-            <!-- Info adicional: entrega y pago -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="bg-white rounded-xl shadow-md p-5 border border-gray-200">
                     <h3 class="text-gray-500 text-xs font-semibold mb-2 uppercase tracking-wider">
@@ -92,9 +88,7 @@
             </div>
         </div>
 
-        <!-- Panel lateral -->
         <div class="space-y-6">
-            <!-- Info del cliente -->
             <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200">
                 <div class="bg-goool-green px-6 py-3">
                     <h3 class="text-white font-bold text-sm"><i class="fa-solid fa-user"></i> CLIENTE</h3>
@@ -128,7 +122,6 @@
                 </div>
             </div>
 
-            <!-- Repartidor asignado -->
             @if($pedido->repartidor)
                 <div class="bg-white rounded-xl shadow-md overflow-hidden border border-purple-200">
                     <div class="bg-purple-500 px-6 py-3">
@@ -147,6 +140,7 @@
                     <h3 class="text-white font-bold text-sm"><i class="fa-solid fa-gear"></i> ACCIONES</h3>
                 </div>
                 <div class="p-5 space-y-3">
+
                     @if($pedido->estado === 'pendiente')
                         <form action="{{ route('cajero.pedidos.cambiar_estado', $pedido->id) }}" method="POST">
                             @csrf
@@ -169,7 +163,25 @@
                         </form>
                     @endif
 
-                    @if($pedido->estado === 'listo')
+                    {{-- LISTO + RECOGER: Entregar directamente --}}
+                    @if($pedido->estado === 'listo' && $pedido->tipo_entrega === 'recoger_local')
+                        <div class="bg-blue-50 border border-blue-200 text-blue-800 p-3 rounded-lg text-sm">
+                            <i class="fa-solid fa-store"></i>
+                            Este pedido es para <strong>Recoger en Local</strong>. El cliente lo retirará en el local.
+                        </div>
+
+                        <form action="{{ route('cajero.pedidos.cambiar_estado', $pedido->id) }}" method="POST" onsubmit="return confirm('¿Confirmas que el cliente retiró el pedido?');">
+                            @csrf
+                            @method('PATCH')
+                            <input type="hidden" name="estado" value="entregado">
+                            <button type="submit" class="w-full bg-gray-600 text-white font-bold py-3 rounded-lg hover:bg-gray-700 transition">
+                                <i class="fa-solid fa-check-circle"></i> Marcar como Entregado (Retirado)
+                            </button>
+                        </form>
+                    @endif
+
+                    {{-- LISTO + DELIVERY: Asignar repartidor --}}
+                    @if($pedido->estado === 'listo' && $pedido->tipo_entrega === 'contraentrega')
                         <form action="{{ route('cajero.pedidos.asignar_repartidor', $pedido->id) }}" method="POST">
                             @csrf
                             @method('PATCH')

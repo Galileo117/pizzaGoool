@@ -8,13 +8,9 @@
     <title>@yield('title', 'Panel de Repartidor - Pizza Goool')</title>
 
     <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-
-    <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
-    <!-- Fuente Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
@@ -27,8 +23,8 @@
     <div class="flex min-h-screen">
         <!-- Sidebar (escritorio) -->
         <aside class="w-64 bg-goool-green text-white flex-shrink-0 hidden md:flex flex-col">
-            <div class="p-4 border-b border-goool-green-dark flex flex-col items-center">
-                <img src="{{ asset('img/logo.png') }}" alt="Pizza Goool" class="h-20 w-auto mb-2">
+            <div class="p-5 border-b border-goool-green-dark flex flex-col items-center">
+                <img src="{{ asset('img/logo.png') }}" alt="Pizza Goool" class="h-32 w-auto mb-3">
                 <span class="text-goool-yellow font-bold text-sm uppercase tracking-widest">Panel Repartidor</span>
             </div>
 
@@ -59,13 +55,11 @@
 
         <!-- Menú móvil (overlay) -->
         <div id="mobile-menu" class="fixed inset-0 z-50 hidden md:hidden">
-            <!-- Fondo oscuro -->
             <div class="absolute inset-0 bg-black bg-opacity-50" onclick="toggleMenu()"></div>
-            
-            <!-- Panel deslizable -->
+
             <aside class="relative w-72 bg-goool-green text-white h-full flex flex-col transform transition-transform duration-300 -translate-x-full" id="mobile-sidebar">
-                <div class="p-4 border-b border-goool-green-dark flex flex-col items-center">
-                    <img src="{{ asset('img/logo.png') }}" alt="Pizza Goool" class="h-20 w-auto mb-2">
+                <div class="p-5 border-b border-goool-green-dark flex flex-col items-center">
+                    <img src="{{ asset('img/logo.png') }}" alt="Pizza Goool" class="h-32 w-auto mb-3">
                     <span class="text-goool-yellow font-bold text-sm uppercase tracking-widest">Panel Repartidor</span>
                 </div>
 
@@ -97,24 +91,27 @@
 
         <!-- Contenido Principal -->
         <div class="flex-1 flex flex-col min-w-0">
-            <!-- Header superior -->
-            <header class="bg-white shadow-sm border-b border-gray-200 px-4 sm:px-6 py-4 flex justify-between items-center">
-                <!-- Botón menú móvil -->
-                <button onclick="toggleMenu()" class="md:hidden text-goool-green text-2xl p-1">
-                    <i class="fa-solid fa-bars"></i>
-                </button>
+            <header class="bg-white shadow-sm border-b border-gray-200 px-4 sm:px-6 py-3 flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <button onclick="toggleMenu()" class="md:hidden text-goool-green text-2xl p-1">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <h1 class="text-lg sm:text-xl font-bold text-goool-green">@yield('page_title', 'Panel de Repartidor')</h1>
+                </div>
 
-                <h1 class="text-lg sm:text-xl font-bold text-goool-green">@yield('page_title', 'Panel de Repartidor')</h1>
+                {{-- Ícono de usuario --}}
+                <div class="flex items-center gap-3">
+                    <div class="text-right hidden sm:block">
+                        <p class="text-sm font-bold text-gray-800 leading-tight">{{ auth()->user()->nombre }}</p>
+                        <p class="text-xs text-gray-500 capitalize">{{ auth()->user()->rol }}</p>
+                    </div>
 
-                <div class="flex items-center gap-2 sm:gap-3">
-                    <span class="text-xs sm:text-sm text-gray-600">
-                        <i class="fa-solid fa-user-circle text-goool-green"></i>
-                        <span class="hidden sm:inline">{{ auth()->user()->nombre }}</span>
-                    </span>
+                    <div class="w-12 h-12 rounded-full bg-goool-green text-white flex items-center justify-center text-xl font-bold shadow-md">
+                        {{ strtoupper(substr(auth()->user()->nombre, 0, 1)) }}
+                    </div>
                 </div>
             </header>
 
-            <!-- Contenido -->
             <main class="flex-1 p-4 sm:p-6">
                 @if (session('success'))
                     <div class="bg-green-50 border border-green-200 text-green-700 p-4 rounded-lg mb-6">
@@ -133,15 +130,13 @@
         </div>
     </div>
 
-    <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-    <!-- Script del menú móvil -->
     <script>
         function toggleMenu() {
             const menu = document.getElementById('mobile-menu');
             const sidebar = document.getElementById('mobile-sidebar');
-            
+
             if (menu.classList.contains('hidden')) {
                 menu.classList.remove('hidden');
                 setTimeout(() => sidebar.classList.remove('-translate-x-full'), 10);

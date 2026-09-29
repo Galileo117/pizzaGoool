@@ -20,8 +20,8 @@
 
         {{-- Sidebar escritorio --}}
         <aside class="w-64 bg-goool-green text-white flex-shrink-0 hidden md:flex flex-col">
-            <div class="p-4 border-b border-goool-green-dark flex flex-col items-center">
-                <img src="{{ asset('img/logo.png') }}" alt="Pizza Goool" class="h-20 w-auto mb-2">
+            <div class="p-5 border-b border-goool-green-dark flex flex-col items-center">
+                <img src="{{ asset('img/logo.png') }}" alt="Pizza Goool" class="h-32 w-auto mb-3">
                 <span class="text-goool-yellow font-bold text-sm uppercase tracking-widest">Panel Cajero</span>
             </div>
 
@@ -48,8 +48,8 @@
         <div id="mobile-menu" class="fixed inset-0 z-50 hidden md:hidden">
             <div class="absolute inset-0 bg-black bg-opacity-50" onclick="toggleMenu()"></div>
             <aside id="mobile-sidebar" class="relative w-72 bg-goool-green text-white h-full flex flex-col transform transition-transform duration-300 -translate-x-full">
-                <div class="p-4 border-b border-goool-green-dark flex flex-col items-center">
-                    <img src="{{ asset('img/logo.png') }}" alt="Pizza Goool" class="h-20 w-auto mb-2">
+                <div class="p-5 border-b border-goool-green-dark flex flex-col items-center">
+                    <img src="{{ asset('img/logo.png') }}" alt="Pizza Goool" class="h-32 w-auto mb-3">
                     <span class="text-goool-yellow font-bold text-sm uppercase tracking-widest">Panel Cajero</span>
                 </div>
 
@@ -75,7 +75,7 @@
 
         {{-- Contenido principal --}}
         <div class="flex-1 flex flex-col min-w-0">
-            <header class="bg-white shadow-sm border-b border-gray-200 px-4 sm:px-6 py-4 flex justify-between items-center">
+            <header class="bg-white shadow-sm border-b border-gray-200 px-4 sm:px-6 py-3 flex justify-between items-center">
                 <div class="flex items-center gap-3">
                     <button onclick="toggleMenu()" class="md:hidden text-goool-green text-2xl p-1">
                         <i class="fa-solid fa-bars"></i>
@@ -83,11 +83,16 @@
                     <h1 class="text-lg sm:text-xl font-bold text-goool-green">@yield('page_title', 'Panel de Cajero')</h1>
                 </div>
 
-                <div class="flex items-center gap-2 sm:gap-3">
-                    <span class="text-xs sm:text-sm text-gray-600">
-                        <i class="fa-solid fa-user-circle text-goool-green"></i>
-                        <span class="hidden sm:inline">{{ auth()->user()->nombre }}</span>
-                    </span>
+                {{-- Ícono de usuario --}}
+                <div class="flex items-center gap-3">
+                    <div class="text-right hidden sm:block">
+                        <p class="text-sm font-bold text-gray-800 leading-tight">{{ auth()->user()->nombre }}</p>
+                        <p class="text-xs text-gray-500 capitalize">{{ auth()->user()->rol }}</p>
+                    </div>
+
+                    <div class="w-12 h-12 rounded-full bg-goool-green text-white flex items-center justify-center text-xl font-bold shadow-md">
+                        {{ strtoupper(substr(auth()->user()->nombre, 0, 1)) }}
+                    </div>
                 </div>
             </header>
 
