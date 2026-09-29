@@ -1,83 +1,53 @@
 <?php
 
-namespace App\Http\Controllers\Cliente;
+namespace App\Livewire;
 
-use App\Http\Controllers\Controller;
 use App\Models\Producto;
-use Illuminate\Http\Request;
+use Livewire\Component;
 
-class CatalogoController extends Controller
+class CarritoCompras extends Component
 {
-    public function index()
-    {
-        $productos = Producto::where('disponible', true)
-            ->with('categoria')
-            ->paginate(8);
-            
-        $carrito = session('carrito', []);
-        $total = $this->calcularTotal($carrito);
+    public $carrito = [];
+    public $total = 0;
 
-        return view('cliente.catalogo', compact('productos', 'carrito', 'total'));
+    public function mount()
+    {
+        $this->carrito = session()->get('carrito', []);
+        $this->calcularTotal();
     }
 
-    public function agregarAlCarrito(Request $request, $productoId)
+    public function agregarAlCarrito($productoId)
     {
         $producto = Producto::findOrFail($productoId);
-        $carrito = session()->get('carrito', []);
 
-        if (isset($carrito[$productoId])) {
-            $carrito[$productoId]['cantidad']++;
+        if (isset($this->carrito[$productoId])) {
+            $this->carrito[$productoId]['cantidad']++;
         } else {
-            $carrito[$productoId] = [
+            $this->carrito[$productoId] = [
                 'producto_id' => $producto->id,
                 'nombre' => $producto->nombre,
-                'descripcion' => $producto->descripcion,
                 'precio' => $producto->precio,
                 'cantidad' => 1,
                 'imagen' => $producto->imagen,
             ];
         }
 
-        session()->put('carrito', $carrito);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Producto agregado al carrito',
-            'carrito' => $carrito,
-            'total' => $this->calcularTotal($carrito),
-            'cantidad_items' => count($carrito)
-        ]);
+        session()->put('carrito', $this->carrito);
+        $this->calcularTotal();
     }
 
-    public function guardarCarrito(Request $request)
+    public function calcularTotal()
     {
-        $carrito = $request->input('carrito', []);
-        
-        $carritoSesion = [];
-        foreach ($carrito as $item) {
-            $carritoSesion[$item['id']] = [
-                'producto_id' => $item['id'],
-                'nombre' => $item['nombre'],
-                'precio' => $item['precio'],
-                'cantidad' => $item['cantidad'],
-                'imagen' => $item['imagen'] ?? null,
-            ];
+        $this->total = 0;
+        foreach ($this->carrito as $item) {
+            $this->total += $item['precio'] * $item['cantidad'];
         }
-        
-        session()->put('carrito', $carritoSesion);
-
-        return response()->json([
-            'success' => true,
-            'carrito' => $carritoSesion
-        ]);
     }
 
-    private function calcularTotal($carrito)
+    public function render()
     {
-        $total = 0;
-        foreach ($carrito as $item) {
-            $total += $item['precio'] * $item['cantidad'];
-        }
-        return $total;
+        return view('livewire.carrito-compras', [
+            'productos' => Producto::where('disponible', true)->paginate(8),
+        ]);
     }
 }
