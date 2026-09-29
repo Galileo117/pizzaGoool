@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,43 +13,60 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
 </head>
+
 <body class="min-h-screen bg-gray-50 font-sans text-gray-900 antialiased flex flex-col">
 
-    {{-- ========================================
-         HEADER
-    ========================================= --}}
+    {{-- HEADER --}}
     <header class="sticky top-0 z-40 bg-goool-green text-white shadow-lg">
         <div class="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div class="flex h-20 items-center justify-between">
+            <div class="flex h-20 items-center justify-between gap-4">
 
                 {{-- Logo + menú hamburguesa --}}
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-3 flex-shrink-0">
                     @auth
-                        @if(auth()->user()->rol === 'cliente')
-                            <button onclick="toggleMenuCliente()" class="text-white text-2xl p-2 hover:bg-white/10 rounded-lg transition" aria-label="Abrir menú">
+                        @if (auth()->user()->rol === 'cliente')
+                            <button onclick="toggleMenuCliente()"
+                                class="text-white text-2xl p-2 hover:bg-white/10 rounded-lg transition"
+                                aria-label="Abrir menú">
                                 <i class="fa-solid fa-bars"></i>
                             </button>
                         @endif
                     @endauth
 
                     <a href="{{ route('cliente.home') }}" class="flex shrink-0 items-center gap-3">
-                        <img src="{{ asset('img/logo.png') }}" alt="Pizza Goool" class="h-14 w-auto object-contain">
+                        <img src="{{ asset('img/logo.png') }}" alt="Pizza Goool" class="h-16 w-auto object-contain">
                         <span class="hidden text-2xl font-extrabold tracking-tight sm:inline">
                             Pizza<span class="text-goool-yellow">Goool</span>
                         </span>
                     </a>
                 </div>
 
+                {{-- Barra de búsqueda (solo en pantallas medianas+) --}}
+                @if (auth()->check() && auth()->user()->rol === 'cliente')
+                    <form action="{{ route('cliente.catalogo') }}" method="GET"
+                        class="hidden lg:flex flex-1 max-w-md">
+                        <div class="relative w-full">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <i class="fa-solid fa-search text-gray-400"></i>
+                            </div>
+                            <input type="text" name="buscar" placeholder="Buscar pizzas, bebidas..."
+                                value="{{ request('buscar') }}"
+                                class="w-full pl-11 pr-4 py-2.5 rounded-full bg-white/10 border border-white/20 text-white placeholder-white/60 focus:bg-white focus:text-gray-900 focus:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-goool-yellow transition-all duration-200">
+                        </div>
+                    </form>
+                @endif
+
                 {{-- Navegación derecha --}}
-                <nav class="flex items-center gap-3 sm:gap-5" aria-label="Navegación principal">
+                <nav class="flex items-center gap-3 sm:gap-5 flex-shrink-0" aria-label="Navegación principal">
 
                     @auth
-                        @if(auth()->user()->rol === 'cliente')
+                        @if (auth()->user()->rol === 'cliente')
                             {{-- Carrito con badge --}}
                             @php
                                 $carritoHeader = session('carrito', []);
@@ -58,11 +76,12 @@
                                 }
                             @endphp
                             <a href="{{ route('cliente.catalogo') }}#carrito"
-                               class="relative inline-flex items-center justify-center w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 transition"
-                               title="Ver carrito">
+                                class="relative inline-flex items-center justify-center w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 transition"
+                                title="Ver carrito">
                                 <i class="fa-solid fa-cart-shopping text-white text-lg"></i>
-                                @if($cantidadHeader > 0)
-                                    <span class="absolute -top-1 -right-1 bg-goool-yellow text-goool-green-dark text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                                @if ($cantidadHeader > 0)
+                                    <span
+                                        class="absolute -top-1 -right-1 bg-goool-yellow text-goool-green-dark text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
                                         {{ $cantidadHeader }}
                                     </span>
                                 @endif
@@ -71,15 +90,17 @@
 
                         <div class="flex items-center gap-3">
                             <div class="hidden md:flex items-center gap-2">
-                                <div class="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center text-sm font-bold">
+                                <div
+                                    class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-sm font-bold">
                                     {{ strtoupper(substr(auth()->user()->nombre, 0, 1)) }}
                                 </div>
-                                <span class="font-medium text-sm">{{ auth()->user()->nombre }}</span>
+                                <span class="font-medium text-sm hidden lg:inline">{{ auth()->user()->nombre }}</span>
                             </div>
 
                             <form method="POST" action="{{ route('logout') }}" class="inline">
                                 @csrf
-                                <button type="submit" class="inline-flex items-center gap-2 rounded-lg bg-white/10 px-3.5 py-2 text-sm hover:bg-white hover:text-goool-green transition">
+                                <button type="submit"
+                                    class="inline-flex items-center gap-2 rounded-lg bg-white/10 px-3.5 py-2 text-sm hover:bg-white hover:text-goool-green transition">
                                     <i class="fa-solid fa-right-from-bracket"></i>
                                     <span class="hidden sm:inline">Salir</span>
                                 </button>
@@ -87,11 +108,13 @@
                         </div>
                     @else
                         <div class="flex items-center gap-3">
-                            <a href="{{ route('login') }}" class="inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-semibold text-goool-green hover:bg-goool-yellow transition">
+                            <a href="{{ route('login') }}"
+                                class="inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-semibold text-goool-green hover:bg-goool-yellow transition">
                                 <i class="fa-solid fa-right-to-bracket"></i>
                                 <span>Iniciar Sesión</span>
                             </a>
-                            <a href="{{ route('register') }}" class="hidden sm:inline-flex items-center gap-2 rounded-lg border-2 border-white/30 px-4 py-2 text-sm hover:bg-white/10 transition">
+                            <a href="{{ route('register') }}"
+                                class="hidden sm:inline-flex items-center gap-2 rounded-lg border-2 border-white/30 px-4 py-2 text-sm hover:bg-white/10 transition">
                                 <i class="fa-solid fa-user-plus"></i>
                                 <span>Registrarse</span>
                             </a>
@@ -102,18 +125,18 @@
         </div>
     </header>
 
-    {{-- ========================================
-         MENÚ LATERAL DEL CLIENTE
-    ========================================= --}}
+    {{-- MENÚ LATERAL DEL CLIENTE--}}
     @auth
-        @if(auth()->user()->rol === 'cliente')
+        @if (auth()->user()->rol === 'cliente')
             <div id="menu-cliente" class="fixed inset-0 z-50 hidden">
                 <div class="absolute inset-0 bg-black bg-opacity-50" onclick="toggleMenuCliente()"></div>
 
-                <aside id="menu-cliente-sidebar" class="relative w-72 bg-goool-green text-white h-full flex flex-col transform transition-transform duration-300 -translate-x-full">
+                <aside id="menu-cliente-sidebar"
+                    class="relative w-72 bg-goool-green text-white h-full flex flex-col transform transition-transform duration-300 -translate-x-full">
                     <div class="p-6 border-b border-goool-green-dark">
                         <div class="flex items-center gap-3">
-                            <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-lg font-bold">
+                            <div
+                                class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-lg font-bold">
                                 {{ strtoupper(substr(auth()->user()->nombre, 0, 1)) }}
                             </div>
                             <div class="min-w-0">
@@ -125,19 +148,19 @@
 
                     <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
                         <a href="{{ route('cliente.home') }}"
-                           class="flex items-center gap-3 px-4 py-3 rounded-lg {{ request()->routeIs('cliente.home') ? 'bg-goool-green-dark font-bold' : 'hover:bg-goool-green-dark' }} transition">
+                            class="flex items-center gap-3 px-4 py-3 rounded-lg {{ request()->routeIs('cliente.home') ? 'bg-goool-green-dark font-bold' : 'hover:bg-goool-green-dark' }} transition">
                             <i class="fa-solid fa-house"></i> Inicio
                         </a>
                         <a href="{{ route('cliente.catalogo') }}"
-                           class="flex items-center gap-3 px-4 py-3 rounded-lg {{ request()->routeIs('cliente.catalogo') ? 'bg-goool-green-dark font-bold' : 'hover:bg-goool-green-dark' }} transition">
+                            class="flex items-center gap-3 px-4 py-3 rounded-lg {{ request()->routeIs('cliente.catalogo') ? 'bg-goool-green-dark font-bold' : 'hover:bg-goool-green-dark' }} transition">
                             <i class="fa-solid fa-utensils"></i> Catálogo
                         </a>
                         <a href="{{ route('cliente.mis_pedidos') }}"
-                           class="flex items-center gap-3 px-4 py-3 rounded-lg {{ request()->routeIs('cliente.mis_pedidos') ? 'bg-goool-green-dark font-bold' : 'hover:bg-goool-green-dark' }} transition">
+                            class="flex items-center gap-3 px-4 py-3 rounded-lg {{ request()->routeIs('cliente.mis_pedidos') ? 'bg-goool-green-dark font-bold' : 'hover:bg-goool-green-dark' }} transition">
                             <i class="fa-solid fa-receipt"></i> Mis Pedidos
                         </a>
                         <a href="{{ route('cliente.perfil') }}"
-                           class="flex items-center gap-3 px-4 py-3 rounded-lg {{ request()->routeIs('cliente.perfil') ? 'bg-goool-green-dark font-bold' : 'hover:bg-goool-green-dark' }} transition">
+                            class="flex items-center gap-3 px-4 py-3 rounded-lg {{ request()->routeIs('cliente.perfil') ? 'bg-goool-green-dark font-bold' : 'hover:bg-goool-green-dark' }} transition">
                             <i class="fa-solid fa-user"></i> Mi Perfil
                         </a>
                     </nav>
@@ -145,7 +168,8 @@
                     <div class="p-4 border-t border-goool-green-dark">
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
-                            <button type="submit" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-goool-green-dark transition text-left">
+                            <button type="submit"
+                                class="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-goool-green-dark transition text-left">
                                 <i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión
                             </button>
                         </form>
@@ -155,9 +179,7 @@
         @endif
     @endauth
 
-    {{-- ========================================
-         CONTENIDO PRINCIPAL
-    ========================================= --}}
+    {{-- CONTENIDO PRINCIPAL --}}
     <main id="main-content" class="flex-1">
         @if (session('success'))
             <div class="max-w-7xl mx-auto px-4 mt-4">
@@ -178,9 +200,7 @@
         @yield('content')
     </main>
 
-    {{-- ========================================
-         FOOTER MEJORADO
-    ========================================= --}}
+    {{-- FOOTER --}}
     <footer class="border-t border-white/10 bg-goool-green-dark text-gray-300 mt-auto">
         <div class="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
 
@@ -195,7 +215,8 @@
                         </span>
                     </div>
                     <p class="text-sm text-gray-400 leading-relaxed max-w-md">
-                        La mejor pizza con pasión por el fútbol. Pide tu favorita y recíbela caliente en la puerta de tu casa.
+                        La mejor pizza con pasión por el fútbol. Pide tu favorita y recíbela caliente en la puerta de tu
+                        casa.
                     </p>
                 </div>
 
@@ -214,9 +235,10 @@
                             </a>
                         </li>
                         @auth
-                            @if(auth()->user()->rol === 'cliente')
+                            @if (auth()->user()->rol === 'cliente')
                                 <li>
-                                    <a href="{{ route('cliente.mis_pedidos') }}" class="hover:text-goool-yellow transition">
+                                    <a href="{{ route('cliente.mis_pedidos') }}"
+                                        class="hover:text-goool-yellow transition">
                                         <i class="fa-solid fa-chevron-right text-xs mr-2"></i>Mis Pedidos
                                     </a>
                                 </li>
@@ -254,14 +276,19 @@
             {{-- Línea inferior --}}
             <div class="border-t border-white/10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <p class="text-sm">
-                    &copy; {{ now()->year }} <span class="font-bold text-white">Pizza Goool</span>. Todos los derechos reservados.
+                    &copy; {{ now()->year }} <span class="font-bold text-white">Pizza Goool</span>. Todos los
+                    derechos reservados.
                 </p>
 
                 <div class="flex items-center gap-4 text-xl">
-                    <a href="#" class="hover:text-goool-yellow transition" title="Facebook"><i class="fa-brands fa-facebook"></i></a>
-                    <a href="#" class="hover:text-goool-yellow transition" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
-                    <a href="#" class="hover:text-goool-yellow transition" title="TikTok"><i class="fa-brands fa-tiktok"></i></a>
-                    <a href="#" class="hover:text-goool-yellow transition" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+                    <a href="#" class="hover:text-goool-yellow transition" title="Facebook"><i
+                            class="fa-brands fa-facebook"></i></a>
+                    <a href="#" class="hover:text-goool-yellow transition" title="Instagram"><i
+                            class="fa-brands fa-instagram"></i></a>
+                    <a href="#" class="hover:text-goool-yellow transition" title="TikTok"><i
+                            class="fa-brands fa-tiktok"></i></a>
+                    <a href="#" class="hover:text-goool-yellow transition" title="WhatsApp"><i
+                            class="fa-brands fa-whatsapp"></i></a>
                 </div>
             </div>
 
@@ -292,16 +319,29 @@
             if (!container) return;
 
             const colores = {
-                success: { bg: 'bg-green-500', icon: 'fa-circle-check' },
-                error:   { bg: 'bg-red-500',   icon: 'fa-circle-xmark' },
-                warning: { bg: 'bg-yellow-500', icon: 'fa-triangle-exclamation' },
-                info:    { bg: 'bg-blue-500',  icon: 'fa-circle-info' },
+                success: {
+                    bg: 'bg-green-500',
+                    icon: 'fa-circle-check'
+                },
+                error: {
+                    bg: 'bg-red-500',
+                    icon: 'fa-circle-xmark'
+                },
+                warning: {
+                    bg: 'bg-yellow-500',
+                    icon: 'fa-triangle-exclamation'
+                },
+                info: {
+                    bg: 'bg-blue-500',
+                    icon: 'fa-circle-info'
+                },
             };
 
             const color = colores[tipo] || colores.success;
 
             const toast = document.createElement('div');
-            toast.className = `${color.bg} text-white px-5 py-4 rounded-xl shadow-2xl flex items-center gap-3 min-w-[280px] max-w-[400px] pointer-events-auto transform translate-x-full transition-transform duration-300`;
+            toast.className =
+                `${color.bg} text-white px-5 py-4 rounded-xl shadow-2xl flex items-center gap-3 min-w-[280px] max-w-[400px] pointer-events-auto transform translate-x-full transition-transform duration-300`;
             toast.innerHTML = `
                 <i class="fa-solid ${color.icon} text-xl"></i>
                 <span class="font-medium text-sm flex-1">${mensaje}</span>
@@ -325,4 +365,5 @@
 
     @stack('scripts')
 </body>
+
 </html>

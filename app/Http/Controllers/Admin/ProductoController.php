@@ -58,7 +58,7 @@ class ProductoController extends Controller
             'categoria_id' => 'required|exists:categorias,id',
             'nombre' => 'required|string|max:255',
             'descripcion' => 'nullable|string',
-            'precio' => 'required|numeric|min:0',
+            'precio' => 'required|numeric|min:5',
             'imagen' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
