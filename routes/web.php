@@ -58,7 +58,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::resource('productos', ProductoController::class);
     Route::resource('categorias', CategoriaController::class);
     Route::get('pedidos', [AdminPedidoController::class, 'index'])->name('pedidos.index');
-    Route::get('usuarios', [UsuarioController::class, 'index'])->name('usuarios.index');
+    Route::resource('usuarios', UsuarioController::class);
     Route::get('reportes', [ReporteController::class, 'index'])->name('reportes.index');
     Route::get('reportes/pdf', [ReporteController::class, 'pdf'])->name('reportes.pdf');
     Route::get('configuracion', [\App\Http\Controllers\Admin\ConfiguracionController::class, 'index'])->name('configuracion');
