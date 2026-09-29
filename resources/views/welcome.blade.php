@@ -30,11 +30,10 @@
                         <i class="fa-solid fa-arrow-right"></i>
                     </a>
                 @else
-                    <a href="{{ route('dashboard') }}"
-                        class="mt-6 inline-flex items-center gap-3 bg-goool-green text-white font-bold py-3 px-8 rounded-xl hover:bg-goool-green-dark transition-all duration-200 shadow-md hover:shadow-lg text-lg">
-                        <i class="fa-solid fa-gauge-high"></i>
-                        Ir al Panel
-                    </a>
+                    <div class="mt-6 inline-flex items-center gap-3 bg-goool-green text-white font-bold py-3 px-8 rounded-xl text-lg">
+                        <i class="fa-solid fa-circle-check"></i>
+                        Sesión activa como {{ ucfirst(auth()->user()->rol) }}
+                    </div>
                 @endif
             @else
                 <div class="mt-6 flex flex-wrap items-center justify-center gap-4">
@@ -112,29 +111,19 @@
                                             <i class="fa-solid fa-cart-plus"></i>
                                             <span>Agregar</span>
                                         </button>
-                                    @elseif($producto->disponible)
+                                    @else
                                         <a href="{{ route('login') }}"
                                             class="inline-flex items-center gap-1.5 bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200">
                                             <i class="fa-solid fa-lock"></i>
                                             Iniciar Sesión
                                         </a>
-                                    @else
-                                        <span class="text-gray-400 text-xs font-medium">
-                                            No disponible
-                                        </span>
                                     @endif
                                 @else
-                                    @if ($producto->disponible)
-                                        <a href="{{ route('login') }}"
-                                            class="inline-flex items-center gap-1.5 bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200">
-                                            <i class="fa-solid fa-lock"></i>
-                                            Iniciar Sesión
-                                        </a>
-                                    @else
-                                        <span class="text-gray-400 text-xs font-medium">
-                                            No disponible
-                                        </span>
-                                    @endif
+                                    <a href="{{ route('login') }}"
+                                        class="inline-flex items-center gap-1.5 bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200">
+                                        <i class="fa-solid fa-lock"></i>
+                                        Iniciar Sesión
+                                    </a>
                                 @endauth
                             </div>
                         </div>
@@ -163,24 +152,7 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        const badge = document.getElementById('cart-badge');
-                        if (badge) {
-                            badge.textContent = data.cantidad_items;
-                        }
-
-                        const button = document.querySelector(`button[onclick="agregarAlCarrito(${productoId})"]`);
-                        if (button) {
-                            const originalText = button.innerHTML;
-                            button.innerHTML = '<i class="fa-solid fa-check"></i> ¡Agregado!';
-                            button.classList.remove('bg-goool-orange', 'hover:bg-orange-600');
-                            button.classList.add('bg-green-500', 'hover:bg-green-600');
-
-                            setTimeout(() => {
-                                button.innerHTML = originalText;
-                                button.classList.remove('bg-green-500', 'hover:bg-green-600');
-                                button.classList.add('bg-goool-orange', 'hover:bg-orange-600');
-                            }, 1500);
-                        }
+                        alert('¡Producto agregado al carrito!');
                     } else if (data.redirect) {
                         window.location.href = data.redirect;
                     }
