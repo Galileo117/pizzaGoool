@@ -20,27 +20,25 @@ class Pedido extends Model
         'tipo_entrega',
         'direccion',
         'referencia',
+        'latitud',
+        'longitud',
     ];
 
-    // Relación: Un pedido pertenece a un usuario (cliente)
     public function usuario()
     {
         return $this->belongsTo(Usuario::class, 'usuario_id');
     }
 
-    // Relación: Un pedido puede tener un repartidor asignado
     public function repartidor()
     {
         return $this->belongsTo(Usuario::class, 'repartidor_id');
     }
 
-    // Relación: Un pedido tiene muchos detalles
     public function detallePedidos()
     {
         return $this->hasMany(DetallePedido::class);
     }
 
-    // Relación: Un pedido tiene un pago asociado
     public function pago()
     {
         return $this->hasOne(Pago::class);

@@ -12,7 +12,6 @@ class PedidoController extends Controller
     {
         $query = Pedido::with('usuario')->orderBy('created_at', 'desc');
 
-        // Filtro por estado (opcional)
         if ($request->has('estado') && $request->estado !== '') {
             $query->where('estado', $request->estado);
         }

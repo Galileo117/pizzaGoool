@@ -14,7 +14,7 @@ class CatalogoController extends Controller
             ->with('categoria')
             ->limit(4)
             ->get();
-            
+
         $carrito = session()->get('carrito', []);
         $cantidadItems = $this->contarItems($carrito);
 
@@ -26,7 +26,7 @@ class CatalogoController extends Controller
         $productos = Producto::where('disponible', true)
             ->with('categoria')
             ->paginate(8);
-            
+
         $carrito = session()->get('carrito', []);
         $total = $this->calcularTotal($carrito);
         $cantidadItems = $this->contarItems($carrito);
@@ -39,7 +39,7 @@ class CatalogoController extends Controller
         if (!auth()->check()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Debes iniciar sesión para agregar productos al carrito.',
+                'message' => 'Debes iniciar sesión para agregar productos.',
                 'redirect' => route('login')
             ], 401);
         }
@@ -48,7 +48,8 @@ class CatalogoController extends Controller
         $carrito = session()->get('carrito', []);
 
         if (isset($carrito[$productoId])) {
-            $carrito[$productoId]['cantidad']++;
+            // Si ya existe, aumentamos (con límite de 20)
+            $carrito[$productoId]['cantidad'] = min($carrito[$productoId]['cantidad'] + 1, 20);
         } else {
             $carrito[$productoId] = [
                 'producto_id' => $producto->id,
@@ -62,15 +63,11 @@ class CatalogoController extends Controller
 
         session()->put('carrito', $carrito);
 
-        $total = $this->calcularTotal($carrito);
-        $cantidadItems = $this->contarItems($carrito);
-
         return response()->json([
             'success' => true,
             'message' => 'Producto agregado al carrito',
-            'carrito' => $carrito,
-            'total' => $total,
-            'cantidad_items' => $cantidadItems
+            'total' => $this->calcularTotal($carrito),
+            'cantidad_items' => $this->contarItems($carrito)
         ]);
     }
 
@@ -79,46 +76,41 @@ class CatalogoController extends Controller
         if (!auth()->check()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Debes iniciar sesión para continuar.',
+                'message' => 'Debes iniciar sesión.',
                 'redirect' => route('login')
             ], 401);
         }
 
-        $carrito = $request->input('carrito', []);
-        
-        $carritoSesion = [];
-        foreach ($carrito as $item) {
-            $carritoSesion[$item['id']] = [
-                'producto_id' => $item['id'],
-                'nombre' => $item['nombre'],
-                'precio' => $item['precio'],
-                'cantidad' => $item['cantidad'],
-                'imagen' => $item['imagen'] ?? null,
-            ];
+        $productoId = $request->input('producto_id');
+        $cantidad = (int) $request->input('cantidad', 0);
+
+        $carrito = session()->get('carrito', []);
+
+        if (isset($carrito[$productoId])) {
+            if ($cantidad <= 0) {
+                unset($carrito[$productoId]);
+            } else {
+                $carrito[$productoId]['cantidad'] = min($cantidad, 20);
+            }
         }
-        
-        session()->put('carrito', $carritoSesion);
-        $total = $this->calcularTotal($carritoSesion);
-        $cantidadItems = $this->contarItems($carritoSesion);
+
+        session()->put('carrito', $carrito);
 
         return response()->json([
             'success' => true,
-            'carrito' => $carritoSesion,
-            'total' => $total,
-            'cantidad_items' => $cantidadItems
+            'total' => $this->calcularTotal($carrito),
+            'cantidad_items' => $this->contarItems($carrito)
         ]);
     }
 
     public function vaciarCarrito()
     {
         if (!auth()->check()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Debes iniciar sesión para vaciar el carrito.'
-            ], 401);
+            return response()->json(['success' => false], 401);
         }
 
         session()->forget('carrito');
+
         return response()->json(['success' => true]);
     }
 

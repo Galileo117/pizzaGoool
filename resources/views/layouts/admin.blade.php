@@ -61,6 +61,10 @@
                     class="flex items-center gap-3 px-4 py-3 rounded-lg {{ request()->routeIs('admin.reportes.*') ? 'bg-goool-green-dark font-bold' : 'hover:bg-goool-green-dark' }} transition">
                     <i class="fa-solid fa-chart-line"></i> Reportes
                 </a>
+                <a href="{{ route('admin.configuracion') }}"
+                    class="flex items-center gap-3 px-4 py-3 rounded-lg {{ request()->routeIs('admin.configuracion') ? 'bg-goool-green-dark font-bold' : 'hover:bg-goool-green-dark' }} transition">
+                    <i class="fa-solid fa-qrcode"></i> Configurar QR
+                </a>
             </nav>
 
             <!-- Cerrar sesión -->

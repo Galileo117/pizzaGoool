@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.cliente')
 
 @section('title', 'Seguimiento - Pizza Goool')
 

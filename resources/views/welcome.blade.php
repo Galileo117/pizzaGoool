@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.cliente')
 
 @section('title', 'Inicio - Pizza Goool')
 
@@ -30,7 +30,8 @@
                         <i class="fa-solid fa-arrow-right"></i>
                     </a>
                 @else
-                    <div class="mt-6 inline-flex items-center gap-3 bg-goool-green text-white font-bold py-3 px-8 rounded-xl text-lg">
+                    <div
+                        class="mt-6 inline-flex items-center gap-3 bg-goool-green text-white font-bold py-3 px-8 rounded-xl text-lg">
                         <i class="fa-solid fa-circle-check"></i>
                         Sesión activa como {{ ucfirst(auth()->user()->rol) }}
                     </div>
@@ -152,7 +153,7 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        alert('¡Producto agregado al carrito!');
+                        location.reload();
                     } else if (data.redirect) {
                         window.location.href = data.redirect;
                     }
