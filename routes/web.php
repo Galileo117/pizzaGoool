@@ -46,6 +46,10 @@ Route::middleware(['auth', 'role:cliente'])->group(function () {
     })->name('cliente.seguimiento');
 
     Route::delete('/cancelar_pedido/{pedido}', [PedidoController::class, 'cancelar'])->name('cliente.cancelar_pedido');
+
+    Route::get('/mi-perfil', function () {
+        return view('cliente.perfil');
+    })->name('cliente.perfil');
 });
 
 // Rutas del Admin
