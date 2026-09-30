@@ -31,7 +31,7 @@
                         <td class="px-4 py-3 font-semibold text-gray-800">{{ $categoria->nombre }}</td>
                         <td class="px-4 py-3 text-gray-600">{{ $categoria->descripcion ?? 'Sin descripción' }}</td>
                         <td class="px-4 py-3 text-center">
-                            <span class="bg-goool-green-light text-goool-green-dark text-xs font-bold px-2 py-1 rounded-full">
+                            <span class="bg-goool-green-light text-white text-xs font-bold px-2 py-1 rounded-full">
                                 {{ $categoria->productos_count }}
                             </span>
                         </td>
@@ -66,7 +66,7 @@
                 <div class="p-4">
                     <div class="flex justify-between items-start mb-2">
                         <h3 class="font-bold text-gray-800">{{ $categoria->nombre }}</h3>
-                        <span class="bg-goool-green-light text-goool-green-dark text-xs font-bold px-2 py-1 rounded-full">
+                        <span class="bg-goool-green-light text-white text-xs font-bold px-2 py-1 rounded-full">
                             {{ $categoria->productos_count }} prods
                         </span>
                     </div>

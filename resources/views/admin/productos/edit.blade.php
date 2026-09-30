@@ -12,53 +12,68 @@
     </div>
 
     <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6">
-        <form action="{{ route('admin.productos.update', $producto->id) }}" method="POST" enctype="multipart/form-data" class="space-y-5" id="form-producto">
+        <form action="{{ route('admin.productos.update', $producto->id) }}" method="POST" enctype="multipart/form-data"
+            class="space-y-5" id="form-producto">
             @csrf
             @method('PUT')
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Nombre <span class="text-red-500">*</span></label>
-                    <input type="text" name="nombre" value="{{ old('nombre', $producto->nombre) }}" required class="w-full border border-gray-300 rounded-lg p-3 focus:border-goool-green focus:outline-none">
-                    @error('nombre') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Nombre <span
+                            class="text-red-500">*</span></label>
+                    <input type="text" name="nombre" value="{{ old('nombre', $producto->nombre) }}" required
+                        class="w-full border border-gray-300 rounded-lg p-3 focus:border-goool-green focus:outline-none">
+                    @error('nombre')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Categoría <span class="text-red-500">*</span></label>
-                    <select name="categoria_id" required class="w-full border border-gray-300 rounded-lg p-3 focus:border-goool-green focus:outline-none">
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Categoría <span
+                            class="text-red-500">*</span></label>
+                    <select name="categoria_id" required
+                        class="w-full border border-gray-300 rounded-lg p-3 focus:border-goool-green focus:outline-none">
                         <option value="">-- Seleccionar --</option>
-                        @foreach($categorias as $cat)
-                            <option value="{{ $cat->id }}" {{ old('categoria_id', $producto->categoria_id) == $cat->id ? 'selected' : '' }}>{{ $cat->nombre }}</option>
+                        @foreach ($categorias as $cat)
+                            <option value="{{ $cat->id }}"
+                                {{ old('categoria_id', $producto->categoria_id) == $cat->id ? 'selected' : '' }}>
+                                {{ $cat->nombre }}</option>
                         @endforeach
                     </select>
-                    @error('categoria_id') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                    @error('categoria_id')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
             </div>
 
             <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-1">Descripción</label>
-                <textarea name="descripcion" rows="3" class="w-full border border-gray-300 rounded-lg p-3 focus:border-goool-green focus:outline-none">{{ old('descripcion', $producto->descripcion) }}</textarea>
-                @error('descripcion') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                <textarea name="descripcion" rows="3"
+                    class="w-full border border-gray-300 rounded-lg p-3 focus:border-goool-green focus:outline-none">{{ old('descripcion', $producto->descripcion) }}</textarea>
+                @error('descripcion')
+                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                @enderror
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Precio (Bs.) <span class="text-red-500">*</span></label>
-                    <input type="number" 
-                           step="0.01" 
-                           min="0" 
-                           name="precio" 
-                           value="{{ old('precio', $producto->precio) }}" 
-                           required 
-                           onwheel="this.blur()"
-                           class="w-full border border-gray-300 rounded-lg p-3 focus:border-goool-green focus:outline-none">
-                    @error('precio') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Precio (Bs.) <span
+                            class="text-red-500">*</span></label>
+                    <input type="number" step="0.01" min="5" max="999.99" name="precio"
+                        value="{{ old('precio', $producto->precio) }}" required onwheel="this.blur()"
+                        class="w-full border border-gray-300 rounded-lg p-3 focus:border-goool-green focus:outline-none">
+                    @error('precio')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Imagen</label>
-                    <input type="file" name="imagen" id="imagen" accept="image/*" class="w-full border border-gray-300 rounded-lg p-2">
-                    @error('imagen') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                    <input type="file" name="imagen" id="imagen" accept="image/*"
+                        class="w-full border border-gray-300 rounded-lg p-2">
+                    @error('imagen')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
             </div>
 
@@ -70,11 +85,12 @@
                 <div class="flex items-start gap-6 flex-wrap">
                     <div class="text-center">
                         <p class="text-xs text-gray-500 mb-2 font-semibold">Imagen actual</p>
-                        @if($producto->imagen)
+                        @if ($producto->imagen)
                             <img src="{{ asset('storage/' . $producto->imagen) }}" alt="{{ $producto->nombre }}"
-                                 class="w-32 h-32 rounded-lg object-cover border-2 border-gray-300 shadow-sm">
+                                class="w-32 h-32 rounded-lg object-cover border-2 border-gray-300 shadow-sm">
                         @else
-                            <div class="w-32 h-32 rounded-lg bg-gray-100 flex items-center justify-center border-2 border-dashed border-gray-300">
+                            <div
+                                class="w-32 h-32 rounded-lg bg-gray-100 flex items-center justify-center border-2 border-dashed border-gray-300">
                                 <i class="fa-solid fa-image text-3xl text-gray-300"></i>
                             </div>
                             <p class="text-xs text-gray-400 mt-1">Sin imagen</p>
@@ -87,9 +103,11 @@
 
                     <div class="text-center">
                         <p class="text-xs text-gray-500 mb-2 font-semibold">Nueva imagen</p>
-                        <div id="preview-container" class="w-32 h-32 rounded-lg bg-gray-100 flex items-center justify-center border-2 border-dashed border-gray-300 overflow-hidden">
+                        <div id="preview-container"
+                            class="w-32 h-32 rounded-lg bg-gray-100 flex items-center justify-center border-2 border-dashed border-gray-300 overflow-hidden">
                             <i class="fa-solid fa-cloud-arrow-up text-3xl text-gray-300" id="preview-icon"></i>
-                            <img id="preview-image" src="#" alt="Vista previa" class="w-full h-full object-cover hidden">
+                            <img id="preview-image" src="#" alt="Vista previa"
+                                class="w-full h-full object-cover hidden">
                         </div>
                         <p class="text-xs text-gray-400 mt-1" id="preview-text">Selecciona una imagen</p>
                     </div>
@@ -97,12 +115,15 @@
             </div>
 
             <div class="flex items-center gap-2">
-                <input type="checkbox" name="disponible" id="disponible" value="1" {{ old('disponible', $producto->disponible) ? 'checked' : '' }} class="rounded border-gray-300 text-goool-green focus:ring-goool-green">
+                <input type="checkbox" name="disponible" id="disponible" value="1"
+                    {{ old('disponible', $producto->disponible) ? 'checked' : '' }}
+                    class="rounded border-gray-300 text-goool-green focus:ring-goool-green">
                 <label for="disponible" class="text-sm font-semibold text-gray-700">Disponible para la venta</label>
             </div>
 
             <div class="pt-4 border-t border-gray-200">
-                <button type="submit" class="bg-goool-green text-white font-bold px-6 py-3 rounded-lg hover:bg-goool-green-dark transition">
+                <button type="submit"
+                    class="bg-goool-green text-white font-bold px-6 py-3 rounded-lg hover:bg-goool-green-dark transition">
                     <i class="fa-solid fa-save"></i> Actualizar Producto
                 </button>
             </div>

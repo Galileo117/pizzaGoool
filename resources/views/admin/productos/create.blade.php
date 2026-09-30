@@ -57,7 +57,7 @@
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Precio (Bs.) <span
                             class="text-red-500">*</span></label>
-                    <input type="number" step="0.01" min="0" name="precio" value="{{ old('precio') }}" required
+                    <input type="number" step="0.01" min="7" max="999.99" name="precio" value="{{ old('precio') }}" required
                         onwheel="this.blur()"
                         class="w-full border border-gray-300 rounded-lg p-3 focus:border-goool-green focus:outline-none">
                     @error('precio')

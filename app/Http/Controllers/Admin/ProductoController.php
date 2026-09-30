@@ -12,13 +12,17 @@ class ProductoController extends Controller
 {
     public function index()
     {
-        $productos = Producto::with('categoria')->orderBy('created_at', 'desc')->paginate(10);
+        $productos = Producto::with('categoria')
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+
         return view('admin.productos.index', compact('productos'));
     }
 
     public function create()
     {
         $categorias = Categoria::all();
+
         return view('admin.productos.create', compact('categorias'));
     }
 
@@ -27,29 +31,41 @@ class ProductoController extends Controller
         $request->validate([
             'categoria_id' => 'required|exists:categorias,id',
             'nombre' => 'required|string|max:255',
-            'descripcion' => 'nullable|string',
-            'precio' => 'required|numeric|min:0',
-            'imagen' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'descripcion' => 'nullable|string|max:1000',
+            'precio' => 'required|numeric|min:0|max:999999.99|decimal:0,2',
+            'imagen' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
-        $data = $request->only(['categoria_id', 'nombre', 'descripcion', 'precio']);
+        $data = $request->only([
+            'categoria_id',
+            'nombre',
+            'descripcion',
+            'precio'
+        ]);
+
         $data['descripcion'] = $request->descripcion ?? '';
-        $data['disponible'] = $request->has('disponible') ? true : false;
+        $data['disponible'] = $request->has('disponible');
 
         if ($request->hasFile('imagen')) {
-            $data['imagen'] = $request->file('imagen')->store('productos', 'public');
+            $data['imagen'] = $request->file('imagen')
+                ->store('productos', 'public');
         }
 
         Producto::create($data);
 
-        return redirect()->route('admin.productos.index')
+        return redirect()
+            ->route('admin.productos.index')
             ->with('success', 'Producto creado correctamente.');
     }
 
     public function edit(Producto $producto)
     {
         $categorias = Categoria::all();
-        return view('admin.productos.edit', compact('producto', 'categorias'));
+
+        return view(
+            'admin.productos.edit',
+            compact('producto', 'categorias')
+        );
     }
 
     public function update(Request $request, Producto $producto)
@@ -57,25 +73,35 @@ class ProductoController extends Controller
         $request->validate([
             'categoria_id' => 'required|exists:categorias,id',
             'nombre' => 'required|string|max:255',
-            'descripcion' => 'nullable|string',
-            'precio' => 'required|numeric|min:5',
-            'imagen' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'descripcion' => 'nullable|string|max:1000',
+            'precio' => 'required|numeric|min:0|max:999999.99|decimal:0,2',
+            'imagen' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
-        $data = $request->only(['categoria_id', 'nombre', 'descripcion', 'precio']);
+        $data = $request->only([
+            'categoria_id',
+            'nombre',
+            'descripcion',
+            'precio'
+        ]);
+
         $data['descripcion'] = $request->descripcion ?? '';
-        $data['disponible'] = $request->has('disponible') ? true : false;
+        $data['disponible'] = $request->has('disponible');
 
         if ($request->hasFile('imagen')) {
+
             if ($producto->imagen) {
                 Storage::disk('public')->delete($producto->imagen);
             }
-            $data['imagen'] = $request->file('imagen')->store('productos', 'public');
+
+            $data['imagen'] = $request->file('imagen')
+                ->store('productos', 'public');
         }
 
         $producto->update($data);
 
-        return redirect()->route('admin.productos.index')
+        return redirect()
+            ->route('admin.productos.index')
             ->with('success', 'Producto actualizado correctamente.');
     }
 
@@ -84,9 +110,11 @@ class ProductoController extends Controller
         if ($producto->imagen) {
             Storage::disk('public')->delete($producto->imagen);
         }
+
         $producto->delete();
 
-        return redirect()->route('admin.productos.index')
+        return redirect()
+            ->route('admin.productos.index')
             ->with('success', 'Producto eliminado correctamente.');
     }
 }
