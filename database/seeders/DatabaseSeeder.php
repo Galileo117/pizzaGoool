@@ -14,7 +14,7 @@ class DatabaseSeeder extends Seeder
     {
         // Crear Usuarios de prueba
         Usuario::updateOrCreate(['email' => 'admin@goool.com'], [
-            'nombre' => 'Admin Pizza Goool',
+            'nombre' => 'Pizza Goool',
             'email' => 'admin@goool.com',
             'password' => Hash::make('12345678'),
             'rol' => 'admin',
@@ -30,7 +30,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         Usuario::updateOrCreate(['email' => 'repartidor@goool.com'], [
-            'nombre' => 'Repartidor Carlos',
+            'nombre' => 'Carlos',
             'email' => 'repartidor@goool.com',
             'password' => Hash::make('12345678'),
             'rol' => 'repartidor',
@@ -38,7 +38,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         Usuario::updateOrCreate(['email' => 'cliente@goool.com'], [
-            'nombre' => 'Cliente Maria',
+            'nombre' => 'Maria Lopez',
             'email' => 'cliente@goool.com',
             'password' => Hash::make('12345678'),
             'rol' => 'cliente',
