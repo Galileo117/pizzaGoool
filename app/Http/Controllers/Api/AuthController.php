@@ -3,66 +3,33 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Traits\ApiResponse;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
-    /**
-     * Login: devuelve un token de acceso.
-     */
-    public function login(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-            'device_name' => 'nullable|string',
-        ]);
-
-        $usuario = Usuario::where('email', $request->email)->first();
-
-        if (!$usuario || !Hash::check($request->password, $usuario->password)) {
-            throw ValidationException::withMessages([
-                'email' => ['Las credenciales no coinciden.'],
-            ]);
-        }
-
-        // Revocar tokens anteriores del mismo dispositivo
-        $deviceName = $request->device_name ?? 'app-movil';
-        $usuario->tokens()->where('name', $deviceName)->delete();
-
-        $token = $usuario->createToken($deviceName)->plainTextToken;
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Login exitoso.',
-            'token' => $token,
-            'usuario' => [
-                'id' => $usuario->id,
-                'nombre' => $usuario->nombre,
-                'email' => $usuario->email,
-                'rol' => $usuario->rol,
-                'telefono' => $usuario->telefono,
-            ],
-        ]);
-    }
+    use ApiResponse;
 
     /**
      * Registro de nuevos clientes.
      */
     public function register(Request $request)
     {
-        $request->validate([
-            'nombre' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:usuarios,email',
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'telefono' => 'nullable|string|max:20',
-            'device_name' => 'nullable|string',
-        ]);
+        try {
+            $request->validate([
+                'nombre' => 'required|string|max:255',
+                'email' => 'required|string|email|max:255|unique:usuarios,email',
+                'password' => ['required', 'confirmed', Rules\Password::defaults()],
+                'telefono' => 'nullable|string|max:20',
+                'device_name' => 'nullable|string',
+            ]);
+        } catch (ValidationException $e) {
+            return $this->validationErrorResponse($e->errors());
+        }
 
         $usuario = Usuario::create([
             'nombre' => $request->nombre,
@@ -74,9 +41,7 @@ class AuthController extends Controller
 
         $token = $usuario->createToken($request->device_name ?? 'app-movil')->plainTextToken;
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Usuario registrado correctamente.',
+        return $this->successResponse([
             'token' => $token,
             'usuario' => [
                 'id' => $usuario->id,
@@ -85,7 +50,46 @@ class AuthController extends Controller
                 'rol' => $usuario->rol,
                 'telefono' => $usuario->telefono,
             ],
-        ], 201);
+        ], 'Usuario registrado correctamente.', 201);
+    }
+
+    /**
+     * Login: devuelve un token de acceso.
+     */
+    public function login(Request $request)
+    {
+        try {
+            $request->validate([
+                'email' => 'required|email',
+                'password' => 'required',
+                'device_name' => 'nullable|string',
+            ]);
+        } catch (ValidationException $e) {
+            return $this->validationErrorResponse($e->errors());
+        }
+
+        $usuario = Usuario::where('email', $request->email)->first();
+
+        if (!$usuario || !Hash::check($request->password, $usuario->password)) {
+            return $this->unauthorizedResponse('Las credenciales no coinciden.');
+        }
+
+        // Revocar tokens anteriores del mismo dispositivo
+        $deviceName = $request->device_name ?? 'app-movil';
+        $usuario->tokens()->where('name', $deviceName)->delete();
+
+        $token = $usuario->createToken($deviceName)->plainTextToken;
+
+        return $this->successResponse([
+            'token' => $token,
+            'usuario' => [
+                'id' => $usuario->id,
+                'nombre' => $usuario->nombre,
+                'email' => $usuario->email,
+                'rol' => $usuario->rol,
+                'telefono' => $usuario->telefono,
+            ],
+        ], 'Login exitoso.');
     }
 
     /**
@@ -95,10 +99,7 @@ class AuthController extends Controller
     {
         $request->user()->currentAccessToken()->delete();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Sesión cerrada correctamente.',
-        ]);
+        return $this->successResponse(null, 'Sesión cerrada correctamente.');
     }
 
     /**
@@ -106,9 +107,15 @@ class AuthController extends Controller
      */
     public function user(Request $request)
     {
-        return response()->json([
-            'success' => true,
-            'usuario' => $request->user(),
-        ]);
+        return $this->successResponse([
+            'usuario' => [
+                'id' => $request->user()->id,
+                'nombre' => $request->user()->nombre,
+                'email' => $request->user()->email,
+                'rol' => $request->user()->rol,
+                'telefono' => $request->user()->telefono,
+                'created_at' => $request->user()->created_at,
+            ],
+        ], 'Datos del usuario.');
     }
 }
