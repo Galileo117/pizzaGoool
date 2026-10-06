@@ -1,0 +1,590 @@
+{
+  "info": {
+    "_postman_id": "5128b7e2-98cb-44ef-a4ef-f2c6e65fdda7",
+    "name": "API Pizza Goool - v1",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "57885195",
+    "_collection_link": "https://go.postman.co/collection/57885195-5128b7e2-98cb-44ef-a4ef-f2c6e65fdda7?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "02 - Catálogo",
+      "item": [
+        {
+          "name": "Listar Categorias",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/categorias",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "categorias"
+              ]
+            },
+            "description": "Lista todas las categorías. No requiere autenticación."
+          },
+          "response": []
+        },
+        {
+          "name": "Filtrar por Categorias",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/productos?categoria_id=1",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "productos"
+              ],
+              "query": [
+                {
+                  "key": "categoria_id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Ejemplo de filtrado: /api/productos?categoria_id=1"
+          },
+          "response": []
+        },
+        {
+          "name": "Listar Productos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/productos",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "productos"
+              ]
+            },
+            "description": "Lista los productos disponibles.  \nQuery params opcionales: categoria_id, buscar.  \nNo requiere autenticación."
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar Producto",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/productos?buscar=pizza",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "productos"
+              ],
+              "query": [
+                {
+                  "key": "buscar",
+                  "value": "pizza"
+                }
+              ]
+            },
+            "description": "Ejemplo de búsqueda: /api/productos?buscar=pizza"
+          },
+          "response": []
+        },
+        {
+          "name": "Detalle Producto",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/productos/2",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "productos",
+                "2"
+              ]
+            },
+            "description": "Devuelve el detalle de un producto.  \nNo requiere autenticación."
+          },
+          "response": []
+        }
+      ],
+      "description": "Endpoints públicos para consultar categorías y productos. No requieren autenticación."
+    },
+    {
+      "name": "03 - Pedidos (Cliente)",
+      "item": [
+        {
+          "name": "Crear Pedido",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "3|jwlydzK8kOS7ArEsoEieByNli3xT5fbgF3dDg0xia14f9792",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"items\": [\r\n        { \"producto_id\": 2, \"cantidad\": 2 },\r\n        { \"producto_id\": 3, \"cantidad\": 1 }\r\n    ],\r\n    \"metodo_pago\": \"efectivo\",\r\n    \"tipo_entrega\": \"contraentrega\",\r\n    \"direccion\": \"Av. Principal #123\",\r\n    \"referencia\": \"Piso 2, portón verde\",\r\n    \"latitud\": -16.5,\r\n    \"longitud\": -68.15\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/pedidos",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "pedidos"
+              ]
+            },
+            "description": "Crea un pedido. Requiere token de cliente.  \nBody: items\\[\\], metodo_pago, tipo_entrega, direccion, referencia, latitud, longitud."
+          },
+          "response": []
+        },
+        {
+          "name": "Listar mis Pedidos",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "3|jwlydzK8kOS7ArEsoEieByNli3xT5fbgF3dDg0xia14f9792",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/pedidos",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "pedidos"
+              ]
+            },
+            "description": "Lista los pedidos del cliente autenticado.  \nRequiere token de cliente."
+          },
+          "response": []
+        },
+        {
+          "name": "Detalle Pedido",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "3|jwlydzK8kOS7ArEsoEieByNli3xT5fbgF3dDg0xia14f9792",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/pedidos/2",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "pedidos",
+                "2"
+              ]
+            },
+            "description": "Devuelve el detalle de un pedido específico.  \nRequiere token de cliente."
+          },
+          "response": []
+        },
+        {
+          "name": "Cancelar Pedido",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "3|jwlydzK8kOS7ArEsoEieByNli3xT5fbgF3dDg0xia14f9792",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/pedidos/2",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "pedidos",
+                "2"
+              ]
+            },
+            "description": "Cancela un pedido en estado pendiente.  \nRequiere token de cliente."
+          },
+          "response": []
+        }
+      ],
+      "description": "Endpoints para que el cliente cree, liste, vea el detalle y cancele pedidos. Requiere token con rol cliente."
+    },
+    {
+      "name": "04 - Pedidos (Repartidor)",
+      "item": [
+        {
+          "name": "Listar Pedidos Asignados",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "5|3p0qK6CH2MGjLehRcQOe8JAdpZknW0LUw3AzT5Gd5c2f7908",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/repartidor/pedidos",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "repartidor",
+                "pedidos"
+              ]
+            },
+            "description": "Lista los pedidos asignados al repartidor.  \nRequiere token de repartidor."
+          },
+          "response": []
+        },
+        {
+          "name": "Detalle Pedido Asignado",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "4|zTVIcbfOBuSMn1ZPrAGiqTAPZj5tuIiDPNzsGBQk0bdaaa4e",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/repartidor/pedidos/1",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "repartidor",
+                "pedidos",
+                "1"
+              ]
+            },
+            "description": "Devuelve el detalle de un pedido asignado.  \nRequiere token de repartidor."
+          },
+          "response": []
+        },
+        {
+          "name": "Marcar como Entregado",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "4|zTVIcbfOBuSMn1ZPrAGiqTAPZj5tuIiDPNzsGBQk0bdaaa4e",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/repartidor/pedidos/1/entregar",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "repartidor",
+                "pedidos",
+                "1",
+                "entregar"
+              ]
+            },
+            "description": "Marca el pedido como entregado.  \nRequiere token de repartidor."
+          },
+          "response": []
+        },
+        {
+          "name": "Login Repartidor",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"galileo@gmail.com\",\r\n    \"password\": \"Galileo343\",\r\n    \"device_name\": \"postman-repartidor\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/login",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "login"
+              ]
+            },
+            "description": "Inicia sesión con credenciales de repartidor.  \nBody: email, password, device_name."
+          },
+          "response": []
+        }
+      ],
+      "description": "Endpoints para que el repartidor vea sus pedidos asignados y los marque como entregados. Requiere token con rol repartidor."
+    },
+    {
+      "name": "01 - Autentificación",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"isabel@gmail.com\",\r\n    \"password\": \"isabel123\",\r\n    \"device_name\": \"postman-test\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/login",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "login"
+              ]
+            },
+            "description": "Inicia sesión y devuelve un token.  \nBody: email, password, device_name.  \nRespuesta: token + datos del usuario."
+          },
+          "response": []
+        },
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"nombre\": \"Deyna\",\r\n    \"email\": \"deyna@gmail.com\",\r\n    \"password\": \"12345678\",\r\n    \"password_confirmation\": \"12345678\",\r\n    \"telefono\": \"71234599\",\r\n    \"device_name\": \"postman-test\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/register",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "register"
+              ]
+            },
+            "description": "Crea un nuevo cliente y devuelve un token de acceso.  \nBody: nombre, email, password, password_confirmation, telefono, device_name.  \nRespuesta: token + datos del usuario."
+          },
+          "response": []
+        },
+        {
+          "name": "logout",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "6|5MXQuONNhPV3p63LKlSKDyAyDQNEs96NUcGmP17x98b7947e",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/logout",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "logout"
+              ]
+            },
+            "description": "Cierra la sesión y revoca el token actual.  \nRequiere: Authorization: Bearer {token}."
+          },
+          "response": []
+        },
+        {
+          "name": "Perfil",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "2|guZkFhXDtNZuBofOz6u7ele9cWkFbMqtvWGNHs1O7a6e7bb9",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/user",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "user"
+              ]
+            },
+            "description": "Devuelve los datos del usuario autenticado.  \nRequiere: Authorization: Bearer {token}."
+          },
+          "response": []
+        }
+      ],
+      "description": "Endpoints para registro, login, logout y perfil del usuario."
+    }
+  ]
+}
