@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoriaController;
+use App\Http\Controllers\Api\PedidoController;
 use App\Http\Controllers\Api\ProductoController;
 use Illuminate\Support\Facades\Route;
 
@@ -39,5 +40,24 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [AuthController::class, 'user']);
 
-    // Aquí irán las rutas de pedidos (Fase 3)
+    /*
+    |----------------------------------------------------------------------
+    | Rutas de Cliente
+    |----------------------------------------------------------------------
+    */
+    Route::middleware('api.role:cliente')->group(function () {
+        Route::post('/pedidos', [PedidoController::class, 'store']);
+        Route::get('/pedidos', [PedidoController::class, 'index']);
+        Route::get('/pedidos/{id}', [PedidoController::class, 'show']);
+        Route::delete('/pedidos/{id}', [PedidoController::class, 'cancelar']);
+    });
+
+    /*
+    |----------------------------------------------------------------------
+    | Rutas de Repartidor (Fase 4)
+    |----------------------------------------------------------------------
+    */
+    // Route::middleware('api.role:repartidor')->group(function () {
+    //     ...
+    // });
 });
