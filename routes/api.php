@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoriaController;
 use App\Http\Controllers\Api\PedidoController;
 use App\Http\Controllers\Api\ProductoController;
+use App\Http\Controllers\Api\RepartidorController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -54,10 +55,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
     /*
     |----------------------------------------------------------------------
-    | Rutas de Repartidor (Fase 4)
+    | Rutas de Repartidor
     |----------------------------------------------------------------------
     */
-    // Route::middleware('api.role:repartidor')->group(function () {
-    //     ...
-    // });
+    Route::middleware('api.role:repartidor')->group(function () {
+        Route::get('/repartidor/pedidos', [RepartidorController::class, 'pedidos']);
+        Route::get('/repartidor/pedidos/{id}', [RepartidorController::class, 'show']);
+        Route::patch('/repartidor/pedidos/{id}/entregar', [RepartidorController::class, 'entregar']);
+    });
 });
