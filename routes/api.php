@@ -29,7 +29,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::get('/categorias', [CategoriaController::class, 'index']);
 Route::get('/productos', [ProductoController::class, 'index']);
 Route::get('/productos/{id}', [ProductoController::class, 'show']);
-
+Route::get('/configuracion', [App\Http\Controllers\Api\ConfiguracionController::class, 'publica']);
 /*
 |--------------------------------------------------------------------------
 | Rutas Protegidas (requieren token de Sanctum)
