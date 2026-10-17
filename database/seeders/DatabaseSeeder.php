@@ -12,9 +12,10 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // Crear Usuarios de prueba
+        // Crear Usuarios de prueba (Nombres y Apellidos separados)
         Usuario::updateOrCreate(['email' => 'admin@goool.com'], [
-            'nombre' => 'Pizza Goool',
+            'nombres' => 'Admin',
+            'apellidos' => 'Pizza Goool',
             'email' => 'admin@goool.com',
             'password' => Hash::make('12345678'),
             'rol' => 'admin',
@@ -22,7 +23,8 @@ class DatabaseSeeder extends Seeder
         ]);
 
         Usuario::updateOrCreate(['email' => 'cajero@goool.com'], [
-            'nombre' => 'Cajero Juan',
+            'nombres' => 'Juan',
+            'apellidos' => 'Perez',
             'email' => 'cajero@goool.com',
             'password' => Hash::make('12345678'),
             'rol' => 'cajero',
@@ -30,7 +32,8 @@ class DatabaseSeeder extends Seeder
         ]);
 
         Usuario::updateOrCreate(['email' => 'repartidor@goool.com'], [
-            'nombre' => 'Carlos',
+            'nombres' => 'Carlos',
+            'apellidos' => 'Gomez',
             'email' => 'repartidor@goool.com',
             'password' => Hash::make('12345678'),
             'rol' => 'repartidor',
@@ -38,19 +41,20 @@ class DatabaseSeeder extends Seeder
         ]);
 
         Usuario::updateOrCreate(['email' => 'cliente@goool.com'], [
-            'nombre' => 'Maria Lopez',
+            'nombres' => 'Maria',
+            'apellidos' => 'Lopez',
             'email' => 'cliente@goool.com',
             'password' => Hash::make('12345678'),
             'rol' => 'cliente',
             'telefono' => '71234570'
         ]);
 
-        // Crear Categorías
+        // Crear Categorías (Sin cambios, esta tabla sí tiene 'nombre')
         $pizzas = Categoria::updateOrCreate(['nombre' => 'Pizzas'], ['descripcion' => 'Pizzas artesanales al horno de leña']);
         $bebidas = Categoria::updateOrCreate(['nombre' => 'Bebidas'], ['descripcion' => 'Refrescos y bebidas heladas']);
         $promos = Categoria::updateOrCreate(['nombre' => 'Promociones'], ['descripcion' => 'Combos especiales']);
 
-        // Crear Productos (Pizzas)
+        // Crear Productos (Sin cambios, esta tabla sí tiene 'nombre')
         Producto::updateOrCreate(['nombre' => 'Pizza Napolitana'], [
             'categoria_id' => $pizzas->id,
             'nombre' => 'Pizza Napolitana',
