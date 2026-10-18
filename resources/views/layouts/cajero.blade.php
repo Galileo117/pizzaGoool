@@ -120,9 +120,10 @@
                     </div>
 
                     <div
-                        class="w-10 h-10 rounded-full bg-gradient-to-tr from-goool-green to-goool-green-light text-white flex items-center justify-center text-lg font-bold shadow-sm ring-2 ring-white">
+                        class="w-10 h-10 rounded-full bg-green-100 text-goool-green flex items-center justify-center text-xl font-extrabold shadow-sm ring-2 ring-slate-100">
                         {{ strtoupper(substr(auth()->user()->nombres, 0, 1)) }}
                     </div>
+
                 </div>
             </header>
 

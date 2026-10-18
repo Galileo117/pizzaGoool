@@ -234,7 +234,10 @@
     {{-- FOOTER --}}
     <footer class="border-t border-white/10 bg-goool-green-dark text-gray-300 mt-auto">
         <div class="mx-auto w-full max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-10">
+
+            {{-- Contenido principal del Footer --}}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-10">
+
                 {{-- Logo + descripción --}}
                 <div class="lg:col-span-2">
                     <div class="flex items-center gap-3 mb-4">
@@ -291,10 +294,19 @@
                     <ul class="space-y-4 text-sm font-medium">
                         <li class="flex items-start gap-3">
                             <div
-                                class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center flex-shrink-0">
+                                class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center flex-shrink-0 mt-0.5">
                                 <i class="fa-solid fa-location-dot text-goool-yellow text-xs"></i>
                             </div>
-                            <span class="mt-1">Av. Principal #123, Zona Central<br>La Paz, Bolivia</span>
+                            <span class="leading-relaxed">Av. Mario Mercado<br>(a media cuadra del mercado Bajo
+                                Llojeta)<br>La Paz, Bolivia</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <div
+                                class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <i class="fa-regular fa-clock text-goool-yellow text-xs"></i>
+                            </div>
+                            <span class="leading-relaxed">Lunes a domingo<br>17:00 a 22:00 <span
+                                    class="text-white/60 text-xs">(5:00 PM – 10:00 PM)</span></span>
                         </li>
                         <li class="flex items-center gap-3">
                             <div
@@ -314,9 +326,9 @@
                 </div>
             </div>
 
-            {{-- Línea inferior --}}
+            {{-- Línea inferior (Copyright y Redes) --}}
             <div class="border-t border-white/10 pt-8 flex flex-col sm:flex-row items-center justify-between gap-6">
-                <p class="text-sm text-gray-400">
+                <p class="text-sm text-gray-400 text-center sm:text-left">
                     &copy; {{ now()->year }} <span class="font-bold text-white tracking-wide">Pizza Goool</span>.
                     Todos los derechos reservados.
                 </p>
@@ -344,6 +356,7 @@
                     </a>
                 </div>
             </div>
+
         </div>
     </footer>
 
