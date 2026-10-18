@@ -31,64 +31,68 @@
 
     {{-- Tabla (escritorio) --}}
     <div class="hidden md:block bg-white rounded-xl shadow-md overflow-hidden border border-gray-200">
-        <table class="w-full text-sm">
-            <thead class="bg-gray-50 border-b border-gray-200">
-                <tr>
-                    <th class="px-4 py-3 text-left font-semibold text-gray-600"># Pedido</th>
-                    <th class="px-4 py-3 text-left font-semibold text-gray-600">Cliente</th>
-                    <th class="px-4 py-3 text-left font-semibold text-gray-600">Total</th>
-                    <th class="px-4 py-3 text-left font-semibold text-gray-600">Tipo</th>
-                    <th class="px-4 py-3 text-center font-semibold text-gray-600">Estado</th>
-                    <th class="px-4 py-3 text-left font-semibold text-gray-600">Fecha</th>
-                    <th class="px-4 py-3 text-center font-semibold text-gray-600">Acciones</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-100">
-                @forelse($pedidos as $pedido)
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-4 py-3 font-bold text-goool-green">#{{ str_pad($pedido->id, 6, '0', STR_PAD_LEFT) }}
-                        </td>
-                        <td class="px-4 py-3 text-gray-700">{{ $pedido->usuario->nombre ?? 'N/A' }}</td>
-                        <td class="px-4 py-3 font-bold text-gray-800">Bs. {{ number_format($pedido->total, 2) }}</td>
-                        <td class="px-4 py-3 text-gray-600">
-                            <i
-                                class="fa-solid {{ $pedido->tipo_entrega === 'contraentrega' ? 'fa-truck-fast' : 'fa-store' }} text-goool-green"></i>
-                            {{ $pedido->tipo_entrega === 'contraentrega' ? 'Delivery' : 'Recoger' }}
-                        </td>
-                        <td class="px-4 py-3 text-center">
-                            @php
-                                $colores = [
-                                    'pendiente' => 'bg-yellow-100 text-yellow-700',
-                                    'preparacion' => 'bg-blue-100 text-blue-700',
-                                    'listo' => 'bg-green-100 text-green-700',
-                                    'en_reparto' => 'bg-purple-100 text-purple-700',
-                                    'entregado' => 'bg-gray-100 text-gray-700',
-                                    'cancelado' => 'bg-red-100 text-red-700',
-                                ];
-                                $color = $colores[$pedido->estado] ?? 'bg-gray-100 text-gray-700';
-                            @endphp
-                            <span class="{{ $color }} text-xs font-bold px-2 py-1 rounded-full">
-                                {{ ucfirst(str_replace('_', ' ', $pedido->estado)) }}
-                            </span>
-                        </td>
-                        <td class="px-4 py-3 text-gray-500 text-xs">{{ $pedido->created_at->format('d/m/Y H:i') }}</td>
-                        <td class="px-4 py-3 text-center">
-                            <a href="{{ route('cajero.pedidos.show', $pedido->id) }}"
-                                class="bg-goool-green text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-goool-green-dark transition">
-                                <i class="fa-solid fa-eye"></i> Ver
-                            </a>
-                        </td>
-                    </tr>
-                @empty
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead class="bg-gray-50 border-b border-gray-200">
                     <tr>
-                        <td colspan="7" class="px-4 py-8 text-center text-gray-400">
-                            <i class="fa-solid fa-receipt text-4xl mb-2"></i>
-                            <p>No hay pedidos para mostrar.</p>
-                        </td>
+                        <th class="px-4 py-3 text-left font-semibold text-gray-600"># Pedido</th>
+                        <th class="px-4 py-3 text-left font-semibold text-gray-600">Cliente</th>
+                        <th class="px-4 py-3 text-left font-semibold text-gray-600">Total</th>
+                        <th class="px-4 py-3 text-left font-semibold text-gray-600">Tipo</th>
+                        <th class="px-4 py-3 text-center font-semibold text-gray-600">Estado</th>
+                        <th class="px-4 py-3 text-left font-semibold text-gray-600">Fecha</th>
+                        <th class="px-4 py-3 text-center font-semibold text-gray-600">Acciones</th>
                     </tr>
-                @endforelse
-            </tbody>
-        </table>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    @forelse($pedidos as $pedido)
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-4 py-3 font-bold text-goool-green">
+                                #{{ str_pad($pedido->id, 6, '0', STR_PAD_LEFT) }}</td>
+                            {{-- CORREGIDO: nombres y apellidos --}}
+                            <td class="px-4 py-3 text-gray-700">{{ $pedido->usuario->nombres ?? 'N/A' }}
+                                {{ $pedido->usuario->apellidos ?? '' }}</td>
+                            <td class="px-4 py-3 font-bold text-gray-800">Bs. {{ number_format($pedido->total, 2) }}</td>
+                            <td class="px-4 py-3 text-gray-600">
+                                <i
+                                    class="fa-solid {{ $pedido->tipo_entrega === 'contraentrega' ? 'fa-truck-fast' : 'fa-store' }} text-goool-green"></i>
+                                {{ $pedido->tipo_entrega === 'contraentrega' ? 'Delivery' : 'Recoger' }}
+                            </td>
+                            <td class="px-4 py-3 text-center">
+                                @php
+                                    $colores = [
+                                        'pendiente' => 'bg-yellow-100 text-yellow-700',
+                                        'preparacion' => 'bg-blue-100 text-blue-700',
+                                        'listo' => 'bg-green-100 text-green-700',
+                                        'en_reparto' => 'bg-purple-100 text-purple-700',
+                                        'entregado' => 'bg-gray-100 text-gray-700',
+                                        'cancelado' => 'bg-red-100 text-red-700',
+                                    ];
+                                    $color = $colores[$pedido->estado] ?? 'bg-gray-100 text-gray-700';
+                                @endphp
+                                <span class="{{ $color }} text-xs font-bold px-2 py-1 rounded-full">
+                                    {{ ucfirst(str_replace('_', ' ', $pedido->estado)) }}
+                                </span>
+                            </td>
+                            <td class="px-4 py-3 text-gray-500 text-xs">{{ $pedido->created_at->format('d/m/Y H:i') }}</td>
+                            <td class="px-4 py-3 text-center">
+                                <a href="{{ route('cajero.pedidos.show', $pedido->id) }}"
+                                    class="bg-goool-green text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-goool-green-dark transition">
+                                    <i class="fa-solid fa-eye"></i> Ver
+                                </a>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="7" class="px-4 py-8 text-center text-gray-400">
+                                <i class="fa-solid fa-receipt text-4xl mb-2"></i>
+                                <p>No hay pedidos para mostrar.</p>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
         <div class="px-4 py-3 border-t border-gray-200">{{ $pedidos->links() }}</div>
     </div>
 
@@ -120,7 +124,9 @@
                 <div class="p-4 space-y-2 text-sm">
                     <div class="flex justify-between">
                         <span class="text-gray-500 font-semibold">Cliente</span>
-                        <span class="font-bold text-gray-800">{{ $pedido->usuario->nombre ?? 'N/A' }}</span>
+                        {{-- CORREGIDO: nombres y apellidos --}}
+                        <span class="font-bold text-gray-800">{{ $pedido->usuario->nombres ?? 'N/A' }}
+                            {{ $pedido->usuario->apellidos ?? '' }}</span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-gray-500 font-semibold">Total</span>

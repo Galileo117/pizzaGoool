@@ -10,28 +10,39 @@
             <h2 class="text-xl font-bold text-goool-green-dark">Reportes de Ventas</h2>
             <p class="text-gray-600 text-sm">Analiza las ventas del negocio por rango de fechas.</p>
         </div>
-        <a href="{{ route('admin.reportes.pdf', ['fecha_inicio' => $fechaInicio, 'fecha_fin' => $fechaFin]) }}" 
-           target="_blank"
-           class="bg-red-500 text-white font-bold px-5 py-3 rounded-lg hover:bg-red-600 transition flex items-center gap-2 w-full sm:w-auto justify-center">
+        <a href="{{ route('admin.reportes.pdf', ['fecha_inicio' => $fechaInicio, 'fecha_fin' => $fechaFin]) }}"
+            target="_blank"
+            class="bg-red-500 text-white font-bold px-5 py-3 rounded-lg hover:bg-red-600 transition flex items-center gap-2 w-full sm:w-auto justify-center shadow-sm">
             <i class="fa-solid fa-file-pdf"></i> Exportar PDF
         </a>
     </div>
 
     <!-- Filtro por fechas -->
     <div class="bg-white rounded-xl shadow-md p-4 sm:p-6 border border-gray-200 mb-6">
-        <form method="GET" action="{{ route('admin.reportes.index') }}" class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+        <form method="GET" action="{{ route('admin.reportes.index') }}"
+            class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
             <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-1">Fecha Inicio</label>
-                <input type="date" name="fecha_inicio" value="{{ $fechaInicio }}" class="w-full border border-gray-300 rounded-lg p-3 focus:border-goool-green focus:outline-none">
+                <input type="date" name="fecha_inicio" value="{{ $fechaInicio }}"
+                    class="w-full border border-gray-300 rounded-lg p-3 focus:border-goool-green focus:outline-none">
             </div>
             <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-1">Fecha Fin</label>
-                <input type="date" name="fecha_fin" value="{{ $fechaFin }}" class="w-full border border-gray-300 rounded-lg p-3 focus:border-goool-green focus:outline-none">
+                <input type="date" name="fecha_fin" value="{{ $fechaFin }}"
+                    class="w-full border border-gray-300 rounded-lg p-3 focus:border-goool-green focus:outline-none">
             </div>
             <div>
-                <button type="submit" class="w-full bg-goool-green text-white font-bold py-3 rounded-lg hover:bg-goool-green-dark transition">
+                <button type="submit"
+                    class="w-full bg-goool-green text-white font-bold py-3 rounded-lg hover:bg-goool-green-dark transition flex items-center justify-center gap-2">
                     <i class="fa-solid fa-filter"></i> Filtrar
                 </button>
+            </div>
+            <div>
+                {{-- Botón de limpiar filtros --}}
+                <a href="{{ route('admin.reportes.index') }}"
+                    class="w-full bg-gray-100 text-gray-700 border border-gray-200 font-bold py-3 rounded-lg hover:bg-gray-200 transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-rotate-left"></i> Limpiar
+                </a>
             </div>
         </form>
     </div>
@@ -42,9 +53,10 @@
             <div class="flex justify-between items-center">
                 <div>
                     <p class="text-gray-500 text-xs sm:text-sm font-semibold">Ventas Totales</p>
-                    <p class="text-2xl sm:text-3xl font-bold text-goool-green-dark">Bs. {{ number_format($totalVentas, 2) }}</p>
+                    <p class="text-2xl sm:text-3xl font-bold text-goool-green-dark">Bs. {{ number_format($totalVentas, 2) }}
+                    </p>
                 </div>
-                <div class="bg-goool-green-light/30 p-2 sm:p-3 rounded-full">
+                <div class="bg-goool-green-light/30 p-2 sm:p-3 rounded-full flex-shrink-0">
                     <i class="fa-solid fa-money-bill-wave text-xl sm:text-2xl text-goool-green"></i>
                 </div>
             </div>
@@ -56,7 +68,7 @@
                     <p class="text-gray-500 text-xs sm:text-sm font-semibold">Total Pedidos</p>
                     <p class="text-2xl sm:text-3xl font-bold text-blue-600">{{ $totalPedidos }}</p>
                 </div>
-                <div class="bg-blue-100 p-2 sm:p-3 rounded-full">
+                <div class="bg-blue-100 p-2 sm:p-3 rounded-full flex-shrink-0">
                     <i class="fa-solid fa-receipt text-xl sm:text-2xl text-blue-600"></i>
                 </div>
             </div>
@@ -66,10 +78,11 @@
             <div class="flex justify-between items-center">
                 <div>
                     <p class="text-gray-500 text-xs sm:text-sm font-semibold">Promedio por Pedido</p>
-                    <p class="text-2xl sm:text-3xl font-bold text-yellow-600">Bs. {{ number_format($ticketPromedio, 2) }}</p>
+                    <p class="text-2xl sm:text-3xl font-bold text-yellow-600">Bs. {{ number_format($ticketPromedio, 2) }}
+                    </p>
                     <p class="text-xs text-gray-400 mt-1 italic">Monto promedio por cliente</p>
                 </div>
-                <div class="bg-yellow-100 p-2 sm:p-3 rounded-full">
+                <div class="bg-yellow-100 p-2 sm:p-3 rounded-full flex-shrink-0">
                     <i class="fa-solid fa-chart-line text-xl sm:text-2xl text-yellow-600"></i>
                 </div>
             </div>
@@ -83,7 +96,7 @@
                 <h3 class="text-white font-bold text-sm"><i class="fa-solid fa-chart-line"></i> VENTAS POR DÍA</h3>
             </div>
             <div class="p-4 sm:p-6">
-                <div class="h-64">
+                <div class="h-64 relative">
                     <canvas id="graficoVentas"></canvas>
                 </div>
             </div>
@@ -94,7 +107,7 @@
                 <h3 class="text-white font-bold text-sm"><i class="fa-solid fa-chart-bar"></i> PRODUCTOS MÁS VENDIDOS</h3>
             </div>
             <div class="p-4 sm:p-6">
-                <div class="h-64">
+                <div class="h-64 relative">
                     <canvas id="graficoProductos"></canvas>
                 </div>
             </div>
@@ -112,15 +125,18 @@
                 @forelse($productosMasVendidos as $item)
                     <div class="flex justify-between items-center py-3 border-b border-gray-100 last:border-0">
                         <div class="flex items-center gap-3">
-                            <div class="bg-goool-green-light/30 w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0">
+                            <div
+                                class="bg-goool-green-light/30 w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0">
                                 <i class="fa-solid fa-pizza-slice text-goool-green"></i>
                             </div>
                             <div class="min-w-0">
-                                <p class="font-semibold text-gray-800 text-sm truncate">{{ $item->producto->nombre ?? 'Producto eliminado' }}</p>
+                                <p class="font-semibold text-gray-800 text-sm truncate">
+                                    {{ $item->producto->nombre ?? 'Producto eliminado' }}</p>
                                 <p class="text-xs text-gray-500">{{ $item->total_vendido }} unidades vendidas</p>
                             </div>
                         </div>
-                        <span class="font-bold text-goool-green text-sm whitespace-nowrap ml-2">Bs. {{ number_format($item->total_ingresos, 2) }}</span>
+                        <span class="font-bold text-goool-green text-sm whitespace-nowrap ml-2">Bs.
+                            {{ number_format($item->total_ingresos, 2) }}</span>
                     </div>
                 @empty
                     <p class="text-center text-gray-400 py-4">No hay ventas en este período.</p>
@@ -134,7 +150,7 @@
                 <h3 class="text-white font-bold text-sm"><i class="fa-solid fa-credit-card"></i> MÉTODOS DE PAGO</h3>
             </div>
             <div class="p-4 sm:p-6">
-                <div class="h-64">
+                <div class="h-64 relative">
                     <canvas id="graficoMetodos"></canvas>
                 </div>
             </div>
@@ -165,7 +181,8 @@
                                 {{ \Carbon\Carbon::parse($dia->fecha)->format('d/m/Y') }}
                             </td>
                             <td class="px-4 py-3 text-center text-gray-700">{{ $dia->total_pedidos }}</td>
-                            <td class="px-4 py-3 text-right font-bold text-goool-green">Bs. {{ number_format($dia->total_ventas, 2) }}</td>
+                            <td class="px-4 py-3 text-right font-bold text-goool-green">Bs.
+                                {{ number_format($dia->total_ventas, 2) }}</td>
                         </tr>
                     @empty
                         <tr>
@@ -209,14 +226,18 @@
         const productosMasVendidos = @json($productosMasVendidos);
         const ventasPorMetodo = @json($ventasPorMetodo);
 
-        // Gráfico de ventas por día
+        // Gráfico de ventas por día (CON FECHAS CORREGIDAS)
         const ctxVentas = document.getElementById('graficoVentas').getContext('2d');
         new Chart(ctxVentas, {
             type: 'line',
             data: {
+                // Se agrega T12:00:00 para evitar desfase por zona horaria
                 labels: ventasPorDia.map(v => {
-                    const fecha = new Date(v.fecha);
-                    return fecha.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' });
+                    const fecha = new Date(v.fecha + 'T12:00:00');
+                    return fecha.toLocaleDateString('es-ES', {
+                        day: '2-digit',
+                        month: '2-digit'
+                    });
                 }).reverse(),
                 datasets: [{
                     label: 'Ventas (Bs.)',
@@ -234,11 +255,19 @@
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
                 scales: {
                     y: {
                         beginAtZero: true,
-                        ticks: { callback: function(value) { return 'Bs. ' + value; } }
+                        ticks: {
+                            callback: function(value) {
+                                return 'Bs. ' + value;
+                            }
+                        }
                     }
                 }
             }
@@ -260,9 +289,18 @@
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
                 scales: {
-                    y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
                 }
             }
         });
@@ -285,7 +323,13 @@
                 plugins: {
                     legend: {
                         position: 'bottom',
-                        labels: { padding: 20, font: { size: 12, weight: 'bold' } }
+                        labels: {
+                            padding: 20,
+                            font: {
+                                size: 12,
+                                weight: 'bold'
+                            }
+                        }
                     }
                 }
             }
