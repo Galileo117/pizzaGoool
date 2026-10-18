@@ -14,9 +14,13 @@ class ProductoResource extends JsonResource
             'nombre' => $this->nombre,
             'descripcion' => $this->descripcion,
             'precio' => (float) $this->precio,
-            'imagen' => $this->imagen ? asset('storage/' . $this->imagen) : null,
+            'imagen' => $this->imagen
+                ? asset('storage/' . $this->imagen)
+                : null,
             'disponible' => (bool) $this->disponible,
-            'categoria' => new CategoriaResource($this->whenLoaded('categoria')),
+            'categoria' => new CategoriaResource(
+                $this->whenLoaded('categoria')
+            ),
         ];
     }
 }

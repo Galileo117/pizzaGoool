@@ -11,14 +11,12 @@ use App\Models\Pedido;
 use App\Models\Producto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Throwable;
 
 class PedidoController extends Controller
 {
     use ApiResponse;
 
-    /**
-     * Crear un pedido desde la app móvil.
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -44,10 +42,15 @@ class PedidoController extends Controller
 
                 if (!$producto || !$producto->disponible) {
                     DB::rollBack();
-                    return $this->errorResponse("El producto {$item['producto_id']} no está disponible.", 422);
+
+                    return $this->errorResponse(
+                        "El producto {$item['producto_id']} no está disponible.",
+                        422
+                    );
                 }
 
-                $subtotal = $producto->precio * $item['cantidad'];
+                $subtotal = (float) $producto->precio * $item['cantidad'];
+
                 $total += $subtotal;
 
                 $detalles[] = [
@@ -88,27 +91,43 @@ class PedidoController extends Controller
 
             DB::commit();
 
-            $pedido->load('detallePedidos.producto', 'repartidor');
+            $pedido->load([
+                'usuario',
+                'repartidor',
+                'detallePedidos.producto',
+                'pago',
+            ]);
 
             return $this->successResponse(
                 new PedidoResource($pedido),
                 'Pedido creado correctamente.',
                 201
             );
-        } catch (\Exception $e) {
+        } catch (Throwable $e) {
             DB::rollBack();
-            return $this->errorResponse('Error al crear el pedido: ' . $e->getMessage(), 500);
+
+            report($e);
+
+            return $this->errorResponse(
+                'No se pudo crear el pedido.',
+                500
+            );
         }
     }
 
-    /**
-     * Listar los pedidos del cliente autenticado.
-     */
     public function index(Request $request)
     {
-        $pedidos = Pedido::where('usuario_id', $request->user()->id)
-            ->with(['detallePedidos.producto', 'repartidor'])
-            ->orderBy('created_at', 'desc')
+        $pedidos = Pedido::where(
+            'usuario_id',
+            $request->user()->id
+        )
+            ->with([
+                'usuario',
+                'repartidor',
+                'detallePedidos.producto',
+                'pago',
+            ])
+            ->orderByDesc('created_at')
             ->get();
 
         return $this->successResponse(
@@ -117,17 +136,24 @@ class PedidoController extends Controller
         );
     }
 
-    /**
-     * Ver el detalle de un pedido.
-     */
     public function show(Request $request, $id)
     {
-        $pedido = Pedido::with(['detallePedidos.producto', 'repartidor', 'pago'])
-            ->where('usuario_id', $request->user()->id)
+        $pedido = Pedido::where(
+            'usuario_id',
+            $request->user()->id
+        )
+            ->with([
+                'usuario',
+                'repartidor',
+                'detallePedidos.producto',
+                'pago',
+            ])
             ->find($id);
 
         if (!$pedido) {
-            return $this->notFoundResponse('Pedido no encontrado.');
+            return $this->notFoundResponse(
+                'Pedido no encontrado.'
+            );
         }
 
         return $this->successResponse(
@@ -136,23 +162,33 @@ class PedidoController extends Controller
         );
     }
 
-    /**
-     * Cancelar un pedido (solo si está pendiente).
-     */
     public function cancelar(Request $request, $id)
     {
-        $pedido = Pedido::where('usuario_id', $request->user()->id)->find($id);
+        $pedido = Pedido::where(
+            'usuario_id',
+            $request->user()->id
+        )->find($id);
 
         if (!$pedido) {
-            return $this->notFoundResponse('Pedido no encontrado.');
+            return $this->notFoundResponse(
+                'Pedido no encontrado.'
+            );
         }
 
         if ($pedido->estado !== 'pendiente') {
-            return $this->errorResponse('Este pedido ya no se puede cancelar.', 422);
+            return $this->errorResponse(
+                'Este pedido ya no se puede cancelar.',
+                422
+            );
         }
 
-        $pedido->update(['estado' => 'cancelado']);
+        $pedido->update([
+            'estado' => 'cancelado',
+        ]);
 
-        return $this->successResponse(null, 'Pedido cancelado correctamente.');
+        return $this->successResponse(
+            null,
+            'Pedido cancelado correctamente.'
+        );
     }
 }

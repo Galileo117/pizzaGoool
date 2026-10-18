@@ -12,17 +12,19 @@ class RepartidorController extends Controller
 {
     use ApiResponse;
 
-    /**
-     * Listar los pedidos asignados al repartidor autenticado.
-     * Solo muestra pedidos en_reparto o entregados recientemente.
-     */
     public function pedidos(Request $request)
     {
-        $repartidorId = $request->user()->id;
-
-        $pedidos = Pedido::where('repartidor_id', $repartidorId)
-            ->with(['detallePedidos.producto', 'usuario'])
-            ->orderBy('updated_at', 'desc')
+        $pedidos = Pedido::where(
+            'repartidor_id',
+            $request->user()->id
+        )
+            ->with([
+                'usuario',
+                'repartidor',
+                'detallePedidos.producto',
+                'pago',
+            ])
+            ->orderByDesc('updated_at')
             ->get();
 
         return $this->successResponse(
@@ -31,17 +33,24 @@ class RepartidorController extends Controller
         );
     }
 
-    /**
-     * Ver el detalle de un pedido asignado.
-     */
     public function show(Request $request, $id)
     {
-        $pedido = Pedido::with(['detallePedidos.producto', 'usuario', 'pago'])
-            ->where('repartidor_id', $request->user()->id)
+        $pedido = Pedido::where(
+            'repartidor_id',
+            $request->user()->id
+        )
+            ->with([
+                'usuario',
+                'repartidor',
+                'detallePedidos.producto',
+                'pago',
+            ])
             ->find($id);
 
         if (!$pedido) {
-            return $this->notFoundResponse('Pedido no encontrado o no asignado a ti.');
+            return $this->notFoundResponse(
+                'Pedido no encontrado o no asignado a ti.'
+            );
         }
 
         return $this->successResponse(
@@ -50,25 +59,39 @@ class RepartidorController extends Controller
         );
     }
 
-    /**
-     * Marcar un pedido como entregado.
-     */
     public function entregar(Request $request, $id)
     {
-        $pedido = Pedido::where('repartidor_id', $request->user()->id)->find($id);
+        $pedido = Pedido::where(
+            'repartidor_id',
+            $request->user()->id
+        )->find($id);
 
         if (!$pedido) {
-            return $this->notFoundResponse('Pedido no encontrado o no asignado a ti.');
+            return $this->notFoundResponse(
+                'Pedido no encontrado o no asignado a ti.'
+            );
         }
 
         if ($pedido->estado !== 'en_reparto') {
-            return $this->errorResponse('Este pedido no está en reparto.', 422);
+            return $this->errorResponse(
+                'Este pedido no está en reparto.',
+                422
+            );
         }
 
-        $pedido->update(['estado' => 'entregado']);
+        $pedido->update([
+            'estado' => 'entregado',
+        ]);
+
+        $pedido->load([
+            'usuario',
+            'repartidor',
+            'detallePedidos.producto',
+            'pago',
+        ]);
 
         return $this->successResponse(
-            new PedidoResource($pedido->load('detallePedidos.producto')),
+            new PedidoResource($pedido),
             'Pedido marcado como entregado correctamente.'
         );
     }

@@ -12,10 +12,18 @@ class DetallePedidoResource extends JsonResource
         return [
             'id' => $this->id,
             'producto_id' => $this->producto_id,
-            'producto' => $this->producto ? $this->producto->nombre : 'Producto eliminado',
-            'cantidad' => $this->cantidad,
+
+            'producto' => $this->producto
+                ? $this->producto->nombre
+                : 'Producto eliminado',
+
+            'cantidad' => (int) $this->cantidad,
+
             'precio_unitario' => (float) $this->precio_unitario,
-            'subtotal' => (float) ($this->precio_unitario * $this->cantidad),
+
+            'subtotal' => (float) (
+                $this->precio_unitario * $this->cantidad
+            ),
         ];
     }
 }
