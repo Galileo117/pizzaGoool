@@ -31,15 +31,35 @@ class UsuarioController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nombre' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:usuarios,email',
+            'nombres' => 'required|string|max:50',
+            'apellidos' => 'required|string|max:50',
+            'email' => 'required|string|email|max:150|unique:usuarios,email',
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'rol' => 'required|in:admin,cajero,repartidor,cliente',
-            'telefono' => 'nullable|string|max:20',
+            'telefono' => 'nullable|regex:/^[0-9]+$/|min:8|max:15|unique:usuarios,telefono',
+        ], [
+            'nombres.required' => 'El nombre es obligatorio.',
+            'nombres.max' => 'El nombre no puede superar los 50 caracteres.',
+            'apellidos.required' => 'Los apellidos son obligatorios.',
+            'apellidos.max' => 'Los apellidos no pueden superar los 50 caracteres.',
+            'email.required' => 'El correo electrónico es obligatorio.',
+            'email.email' => 'Debes ingresar un correo electrónico válido.',
+            'email.max' => 'El correo no puede superar los 150 caracteres.',
+            'email.unique' => 'Este correo ya está registrado en el sistema.',
+            'password.required' => 'La contraseña es obligatoria.',
+            'password.confirmed' => 'Las contraseñas no coinciden.',
+            'password.min' => 'La contraseña debe tener al menos 8 caracteres.',
+            'rol.required' => 'Debes seleccionar un rol.',
+            'rol.in' => 'El rol seleccionado no es válido.',
+            'telefono.regex' => 'El teléfono solo debe contener números, sin espacios ni símbolos.',
+            'telefono.min' => 'El teléfono debe tener al menos 8 dígitos.',
+            'telefono.max' => 'El teléfono no puede tener más de 15 dígitos.',
+            'telefono.unique' => 'Este número de teléfono ya está registrado.',
         ]);
 
         Usuario::create([
-            'nombre' => $request->nombre,
+            'nombres' => $request->nombres,
+            'apellidos' => $request->apellidos,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'rol' => $request->rol,
@@ -58,15 +78,34 @@ class UsuarioController extends Controller
     public function update(Request $request, Usuario $usuario)
     {
         $request->validate([
-            'nombre' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:usuarios,email,' . $usuario->id,
+            'nombres' => 'required|string|max:50',
+            'apellidos' => 'required|string|max:50',
+            'email' => 'required|string|email|max:150|unique:usuarios,email,' . $usuario->id,
             'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
             'rol' => 'required|in:admin,cajero,repartidor,cliente',
-            'telefono' => 'nullable|string|max:20',
+            'telefono' => 'nullable|regex:/^[0-9]+$/|min:8|max:15|unique:usuarios,telefono,' . $usuario->id,
+        ], [
+            'nombres.required' => 'El nombre es obligatorio.',
+            'nombres.max' => 'El nombre no puede superar los 50 caracteres.',
+            'apellidos.required' => 'Los apellidos son obligatorios.',
+            'apellidos.max' => 'Los apellidos no pueden superar los 50 caracteres.',
+            'email.required' => 'El correo electrónico es obligatorio.',
+            'email.email' => 'Debes ingresar un correo electrónico válido.',
+            'email.max' => 'El correo no puede superar los 150 caracteres.',
+            'email.unique' => 'Este correo ya está registrado en otro usuario.',
+            'password.confirmed' => 'Las contraseñas no coinciden.',
+            'password.min' => 'La contraseña debe tener al menos 8 caracteres.',
+            'rol.required' => 'Debes seleccionar un rol.',
+            'rol.in' => 'El rol seleccionado no es válido.',
+            'telefono.regex' => 'El teléfono solo debe contener números, sin espacios ni símbolos.',
+            'telefono.min' => 'El teléfono debe tener al menos 8 dígitos.',
+            'telefono.max' => 'El teléfono no puede tener más de 15 dígitos.',
+            'telefono.unique' => 'Este número de teléfono ya está registrado.',
         ]);
 
         $data = [
-            'nombre' => $request->nombre,
+            'nombres' => $request->nombres,
+            'apellidos' => $request->apellidos,
             'email' => $request->email,
             'rol' => $request->rol,
             'telefono' => $request->telefono,
@@ -84,8 +123,7 @@ class UsuarioController extends Controller
 
     public function destroy(Usuario $usuario)
     {
-        // No permitir que el admin se elimine a sí mismo
-        if ($usuario->id === auth()->id()) {
+        if ($usuario->id === (int) auth()->id()) {
             return redirect()->route('admin.usuarios.index')
                 ->with('error', 'No puedes eliminar tu propia cuenta.');
         }
