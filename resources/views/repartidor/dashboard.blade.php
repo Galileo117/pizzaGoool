@@ -5,7 +5,7 @@
 
 @section('content')
     <div class="mb-6">
-        <h2 class="text-2xl font-bold text-goool-green-dark">Bienvenido, {{ auth()->user()->nombre }}</h2>
+        <h2 class="text-2xl font-bold text-goool-green-dark">Bienvenido, {{ auth()->user()->nombres }}</h2>
         <p class="text-gray-600">Aquí verás tus pedidos asignados para entregar.</p>
     </div>
 
@@ -54,7 +54,8 @@
     <!-- Acceso rápido -->
     <div class="bg-white rounded-xl shadow-md p-6">
         <h3 class="text-lg font-bold text-goool-green-dark mb-4">Acceso Rápido</h3>
-        <a href="{{ route('repartidor.pedidos.index') }}" class="inline-flex items-center gap-3 bg-goool-green text-white font-bold px-6 py-3 rounded-lg hover:bg-goool-green-dark transition">
+        <a href="{{ route('repartidor.pedidos.index') }}"
+            class="inline-flex items-center gap-3 bg-goool-green text-white font-bold px-6 py-3 rounded-lg hover:bg-goool-green-dark transition">
             <i class="fa-solid fa-motorcycle"></i>
             Ver Mis Entregas
         </a>

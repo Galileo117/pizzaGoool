@@ -5,7 +5,7 @@
 
 @section('content')
     <div class="mb-6">
-        <h2 class="text-2xl font-bold text-goool-green-dark">Bienvenido, {{ auth()->user()->nombre }}</h2>
+        <h2 class="text-2xl font-bold text-goool-green-dark">Bienvenido, {{ auth()->user()->nombres }}</h2>
         <p class="text-gray-600">Aquí tienes un resumen de la actividad de Pizza Goool.</p>
     </div>
 
@@ -60,19 +60,23 @@
     <div class="bg-white rounded-xl shadow-md p-6">
         <h3 class="text-lg font-bold text-goool-green-dark mb-4">Accesos Rápidos</h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <a href="{{ route('admin.productos.index') }}" class="flex flex-col items-center p-4 border-2 border-gray-200 rounded-lg hover:border-goool-green hover:bg-goool-green-light/10 transition">
+            <a href="{{ route('admin.productos.index') }}"
+                class="flex flex-col items-center p-4 border-2 border-gray-200 rounded-lg hover:border-goool-green hover:bg-goool-green-light/10 transition">
                 <i class="fa-solid fa-pizza-slice text-3xl text-goool-green mb-2"></i>
                 <span class="font-semibold text-gray-700">Gestionar Productos</span>
             </a>
-            <a href="{{ route('admin.categorias.index') }}" class="flex flex-col items-center p-4 border-2 border-gray-200 rounded-lg hover:border-goool-green hover:bg-goool-green-light/10 transition">
+            <a href="{{ route('admin.categorias.index') }}"
+                class="flex flex-col items-center p-4 border-2 border-gray-200 rounded-lg hover:border-goool-green hover:bg-goool-green-light/10 transition">
                 <i class="fa-solid fa-tags text-3xl text-goool-green mb-2"></i>
                 <span class="font-semibold text-gray-700">Gestionar Categorías</span>
             </a>
-            <a href="{{ route('admin.pedidos.index') }}" class="flex flex-col items-center p-4 border-2 border-gray-200 rounded-lg hover:border-goool-green hover:bg-goool-green-light/10 transition">
+            <a href="{{ route('admin.pedidos.index') }}"
+                class="flex flex-col items-center p-4 border-2 border-gray-200 rounded-lg hover:border-goool-green hover:bg-goool-green-light/10 transition">
                 <i class="fa-solid fa-receipt text-3xl text-goool-green mb-2"></i>
                 <span class="font-semibold text-gray-700">Ver Pedidos</span>
             </a>
-            <a href="{{ route('admin.usuarios.index') }}" class="flex flex-col items-center p-4 border-2 border-gray-200 rounded-lg hover:border-goool-green hover:bg-goool-green-light/10 transition">
+            <a href="{{ route('admin.usuarios.index') }}"
+                class="flex flex-col items-center p-4 border-2 border-gray-200 rounded-lg hover:border-goool-green hover:bg-goool-green-light/10 transition">
                 <i class="fa-solid fa-users text-3xl text-goool-green mb-2"></i>
                 <span class="font-semibold text-gray-700">Ver Usuarios</span>
             </a>

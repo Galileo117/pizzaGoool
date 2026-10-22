@@ -43,9 +43,9 @@
 
                     {{-- Info --}}
                     <div class="text-center sm:text-left flex-1 sm:pb-2">
-                        <h2 class="text-2xl font-extrabold text-gray-800">{{ auth()->user()->nombres }}
+                        <h2 class="text-2xl font-extrabold text-white">{{ auth()->user()->nombres }}
                             {{ auth()->user()->apellidos }}</h2>
-                        <p class="text-gray-500 text-sm font-medium">{{ auth()->user()->email }}</p>
+                        <p class="text-white text-sm font-medium">{{ auth()->user()->email }}</p>
                     </div>
                 </div>
 

@@ -8,7 +8,6 @@
     <title>@yield('title', 'Panel de Repartidor - Pizza Goool')</title>
 
     <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com">

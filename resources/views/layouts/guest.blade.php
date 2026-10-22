@@ -8,7 +8,6 @@
     <title>{{ config('app.name', 'Pizza Goool') }}</title>
 
     <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -18,10 +17,13 @@
     <main class="relative min-h-screen overflow-hidden">
 
         {{-- Mancha verde superior izquierda --}}
-        <div class="pointer-events-none absolute -left-32 -top-32 h-96 w-96 rounded-full bg-goool-green/20 blur-3xl"></div>
+        <div class="pointer-events-none absolute -left-32 -top-32 h-96 w-96 rounded-full bg-goool-green/20 blur-3xl">
+        </div>
 
         {{-- Mancha amarilla inferior derecha --}}
-        <div class="pointer-events-none absolute -bottom-40 -right-40 h-[500px] w-[500px] rounded-full bg-goool-yellow/20 blur-3xl"></div>
+        <div
+            class="pointer-events-none absolute -bottom-40 -right-40 h-[500px] w-[500px] rounded-full bg-goool-yellow/20 blur-3xl">
+        </div>
 
         {{-- Patrón de puntos: Arriba derecha (SIEMPRE visible) --}}
         <div class="pointer-events-none absolute right-8 top-8 h-40 w-40 opacity-70">

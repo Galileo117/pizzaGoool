@@ -43,7 +43,7 @@
                         <div
                             class="inline-flex items-center gap-3 bg-white/10 text-white px-6 py-3 rounded-xl font-semibold backdrop-blur-sm">
                             <i class="fa-solid fa-circle-check text-goool-yellow"></i>
-                            <span>¡Hola, {{ auth()->user()->nombre }}! ¿Qué te gustaría pedir hoy?</span>
+                            <span>¡Hola, {{ auth()->user()->nombres }}! ¿Qué te gustaría pedir hoy?</span>
                         </div>
 
                         <div class="mt-4 flex justify-center">
