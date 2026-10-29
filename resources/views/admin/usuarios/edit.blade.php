@@ -8,8 +8,9 @@
         <a href="{{ route('admin.usuarios.index') }}" class="text-goool-green hover:underline">
             <i class="fa-solid fa-arrow-left"></i> Volver al listado
         </a>
-        <h2 class="text-xl font-bold text-goool-green-dark mt-2 break-words">Editar Usuario: {{ $usuario->nombres }}
-            {{ $usuario->apellidos }}</h2>
+        {{-- Usamos el accesor nombre_completo --}}
+        <h2 class="text-xl font-bold text-goool-green-dark mt-2 break-words">Editar Usuario: {{ $usuario->nombre_completo }}
+        </h2>
     </div>
 
     <div class="bg-white rounded-xl shadow-md border border-gray-200 p-4 sm:p-6">
@@ -21,8 +22,10 @@
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Nombres <span
                             class="text-red-500">*</span></label>
-                    <input type="text" name="nombres" value="{{ old('nombres', $usuario->nombres) }}" required
-                        maxlength="50"
+                    {{-- Precargamos dependiendo de la relacion --}}
+                    <input type="text" name="nombres"
+                        value="{{ old('nombres', $usuario->cliente->nombres ?? ($usuario->empleado->nombres ?? ($usuario->repartidor->nombres ?? ''))) }}"
+                        required maxlength="50"
                         class="w-full border @error('nombres') border-red-500 @else border-gray-300 @enderror rounded-lg p-3 focus:border-goool-green focus:outline-none transition-colors">
                     @error('nombres')
                         <p class="text-red-500 text-xs mt-1 font-medium"><i class="fa-solid fa-circle-exclamation mr-1"></i>
@@ -33,8 +36,9 @@
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Apellidos <span
                             class="text-red-500">*</span></label>
-                    <input type="text" name="apellidos" value="{{ old('apellidos', $usuario->apellidos) }}" required
-                        maxlength="50"
+                    <input type="text" name="apellidos"
+                        value="{{ old('apellidos', $usuario->cliente->apellidos ?? ($usuario->empleado->apellidos ?? ($usuario->repartidor->apellidos ?? ''))) }}"
+                        required maxlength="50"
                         class="w-full border @error('apellidos') border-red-500 @else border-gray-300 @enderror rounded-lg p-3 focus:border-goool-green focus:outline-none transition-colors">
                     @error('apellidos')
                         <p class="text-red-500 text-xs mt-1 font-medium"><i class="fa-solid fa-circle-exclamation mr-1"></i>
@@ -58,7 +62,7 @@
 
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Teléfono</label>
-                    <input type="text" name="telefono" value="{{ old('telefono', $usuario->telefono) }}"
+                    <input type="text" name="telefono" value="{{ old('telefono', $usuario->telefono_contacto) }}"
                         oninput="this.value = this.value.replace(/[^0-9]/g, '')" minlength="8" maxlength="15"
                         class="w-full border @error('telefono') border-red-500 @else border-gray-300 @enderror rounded-lg p-3 focus:border-goool-green focus:outline-none transition-colors"
                         placeholder="Ej: 71234567">
@@ -73,7 +77,7 @@
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Rol <span
                             class="text-red-500">*</span></label>
-                    <select name="rol" required
+                    <select name="rol" id="select-rol" required
                         class="w-full border @error('rol') border-red-500 @else border-gray-300 @enderror rounded-lg p-3 focus:border-goool-green focus:outline-none transition-colors">
                         <option value="admin" {{ old('rol', $usuario->rol) == 'admin' ? 'selected' : '' }}>Administrador
                         </option>
@@ -85,6 +89,47 @@
                         </option>
                     </select>
                     @error('rol')
+                        <p class="text-red-500 text-xs mt-1 font-medium"><i class="fa-solid fa-circle-exclamation mr-1"></i>
+                            {{ $message }}</p>
+                    @enderror
+                </div>
+            </div>
+
+            {{-- Campos exclusivos para repartidores --}}
+            <div id="campos-repartidor"
+                class="hidden grid-cols-1 md:grid-cols-3 gap-5 p-4 bg-purple-50 rounded-lg border border-purple-100">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Cédula de Identidad (CI) <span
+                            class="text-red-500">*</span></label>
+                    <input type="text" name="ci" value="{{ old('ci', $usuario->repartidor->ci ?? '') }}"
+                        maxlength="15"
+                        class="w-full border @error('ci') border-red-500 @else border-gray-300 @enderror rounded-lg p-3 focus:border-goool-green focus:outline-none transition-colors"
+                        placeholder="Ej: 1234567-LP">
+                    @error('ci')
+                        <p class="text-red-500 text-xs mt-1 font-medium"><i class="fa-solid fa-circle-exclamation mr-1"></i>
+                            {{ $message }}</p>
+                    @enderror
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Placa de la Moto <span
+                            class="text-red-500">*</span></label>
+                    <input type="text" name="placa" value="{{ old('placa', $usuario->repartidor->placa ?? '') }}"
+                        maxlength="15"
+                        class="w-full border @error('placa') border-red-500 @else border-gray-300 @enderror rounded-lg p-3 focus:border-goool-green focus:outline-none transition-colors"
+                        placeholder="Ej: 4021-ABC">
+                    @error('placa')
+                        <p class="text-red-500 text-xs mt-1 font-medium"><i class="fa-solid fa-circle-exclamation mr-1"></i>
+                            {{ $message }}</p>
+                    @enderror
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Licencia de Conducir <span
+                            class="text-red-500">*</span></label>
+                    <input type="text" name="licencia_conducir"
+                        value="{{ old('licencia_conducir', $usuario->repartidor->licencia_conducir ?? '') }}"
+                        maxlength="20"
+                        class="w-full border @error('licencia_conducir') border-red-500 @else border-gray-300 @enderror rounded-lg p-3 focus:border-goool-green focus:outline-none transition-colors">
+                    @error('licencia_conducir')
                         <p class="text-red-500 text-xs mt-1 font-medium"><i class="fa-solid fa-circle-exclamation mr-1"></i>
                             {{ $message }}</p>
                     @enderror
@@ -151,6 +196,24 @@
                 input.type = 'password';
                 icon.classList.replace('fa-eye-slash', 'fa-eye');
             }
+        }
+
+        // Mostrar u ocultar campos de repartidor según el rol
+        document.getElementById('select-rol').addEventListener('change', function() {
+            const camposRepartidor = document.getElementById('campos-repartidor');
+            if (this.value === 'repartidor') {
+                camposRepartidor.classList.remove('hidden');
+                camposRepartidor.classList.add('grid');
+            } else {
+                camposRepartidor.classList.add('hidden');
+                camposRepartidor.classList.remove('grid');
+            }
+        });
+
+        // Ejecutar al cargar la página para que los campos se muestren si el usuario ya es repartidor
+        if (document.getElementById('select-rol').value === 'repartidor') {
+            document.getElementById('campos-repartidor').classList.remove('hidden');
+            document.getElementById('campos-repartidor').classList.add('grid');
         }
     </script>
 @endsection

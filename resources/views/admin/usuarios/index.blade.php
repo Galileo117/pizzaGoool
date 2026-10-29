@@ -50,11 +50,9 @@
                 <tbody class="divide-y divide-gray-100">
                     @forelse($usuarios as $usuario)
                         <tr class="hover:bg-gray-50">
-                            {{-- CORREGIDO: nombres y apellidos --}}
-                            <td class="px-4 py-3 font-semibold text-gray-800">{{ $usuario->nombres }}
-                                {{ $usuario->apellidos }}</td>
+                            <td class="px-4 py-3 font-semibold text-gray-800">{{ $usuario->nombre_completo }}</td>
                             <td class="px-4 py-3 text-gray-600">{{ $usuario->email }}</td>
-                            <td class="px-4 py-3 text-gray-600">{{ $usuario->telefono ?? '—' }}</td>
+                            <td class="px-4 py-3 text-gray-600">{{ $usuario->telefono_contacto ?? '—' }}</td>
                             <td class="px-4 py-3 text-center">
                                 @php
                                     $colores = [
@@ -111,13 +109,12 @@
                 <div class="p-4 flex items-center gap-4">
                     <div
                         class="w-12 h-12 rounded-full bg-goool-green text-white flex items-center justify-center font-bold text-lg flex-shrink-0">
-                        {{ strtoupper(substr($usuario->nombres, 0, 1)) }}
+                        {{ strtoupper(substr($usuario->nombre_completo, 0, 1)) }}
                     </div>
                     <div class="flex-1 min-w-0">
-                        {{-- CORREGIDO: nombres y apellidos --}}
-                        <p class="font-bold text-gray-800 truncate">{{ $usuario->nombres }} {{ $usuario->apellidos }}</p>
+                        <p class="font-bold text-gray-800 truncate">{{ $usuario->nombre_completo }}</p>
                         <p class="text-xs text-gray-500 truncate">{{ $usuario->email }}</p>
-                        <p class="text-xs text-gray-400 mt-1">{{ $usuario->telefono ?? 'Sin teléfono' }}</p>
+                        <p class="text-xs text-gray-400 mt-1">{{ $usuario->telefono_contacto ?? 'Sin teléfono' }}</p>
                     </div>
                     @php
                         $colores = [

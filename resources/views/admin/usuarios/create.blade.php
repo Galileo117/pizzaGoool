@@ -68,7 +68,7 @@
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Rol <span
                             class="text-red-500">*</span></label>
-                    <select name="rol" required
+                    <select name="rol" id="select-rol" required
                         class="w-full border @error('rol') border-red-500 @else border-gray-300 @enderror rounded-lg p-3 focus:border-goool-green focus:outline-none transition-colors">
                         <option value="">-- Seleccionar --</option>
                         <option value="admin" {{ old('rol') == 'admin' ? 'selected' : '' }}>Administrador</option>
@@ -77,6 +77,43 @@
                         <option value="cliente" {{ old('rol') == 'cliente' ? 'selected' : '' }}>Cliente</option>
                     </select>
                     @error('rol')
+                        <p class="text-red-500 text-xs mt-1 font-medium"><i class="fa-solid fa-circle-exclamation mr-1"></i>
+                            {{ $message }}</p>
+                    @enderror
+                </div>
+            </div>
+
+            {{-- Campos exclusivos para repartidores --}}
+            <div id="campos-repartidor"
+                class="hidden grid-cols-1 md:grid-cols-3 gap-5 p-4 bg-purple-50 rounded-lg border border-purple-100">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Cédula de Identidad (CI) <span
+                            class="text-red-500">*</span></label>
+                    <input type="text" name="ci" value="{{ old('ci') }}" maxlength="15"
+                        class="w-full border @error('ci') border-red-500 @else border-gray-300 @enderror rounded-lg p-3 focus:border-goool-green focus:outline-none transition-colors"
+                        placeholder="Ej: 1234567-LP">
+                    @error('ci')
+                        <p class="text-red-500 text-xs mt-1 font-medium"><i class="fa-solid fa-circle-exclamation mr-1"></i>
+                            {{ $message }}</p>
+                    @enderror
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Placa de la Moto <span
+                            class="text-red-500">*</span></label>
+                    <input type="text" name="placa" value="{{ old('placa') }}" maxlength="15"
+                        class="w-full border @error('placa') border-red-500 @else border-gray-300 @enderror rounded-lg p-3 focus:border-goool-green focus:outline-none transition-colors"
+                        placeholder="Ej: 4021-ABC">
+                    @error('placa')
+                        <p class="text-red-500 text-xs mt-1 font-medium"><i class="fa-solid fa-circle-exclamation mr-1"></i>
+                            {{ $message }}</p>
+                    @enderror
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Licencia de Conducir <span
+                            class="text-red-500">*</span></label>
+                    <input type="text" name="licencia_conducir" value="{{ old('licencia_conducir') }}" maxlength="20"
+                        class="w-full border @error('licencia_conducir') border-red-500 @else border-gray-300 @enderror rounded-lg p-3 focus:border-goool-green focus:outline-none transition-colors">
+                    @error('licencia_conducir')
                         <p class="text-red-500 text-xs mt-1 font-medium"><i class="fa-solid fa-circle-exclamation mr-1"></i>
                             {{ $message }}</p>
                     @enderror
@@ -139,6 +176,24 @@
                 input.type = 'password';
                 icon.classList.replace('fa-eye-slash', 'fa-eye');
             }
+        }
+
+        // Mostrar u ocultar campos de repartidor según el rol
+        document.getElementById('select-rol').addEventListener('change', function() {
+            const camposRepartidor = document.getElementById('campos-repartidor');
+            if (this.value === 'repartidor') {
+                camposRepartidor.classList.remove('hidden');
+                camposRepartidor.classList.add('grid');
+            } else {
+                camposRepartidor.classList.add('hidden');
+                camposRepartidor.classList.remove('grid');
+            }
+        });
+
+        // Ejecutar al cargar la página por si hay un error de validación y ya estaba seleccionado repartidor
+        if (document.getElementById('select-rol').value === 'repartidor') {
+            document.getElementById('campos-repartidor').classList.remove('hidden');
+            document.getElementById('campos-repartidor').classList.add('grid');
         }
     </script>
 @endsection

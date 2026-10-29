@@ -48,4 +48,31 @@ class Usuario extends Authenticatable
     {
         return $this->hasOne(Empleado::class, 'usuario_id');
     }
+
+    // Accesor para obtener el nombre completo según el perfil asociado
+    public function getNombreCompletoAttribute()
+    {
+        if ($this->rol === 'cliente' && $this->cliente) {
+            return $this->cliente->nombres . ' ' . $this->cliente->apellidos;
+        }
+
+        if ($this->rol === 'repartidor' && $this->repartidor) {
+            return $this->repartidor->nombres . ' ' . $this->repartidor->apellidos;
+        }
+
+        if ($this->empleado) {
+            return $this->empleado->nombres . ' ' . $this->empleado->apellidos;
+        }
+
+        return 'Usuario sin perfil';
+    }
+
+    // Accesor para obtener el teléfono
+    public function getTelefonoContactoAttribute()
+    {
+        if ($this->cliente) return $this->cliente->telefono;
+        if ($this->repartidor) return $this->repartidor->telefono;
+        if ($this->empleado) return $this->empleado->telefono;
+        return null;
+    }
 }
