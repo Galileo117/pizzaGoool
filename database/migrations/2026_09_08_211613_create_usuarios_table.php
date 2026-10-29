@@ -10,11 +10,10 @@ return new class extends Migration
     {
         Schema::create('usuarios', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre');
-            $table->string('email')->unique(); // <-- AHORA ES EMAIL
-            $table->string('password');
-            $table->string('rol'); // admin, cajero, repartidor, cliente
-            $table->string('telefono')->nullable();
+            $table->string('email', 150)->unique();
+            $table->string('password', 255);
+            $table->string('rol', 20)->default('cliente');
+            $table->rememberToken();
             $table->timestamps();
         });
     }

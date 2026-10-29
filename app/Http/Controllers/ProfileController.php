@@ -21,7 +21,6 @@ class ProfileController extends Controller
 
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        // Usamos transacción para guardar en ambas tablas de forma segura
         DB::transaction(function () use ($request) {
             $user = $request->user();
 
@@ -41,6 +40,8 @@ class ProfileController extends Controller
                     'apellidos' => $request->validated('apellidos'),
                     'telefono' => $request->validated('telefono'),
                     'direccion_entrega' => $request->validated('direccion_entrega'),
+                    'latitud' => $request->validated('latitud'),
+                    'longitud' => $request->validated('longitud'),
                 ]
             );
         });

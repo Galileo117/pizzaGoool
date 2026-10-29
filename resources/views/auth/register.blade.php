@@ -81,7 +81,7 @@
                 <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
                     <i class="fa-solid fa-phone text-gray-400"></i>
                 </div>
-                <input id="telefono" type="text" name="telefono" value="{{ old('telefono') }}" autocomplete="tel"
+                <input id="telefono" type="phone" name="telefono" value="{{ old('telefono') }}" autocomplete="tel"
                     maxlength="15" placeholder="71234567"
                     class="block h-14 w-full rounded-xl border border-gray-200 bg-gray-50 pl-11 pr-4 text-base text-gray-900 placeholder:text-gray-400 outline-none transition focus:border-goool-green focus:bg-white focus:ring-4 focus:ring-goool-green/10">
             </div>

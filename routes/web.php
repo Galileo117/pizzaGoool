@@ -80,6 +80,7 @@ Route::middleware(['auth', 'role:repartidor'])->prefix('repartidor')->name('repa
     Route::get('pedidos', [RepartidorPedidoController::class, 'index'])->name('pedidos.index');
     Route::get('pedidos/{pedido}', [RepartidorPedidoController::class, 'show'])->name('pedidos.show');
     Route::patch('pedidos/{pedido}/entregado', [RepartidorPedidoController::class, 'marcarEntregado'])->name('pedidos.marcar_entregado');
+    Route::patch('/repartidor/pedidos/{pedido}/fallido', [PedidoController::class, 'marcarFallido'])->name('repartidor.pedidos.marcar_fallido');
 });
 
 // Rutas de perfil

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Repartidor;
 
 use App\Http\Controllers\Controller;
 use App\Models\Pedido;
+use Illuminate\Http\Request;
 
 class PedidoController extends Controller
 {
@@ -11,10 +12,9 @@ class PedidoController extends Controller
     {
         $repartidorId = auth()->id();
 
-        // Pedidos asignados a este repartidor que aún no están entregados
         $pedidos = Pedido::with(['usuario.cliente', 'detallePedidos.producto'])
             ->where('repartidor_id', $repartidorId)
-            ->whereIn('estado', ['en_reparto', 'entregado'])
+            ->whereIn('estado', ['en_reparto', 'entregado', 'cancelado'])
             ->orderBy('updated_at', 'desc')
             ->paginate(10);
 
@@ -23,7 +23,6 @@ class PedidoController extends Controller
 
     public function show(Pedido $pedido)
     {
-        // Validar que el pedido le pertenezca a este repartidor
         if ($pedido->repartidor_id !== auth()->id()) {
             abort(403, 'No tienes permiso para ver este pedido.');
         }
@@ -35,12 +34,10 @@ class PedidoController extends Controller
 
     public function marcarEntregado(Pedido $pedido)
     {
-        // Validar que el pedido le pertenezca a este repartidor
         if ($pedido->repartidor_id !== auth()->id()) {
             abort(403, 'No tienes permiso para modificar este pedido.');
         }
 
-        // Validar que esté en estado "en_reparto"
         if ($pedido->estado !== 'en_reparto') {
             return redirect()->back()->with('error', 'Este pedido no está en reparto.');
         }
@@ -49,5 +46,25 @@ class PedidoController extends Controller
 
         return redirect()->route('repartidor.pedidos.index')
             ->with('success', 'Pedido marcado como entregado correctamente.');
+    }
+
+    // NUEVO MÉTODO: Reportar pedido fallido
+    public function marcarFallido(Request $request, Pedido $pedido)
+    {
+        if ($pedido->repartidor_id !== auth()->id()) {
+            abort(403, 'No tienes permiso para modificar este pedido.');
+        }
+
+        $request->validate([
+            'motivo' => 'required|string|max:255'
+        ]);
+
+        $pedido->update([
+            'estado' => 'cancelado',
+            'referencia' => $pedido->referencia . ' | Fallo: ' . $request->motivo
+        ]);
+
+        return redirect()->route('repartidor.pedidos.index')
+            ->with('success', 'Pedido reportado como fallido. El cajero ha sido notificado.');
     }
 }

@@ -30,11 +30,15 @@
                 class="bg-green-100 text-green-700 px-4 py-2 rounded-full font-bold text-sm border-2 border-green-300 self-start">
                 <i class="fa-solid fa-check"></i> Entregado
             </span>
+        @elseif($pedido->estado === 'cancelado')
+            <span
+                class="bg-red-100 text-red-700 px-4 py-2 rounded-full font-bold text-sm border-2 border-red-300 self-start">
+                <i class="fa-solid fa-xmark"></i> Cancelado / Fallido
+            </span>
         @endif
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
         <div class="lg:col-span-2 space-y-6">
             <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200">
                 <div class="bg-goool-green px-6 py-4">
@@ -113,15 +117,13 @@
                                 <a href="https://www.google.com/maps/dir/?api=1&destination={{ $pedido->latitud }},{{ $pedido->longitud }}"
                                     target="_blank"
                                     class="inline-flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg transition">
-                                    <i class="fa-solid fa-map"></i>
-                                    Abrir en Google Maps
+                                    <i class="fa-solid fa-map"></i> Abrir en Google Maps
                                 </a>
 
                                 @if ($pedido->usuario && $pedido->usuario->telefono_contacto)
                                     <a href="tel:{{ $pedido->usuario->telefono_contacto }}"
                                         class="inline-flex items-center justify-center gap-2 bg-goool-green hover:bg-goool-green-dark text-white font-bold py-3 px-4 rounded-lg transition">
-                                        <i class="fa-solid fa-phone"></i>
-                                        Llamar al cliente
+                                        <i class="fa-solid fa-phone"></i> Llamar al cliente
                                     </a>
                                 @endif
                             </div>
@@ -134,15 +136,13 @@
                             @if ($pedido->usuario && $pedido->usuario->telefono_contacto)
                                 <a href="tel:{{ $pedido->usuario->telefono_contacto }}"
                                     class="inline-flex items-center justify-center gap-2 bg-goool-green hover:bg-goool-green-dark text-white font-bold py-3 px-4 rounded-lg transition w-full">
-                                    <i class="fa-solid fa-phone"></i>
-                                    Llamar al cliente
+                                    <i class="fa-solid fa-phone"></i> Llamar al cliente
                                 </a>
                             @endif
                         @endif
                     </div>
                 </div>
             @endif
-
         </div>
 
         <div class="space-y-6">
@@ -166,11 +166,17 @@
                     <hr class="border-gray-200">
 
                     @if ($pedido->usuario && $pedido->usuario->telefono_contacto)
-                        <a href="tel:{{ $pedido->usuario->telefono_contacto }}"
-                            class="flex items-center gap-2 text-goool-green font-semibold hover:underline">
-                            <i class="fa-solid fa-phone w-4"></i>
-                            {{ $pedido->usuario->telefono_contacto }}
-                        </a>
+                        <div class="grid grid-cols-2 gap-2">
+                            <a href="tel:{{ $pedido->usuario->telefono_contacto }}"
+                                class="flex items-center justify-center gap-2 bg-goool-green text-white font-semibold px-2 py-2 rounded-lg hover:bg-goool-green-dark transition">
+                                <i class="fa-solid fa-phone"></i> Llamar
+                            </a>
+                            <a href="https://wa.me/591{{ $pedido->usuario->telefono_contacto }}?text=Hola%20{{ $pedido->usuario->cliente->nombres ?? '' }},%20soy%20tu%20repartidor%20de%20Pizza%20Goool.%20Estoy%20en%20camino%20a%20tu%20domicilio."
+                                target="_blank"
+                                class="flex items-center justify-center gap-2 bg-green-500 text-white font-semibold px-2 py-2 rounded-lg hover:bg-green-600 transition">
+                                <i class="fa-brands fa-whatsapp text-lg"></i> WhatsApp
+                            </a>
+                        </div>
                     @endif
                 </div>
             </div>
@@ -202,15 +208,20 @@
                     <div class="bg-goool-green px-6 py-3">
                         <h3 class="text-white font-bold text-sm"><i class="fa-solid fa-gear"></i> ACCIONES</h3>
                     </div>
-                    <div class="p-5">
+                    <div class="p-5 space-y-3">
                         <button type="button" onclick="abrirModalEntregar()"
                             class="w-full bg-green-500 text-white font-bold py-3 rounded-lg hover:bg-green-600 transition">
                             <i class="fa-solid fa-check-circle"></i> Marcar como Entregado
                         </button>
+
+                        <button type="button" onclick="abrirModalFallido()"
+                            class="w-full bg-red-500 text-white font-bold py-3 rounded-lg hover:bg-red-600 transition">
+                            <i class="fa-solid fa-triangle-exclamation"></i> No se pudo entregar
+                        </button>
                     </div>
                 </div>
 
-                {{-- Modal de confirmación --}}
+                {{-- Modal Entregar --}}
                 <div id="modal-entregar" class="fixed inset-0 z-50 hidden">
                     <div class="absolute inset-0 bg-black bg-opacity-50" onclick="cerrarModalEntregar()"></div>
                     <div class="relative flex items-center justify-center min-h-screen p-4">
@@ -219,25 +230,55 @@
                                 <i class="fa-solid fa-check-circle text-4xl text-green-500"></i>
                             </div>
                             <h3 class="text-xl font-bold text-gray-800 mb-2">¿Confirmar entrega?</h3>
-                            <p class="text-gray-500 text-sm mb-6">
-                                Confirma que el pedido fue entregado correctamente al cliente.
-                            </p>
-
+                            <p class="text-gray-500 text-sm mb-6">Confirma que el pedido fue entregado correctamente al
+                                cliente.</p>
                             <div class="flex gap-3">
                                 <button type="button" onclick="cerrarModalEntregar()"
-                                    class="flex-1 bg-gray-200 text-gray-700 font-bold py-3 rounded-lg hover:bg-gray-300 transition">
-                                    Cancelar
-                                </button>
+                                    class="flex-1 bg-gray-200 text-gray-700 font-bold py-3 rounded-lg hover:bg-gray-300 transition">Cancelar</button>
                                 <form action="{{ route('repartidor.pedidos.marcar_entregado', $pedido->id) }}"
                                     method="POST" class="flex-1">
                                     @csrf
                                     @method('PATCH')
                                     <button type="submit"
-                                        class="w-full bg-green-500 text-white font-bold py-3 rounded-lg hover:bg-green-600 transition">
-                                        Sí, entregar
-                                    </button>
+                                        class="w-full bg-green-500 text-white font-bold py-3 rounded-lg hover:bg-green-600 transition">Sí,
+                                        entregar</button>
                                 </form>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Modal Fallido --}}
+                <div id="modal-fallido" class="fixed inset-0 z-50 hidden">
+                    <div class="absolute inset-0 bg-black bg-opacity-50" onclick="cerrarModalFallido()"></div>
+                    <div class="relative flex items-center justify-center min-h-screen p-4">
+                        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 text-center">
+                            <div class="w-20 h-20 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center">
+                                <i class="fa-solid fa-triangle-exclamation text-4xl text-red-500"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-800 mb-2">¿Reportar pedido fallido?</h3>
+                            <p class="text-gray-500 text-sm mb-4">Indica el motivo por el cual no se pudo entregar el
+                                pedido.</p>
+
+                            <form action="{{ route('repartidor.pedidos.marcar_fallido', $pedido->id) }}" method="POST">
+                                @csrf
+                                @method('PATCH')
+                                <select name="motivo" required
+                                    class="w-full border border-gray-300 rounded-lg p-3 mb-4 focus:border-goool-green focus:outline-none">
+                                    <option value="">-- Seleccionar motivo --</option>
+                                    <option value="Cliente no contesta">Cliente no contesta</option>
+                                    <option value="Dirección incorrecta">Dirección incorrecta</option>
+                                    <option value="Cliente no se encuentra">Cliente no se encuentra</option>
+                                    <option value="Otro">Otro</option>
+                                </select>
+                                <div class="flex gap-3">
+                                    <button type="button" onclick="cerrarModalFallido()"
+                                        class="flex-1 bg-gray-200 text-gray-700 font-bold py-3 rounded-lg hover:bg-gray-300 transition">Cancelar</button>
+                                    <button type="submit"
+                                        class="flex-1 bg-red-500 text-white font-bold py-3 rounded-lg hover:bg-red-600 transition">Confirmar
+                                        Fallo</button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -249,6 +290,14 @@
 
                     function cerrarModalEntregar() {
                         document.getElementById('modal-entregar').classList.add('hidden');
+                    }
+
+                    function abrirModalFallido() {
+                        document.getElementById('modal-fallido').classList.remove('hidden');
+                    }
+
+                    function cerrarModalFallido() {
+                        document.getElementById('modal-fallido').classList.add('hidden');
                     }
                 </script>
             @endif
