@@ -46,9 +46,9 @@
                             <div class="hidden items-center gap-2 text-sm text-gray-200 md:flex">
                                 <div
                                     class="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 text-sm font-bold text-white">
-                                    {{ strtoupper(substr(auth()->user()->nombre, 0, 1)) }}
+                                    {{ strtoupper(substr(auth()->user()->nombre_completo, 0, 1)) }}
                                 </div>
-                                <span class="font-medium">{{ auth()->user()->nombre }}</span>
+                                <span class="font-medium">{{ auth()->user()->nombre_completo }}</span>
                                 <span
                                     class="hidden rounded-full bg-white/20 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white lg:inline-block">
                                     {{ auth()->user()->rol }}

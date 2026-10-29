@@ -170,7 +170,7 @@
                 <div class="flex items-center gap-3">
                     <div class="text-right hidden sm:block">
                         {{-- CORREGIDO: nombres y apellidos --}}
-                        <p class="text-sm font-bold text-gray-800 leading-tight">{{ auth()->user()->nombres }}
+                        <p class="text-sm font-bold text-gray-800 leading-tight">{{ auth()->user()->nombre_completo }}
                             {{ auth()->user()->apellidos }}</p>
                         <p class="text-[11px] font-semibold text-goool-green uppercase tracking-wider">
                             {{ auth()->user()->rol }}</p>
@@ -178,7 +178,7 @@
 
                     <div
                         class="w-10 h-10 rounded-full bg-green-100 text-goool-green flex items-center justify-center text-xl font-extrabold shadow-sm ring-2 ring-slate-100">
-                        {{ strtoupper(substr(auth()->user()->nombres, 0, 1)) }}
+                        {{ strtoupper(substr(auth()->user()->nombre_completo, 0, 1)) }}
                     </div>
 
 

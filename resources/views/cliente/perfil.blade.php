@@ -26,25 +26,21 @@
 
         {{-- Tarjeta del usuario --}}
         <div class="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden mb-8 relative">
-            {{-- Fondo decorativo --}}
             <div class="h-32 bg-gradient-to-r from-goool-green to-goool-green-dark w-full absolute top-0 left-0"></div>
 
             <div class="px-6 sm:px-10 pt-16 pb-8 relative">
                 <div class="flex flex-col sm:flex-row items-center sm:items-end gap-6">
-
-                    {{-- Avatar (Totalmente redondo) --}}
                     <div
                         class="w-28 h-28 rounded-full bg-white p-1.5 shadow-lg relative z-10 -mt-16 sm:-mt-20 flex-shrink-0">
                         <div
                             class="w-full h-full rounded-full bg-goool-yellow text-goool-green-dark flex items-center justify-center text-4xl font-extrabold overflow-hidden">
-                            {{ strtoupper(substr(auth()->user()->nombres, 0, 1)) }}
+                            {{-- Usamos el accesor nombre_completo --}}
+                            {{ strtoupper(substr(auth()->user()->nombre_completo, 0, 1)) }}
                         </div>
                     </div>
 
-                    {{-- Info --}}
                     <div class="text-center sm:text-left flex-1 sm:pb-2">
-                        <h2 class="text-2xl font-extrabold text-white">{{ auth()->user()->nombres }}
-                            {{ auth()->user()->apellidos }}</h2>
+                        <h2 class="text-2xl font-extrabold text-white">{{ auth()->user()->nombre_completo }}</h2>
                         <p class="text-white text-sm font-medium">{{ auth()->user()->email }}</p>
                     </div>
                 </div>
@@ -57,7 +53,9 @@
                         </div>
                         <div>
                             <p class="text-[11px] text-gray-400 uppercase font-bold tracking-wider">Teléfono</p>
-                            <p class="font-bold text-gray-800">{{ auth()->user()->telefono ?? 'No registrado' }}</p>
+                            {{-- Usamos el accesor telefono_contacto --}}
+                            <p class="font-bold text-gray-800">{{ auth()->user()->telefono_contacto ?? 'No registrado' }}
+                            </p>
                         </div>
                     </div>
 
@@ -90,8 +88,9 @@
                     <div>
                         <label for="nombres" class="block text-sm font-bold text-gray-700 mb-1">Nombres <span
                                 class="text-red-500">*</span></label>
+                        {{-- Precargamos desde la relación cliente --}}
                         <input type="text" id="nombres" name="nombres"
-                            value="{{ old('nombres', auth()->user()->nombres) }}" required maxlength="100"
+                            value="{{ old('nombres', auth()->user()->cliente->nombres ?? '') }}" required maxlength="50"
                             class="w-full border-2 @error('nombres') border-red-500 @else border-gray-200 @enderror rounded-xl p-3 focus:border-goool-green focus:ring-2 focus:ring-goool-green/20 transition-all duration-200">
                         @error('nombres')
                             <p class="text-red-500 text-xs mt-1 font-medium"><i class="fa-solid fa-circle-exclamation mr-1"></i>
@@ -103,7 +102,7 @@
                         <label for="apellidos" class="block text-sm font-bold text-gray-700 mb-1">Apellidos <span
                                 class="text-red-500">*</span></label>
                         <input type="text" id="apellidos" name="apellidos"
-                            value="{{ old('apellidos', auth()->user()->apellidos) }}" required maxlength="100"
+                            value="{{ old('apellidos', auth()->user()->cliente->apellidos ?? '') }}" required maxlength="50"
                             class="w-full border-2 @error('apellidos') border-red-500 @else border-gray-200 @enderror rounded-xl p-3 focus:border-goool-green focus:ring-2 focus:ring-goool-green/20 transition-all duration-200">
                         @error('apellidos')
                             <p class="text-red-500 text-xs mt-1 font-medium"><i class="fa-solid fa-circle-exclamation mr-1"></i>
@@ -128,22 +127,42 @@
                     <div>
                         <label for="telefono" class="block text-sm font-bold text-gray-700 mb-1">Teléfono</label>
                         <input type="text" id="telefono" name="telefono"
-                            value="{{ old('telefono', auth()->user()->telefono) }}"
+                            value="{{ old('telefono', auth()->user()->cliente->telefono ?? '') }}"
                             oninput="this.value = this.value.replace(/[^0-9]/g, ''); validarTelefono(this)" minlength="8"
                             maxlength="15"
                             class="w-full border-2 @error('telefono') border-red-500 @else border-gray-200 @enderror rounded-xl p-3 focus:border-goool-green focus:ring-2 focus:ring-goool-green/20 transition-all duration-200"
                             placeholder="Ej: 71234567">
-
-                        {{-- Mensaje de error dinámico (Vanilla JS) --}}
                         <p id="telefono-error" class="text-red-500 text-xs mt-1 font-medium hidden">
                             <i class="fa-solid fa-circle-exclamation mr-1"></i> El teléfono debe tener al menos 8 dígitos.
                         </p>
-
                         @error('telefono')
                             <p class="text-red-500 text-xs mt-1 font-medium"><i class="fa-solid fa-circle-exclamation mr-1"></i>
                                 {{ $message }}</p>
                         @enderror
                     </div>
+                </div>
+
+                {{-- NUEVO CAMPO: DIRECCIÓN DE ENTREGA --}}
+                <div>
+                    <label for="direccion_entrega" class="block text-sm font-bold text-gray-700 mb-1">
+                        Dirección de entrega por defecto
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fa-solid fa-location-dot text-gray-400"></i>
+                        </div>
+                        <input type="text" id="direccion_entrega" name="direccion_entrega"
+                            value="{{ old('direccion_entrega', auth()->user()->cliente->direccion_entrega ?? '') }}"
+                            maxlength="255"
+                            class="w-full border-2 @error('direccion_entrega') border-red-500 @else border-gray-200 @enderror rounded-xl p-3 pl-10 focus:border-goool-green focus:ring-2 focus:ring-goool-green/20 transition-all duration-200"
+                            placeholder="Ej: Av. Mario Mercado, Edificio...">
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">Esta dirección se usará por defecto al momento de hacer tu pedido.
+                    </p>
+                    @error('direccion_entrega')
+                        <p class="text-red-500 text-xs mt-1 font-medium"><i class="fa-solid fa-circle-exclamation mr-1"></i>
+                            {{ $message }}</p>
+                    @enderror
                 </div>
 
                 <div class="pt-2">
@@ -172,19 +191,15 @@
                 </form>
             </div>
         </div>
-
     </div>
 
-    {{-- Script para validar el teléfono en tiempo real --}}
     <script>
         function validarTelefono(input) {
             const errorMsg = document.getElementById('telefono-error');
-            // Si el campo está vacío, no mostramos error (porque es opcional)
             if (input.value.length === 0) {
                 errorMsg.classList.add('hidden');
                 return;
             }
-            // Si tiene menos de 8 dígitos, mostramos el error
             if (input.value.length < 8) {
                 errorMsg.classList.remove('hidden');
             } else {

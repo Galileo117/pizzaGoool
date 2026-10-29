@@ -6,14 +6,12 @@ use App\Http\Requests\ProfileUpdateRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 
 class ProfileController extends Controller
 {
-    /**
-     * Display the user's profile form.
-     */
     public function edit(Request $request): View
     {
         return view('profile.edit', [
@@ -21,25 +19,35 @@ class ProfileController extends Controller
         ]);
     }
 
-    /**
-     * Update the user's profile information.
-     */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        // Usamos transacción para guardar en ambas tablas de forma segura
+        DB::transaction(function () use ($request) {
+            $user = $request->user();
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
-        }
+            // 1. Actualizamos la tabla usuarios (solo email)
+            $user->email = $request->validated('email');
 
-        $request->user()->save();
+            if ($user->isDirty('email')) {
+                $user->email_verified_at = null;
+            }
+            $user->save();
 
-        // Redirigimos a la ruta del perfil de cliente (la vista bonita)
+            // 2. Actualizamos la tabla clientes (perfil)
+            $user->cliente()->updateOrCreate(
+                ['usuario_id' => $user->id],
+                [
+                    'nombres' => $request->validated('nombres'),
+                    'apellidos' => $request->validated('apellidos'),
+                    'telefono' => $request->validated('telefono'),
+                    'direccion_entrega' => $request->validated('direccion_entrega'),
+                ]
+            );
+        });
+
         return Redirect::route('cliente.perfil')->with('status', 'profile-updated');
     }
-    /**
-     * Delete the user's account.
-     */
+
     public function destroy(Request $request): RedirectResponse
     {
         $request->validateWithBag('userDeletion', [

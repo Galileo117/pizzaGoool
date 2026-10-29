@@ -79,9 +79,10 @@
                             <div class="flex items-center gap-2">
                                 <div
                                     class="w-8 h-8 rounded-full bg-goool-green dark:bg-goool-yellow flex items-center justify-center text-white dark:text-goool-green-dark font-bold text-sm shadow-sm">
-                                    {{ strtoupper(substr(Auth::user()->nombre, 0, 1)) }}
+                                    {{ strtoupper(substr(Auth::user()->nombre_completo, 0, 1)) }}
                                 </div>
-                                <span class="hidden lg:inline-block font-semibold">{{ Auth::user()->nombre }}</span>
+                                <span
+                                    class="hidden lg:inline-block font-semibold">{{ Auth::user()->nombre_completo }}</span>
                             </div>
 
                             <div class="ms-1">
@@ -100,7 +101,7 @@
                         {{-- Información del usuario --}}
                         <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-600">
                             <p class="text-sm font-semibold text-gray-900 dark:text-white">
-                                {{ Auth::user()->nombre }}
+                                {{ Auth::user()->nombre_completo }}
                             </p>
                             <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
                                 {{ Auth::user()->email }}
@@ -221,12 +222,12 @@
                 <div class="flex-shrink-0">
                     <div
                         class="w-10 h-10 rounded-full bg-goool-green dark:bg-goool-yellow flex items-center justify-center text-white dark:text-goool-green-dark font-bold shadow-sm">
-                        {{ strtoupper(substr(Auth::user()->nombre, 0, 1)) }}
+                        {{ strtoupper(substr(Auth::user()->nombre_completo, 0, 1)) }}
                     </div>
                 </div>
                 <div class="ml-3">
                     <div class="text-base font-semibold text-gray-800 dark:text-white">
-                        {{ Auth::user()->nombre }}
+                        {{ Auth::user()->nombre_completo }}
                     </div>
                     <div class="text-sm text-gray-500 dark:text-gray-400 truncate">
                         {{ Auth::user()->email }}

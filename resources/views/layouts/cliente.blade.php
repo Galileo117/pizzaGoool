@@ -94,10 +94,11 @@
                                 <div
                                     class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-sm font-bold shadow-sm ring-1 ring-white/30">
                                     {{-- CORREGIDO: nombres --}}
-                                    {{ strtoupper(substr(auth()->user()->nombres, 0, 1)) }}
+                                    {{ strtoupper(substr(auth()->user()->nombre_completo, 0, 1)) }}
                                 </div>
                                 {{-- CORREGIDO: nombres --}}
-                                <span class="font-semibold text-sm hidden lg:inline">{{ auth()->user()->nombres }}</span>
+                                <span
+                                    class="font-semibold text-sm hidden lg:inline">{{ auth()->user()->nombre_completo }}</span>
                             </div>
 
                             <form method="POST" action="{{ route('logout') }}" class="inline">
@@ -142,13 +143,10 @@
                         <div class="flex items-center gap-4">
                             <div
                                 class="w-14 h-14 rounded-full bg-white/20 flex items-center justify-center text-xl font-bold shadow-inner ring-2 ring-white/20">
-                                {{-- CORREGIDO: nombres --}}
-                                {{ strtoupper(substr(auth()->user()->nombres, 0, 1)) }}
+                                {{ strtoupper(substr(auth()->user()->nombre_completo, 0, 1)) }}
                             </div>
                             <div class="min-w-0">
-                                {{-- CORREGIDO: nombres y apellidos --}}
-                                <p class="font-bold text-lg truncate">{{ auth()->user()->nombres }}
-                                    {{ auth()->user()->apellidos }}</p>
+                                <p class="font-bold text-lg truncate">{{ auth()->user()->nombre_completo }}</p>
                                 <p class="text-xs text-white/70 truncate">{{ auth()->user()->email }}</p>
                             </div>
                         </div>
