@@ -46,7 +46,8 @@
                             @foreach ($carrito as $item)
                                 <div class="flex justify-between items-center pt-3 first:pt-0">
                                     <div class="flex items-center gap-3">
-                                        <div class="w-8 h-8 bg-goool-green/10 rounded-full flex items-center justify-center flex-shrink-0">
+                                        <div
+                                            class="w-8 h-8 bg-goool-green/10 rounded-full flex items-center justify-center flex-shrink-0">
                                             <i class="fa-solid fa-pizza-slice text-goool-green text-sm"></i>
                                         </div>
                                         <div>
@@ -72,7 +73,8 @@
                         <div class="text-center py-8">
                             <i class="fa-solid fa-cart-shopping text-4xl text-gray-300 mb-3"></i>
                             <p class="text-gray-400 font-medium">Tu carrito está vacío</p>
-                            <a href="{{ route('cliente.catalogo') }}" class="inline-block mt-3 text-goool-green hover:underline">
+                            <a href="{{ route('cliente.catalogo') }}"
+                                class="inline-block mt-3 text-goool-green hover:underline">
                                 <i class="fa-solid fa-arrow-left"></i> Volver al catálogo
                             </a>
                         </div>
@@ -90,8 +92,10 @@
 
                 <div class="p-5 sm:p-6">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <label class="relative flex items-start gap-4 p-4 border-2 border-gray-200 rounded-xl cursor-pointer transition-all duration-200 hover:border-goool-green has-[:checked]:border-goool-green has-[:checked]:bg-goool-green/5">
-                            <input type="radio" name="tipo_entrega" value="recoger_local" class="mt-1 form-radio text-goool-green focus:ring-goool-green" checked>
+                        <label
+                            class="relative flex items-start gap-4 p-4 border-2 border-gray-200 rounded-xl cursor-pointer transition-all duration-200 hover:border-goool-green has-[:checked]:border-goool-green has-[:checked]:bg-goool-green/5">
+                            <input type="radio" name="tipo_entrega" value="recoger_local"
+                                class="mt-1 form-radio text-goool-green focus:ring-goool-green" checked>
                             <div>
                                 <span class="font-semibold text-gray-800 flex items-center gap-2">
                                     <i class="fa-solid fa-store text-goool-green"></i> Recoger en Local
@@ -100,8 +104,10 @@
                             </div>
                         </label>
 
-                        <label class="relative flex items-start gap-4 p-4 border-2 border-gray-200 rounded-xl cursor-pointer transition-all duration-200 hover:border-goool-green has-[:checked]:border-goool-green has-[:checked]:bg-goool-green/5">
-                            <input type="radio" name="tipo_entrega" value="contraentrega" class="mt-1 form-radio text-goool-green focus:ring-goool-green">
+                        <label
+                            class="relative flex items-start gap-4 p-4 border-2 border-gray-200 rounded-xl cursor-pointer transition-all duration-200 hover:border-goool-green has-[:checked]:border-goool-green has-[:checked]:bg-goool-green/5">
+                            <input type="radio" name="tipo_entrega" value="contraentrega"
+                                class="mt-1 form-radio text-goool-green focus:ring-goool-green">
                             <div>
                                 <span class="font-semibold text-gray-800 flex items-center gap-2">
                                     <i class="fa-solid fa-truck text-goool-orange"></i> Delivery a Domicilio
@@ -123,8 +129,11 @@
 
                 <div class="p-5 sm:p-6">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <label class="relative flex items-start gap-4 p-4 border-2 border-gray-200 rounded-xl cursor-pointer transition-all duration-200 hover:border-goool-green has-[:checked]:border-goool-green has-[:checked]:bg-goool-green/5">
-                            <input type="radio" name="metodo_pago" value="efectivo" class="mt-1 form-radio text-goool-green focus:ring-goool-green" checked onchange="toggleQR(false)">
+                        <label
+                            class="relative flex items-start gap-4 p-4 border-2 border-gray-200 rounded-xl cursor-pointer transition-all duration-200 hover:border-goool-green has-[:checked]:border-goool-green has-[:checked]:bg-goool-green/5">
+                            <input type="radio" name="metodo_pago" value="efectivo"
+                                class="mt-1 form-radio text-goool-green focus:ring-goool-green" checked
+                                onchange="toggleQR(false)">
                             <div>
                                 <span class="font-semibold text-gray-800 flex items-center gap-2">
                                     <i class="fa-solid fa-cash-register text-goool-green"></i> Efectivo
@@ -133,8 +142,10 @@
                             </div>
                         </label>
 
-                        <label class="relative flex items-start gap-4 p-4 border-2 border-gray-200 rounded-xl cursor-pointer transition-all duration-200 hover:border-goool-green has-[:checked]:border-goool-green has-[:checked]:bg-goool-green/5">
-                            <input type="radio" name="metodo_pago" value="qr" class="mt-1 form-radio text-goool-green focus:ring-goool-green" onchange="toggleQR(true)">
+                        <label
+                            class="relative flex items-start gap-4 p-4 border-2 border-gray-200 rounded-xl cursor-pointer transition-all duration-200 hover:border-goool-green has-[:checked]:border-goool-green has-[:checked]:bg-goool-green/5">
+                            <input type="radio" name="metodo_pago" value="qr"
+                                class="mt-1 form-radio text-goool-green focus:ring-goool-green" onchange="toggleQR(true)">
                             <div>
                                 <span class="font-semibold text-gray-800 flex items-center gap-2">
                                     <i class="fa-solid fa-qrcode text-goool-orange"></i> Código QR
@@ -161,7 +172,8 @@
 
                         @if ($imagenQR)
                             <div class="inline-block bg-white p-4 rounded-xl shadow-md border border-gray-200">
-                                <img id="imagen-qr-pago" src="{{ asset('storage/' . $imagenQR) }}" alt="Código QR de Pago" class="w-56 h-56 sm:w-64 sm:h-64 object-contain mx-auto">
+                                <img id="imagen-qr-pago" src="{{ asset('storage/' . $imagenQR) }}" alt="Código QR de Pago"
+                                    class="w-56 h-56 sm:w-64 sm:h-64 object-contain mx-auto">
                             </div>
 
                             <div id="instrucciones-escritorio" class="mt-4 hidden sm:block">
@@ -172,7 +184,8 @@
                             </div>
 
                             <div id="instrucciones-movil" class="mt-4 hidden">
-                                <div class="bg-blue-50 border border-blue-200 text-blue-800 p-4 rounded-lg text-sm text-left max-w-md mx-auto">
+                                <div
+                                    class="bg-blue-50 border border-blue-200 text-blue-800 p-4 rounded-lg text-sm text-left max-w-md mx-auto">
                                     <p class="font-bold mb-2">
                                         <i class="fa-solid fa-mobile-screen"></i> Estás desde tu celular
                                     </p>
@@ -192,7 +205,8 @@
                                     </ul>
 
                                     <div class="mt-4">
-                                        <button type="button" onclick="descargarQR()" class="w-full inline-flex items-center justify-center gap-2 bg-goool-green text-white px-4 py-2.5 rounded-lg font-bold text-sm hover:bg-goool-green-dark transition">
+                                        <button type="button" onclick="descargarQR()"
+                                            class="w-full inline-flex items-center justify-center gap-2 bg-goool-green text-white px-4 py-2.5 rounded-lg font-bold text-sm hover:bg-goool-green-dark transition">
                                             <i class="fa-solid fa-download"></i> Guardar QR
                                         </button>
                                     </div>
@@ -214,7 +228,8 @@
             </div>
 
             {{-- Dirección de entrega (solo delivery) --}}
-            <div id="direccion_contraentrega" class="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden hidden">
+            <div id="direccion_contraentrega"
+                class="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden hidden">
                 <div class="bg-goool-orange px-5 sm:px-6 py-4">
                     <h2 class="text-white font-bold text-lg flex items-center gap-2">
                         <i class="fa-solid fa-location-dot"></i> Dirección de Entrega
@@ -226,9 +241,15 @@
                         <label for="direccion" class="block text-sm font-semibold text-gray-700 mb-1.5">
                             Dirección Completa <span class="text-red-500">*</span>
                         </label>
+                        {{-- Cargamos la dirección guardada en el perfil del cliente --}}
                         <input type="text" id="direccion" name="direccion"
-                            class="w-full border-2 border-gray-200 rounded-xl p-3 focus:border-goool-green focus:ring-2 focus:ring-goool-green/20 transition-all duration-200"
+                            value="{{ old('direccion', auth()->user()->cliente->direccion_entrega ?? '') }}"
+                            class="w-full border-2 @error('direccion') border-red-500 @else border-gray-200 @enderror rounded-xl p-3 focus:border-goool-green focus:ring-2 focus:ring-goool-green/20 transition-all duration-200"
                             placeholder="Ej: Av. Siempre Viva 123, Zona Norte">
+                        @error('direccion')
+                            <p class="text-red-500 text-xs mt-1 font-medium"><i
+                                    class="fa-solid fa-circle-exclamation mr-1"></i> {{ $message }}</p>
+                        @enderror
                     </div>
 
                     <div>
@@ -365,17 +386,24 @@
             const lngGuardada = document.getElementById('longitud').value;
 
             if (latGuardada && lngGuardada) {
-                marker = L.marker([latGuardada, lngGuardada], { draggable: true }).addTo(map);
+                marker = L.marker([latGuardada, lngGuardada], {
+                    draggable: true
+                }).addTo(map);
                 map.setView([latGuardada, lngGuardada], 16);
             }
 
             map.on('click', function(e) {
-                const { lat, lng } = e.latlng;
+                const {
+                    lat,
+                    lng
+                } = e.latlng;
 
                 if (marker) {
                     marker.setLatLng([lat, lng]);
                 } else {
-                    marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+                    marker = L.marker([lat, lng], {
+                        draggable: true
+                    }).addTo(map);
                 }
 
                 document.getElementById('latitud').value = lat;
@@ -398,32 +426,33 @@
         }
 
         function obtenerDireccion(lat, lng) {
-            const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1&accept-language=es`;
+            const url =
+                `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1&accept-language=es`;
 
             fetch(url, {
-                headers: {
-                    'Accept': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data && data.display_name) {
-                    const inputDireccion = document.getElementById('direccion');
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.display_name) {
+                        const inputDireccion = document.getElementById('direccion');
 
-                    if (!inputDireccion.value || inputDireccion.dataset.auto === 'true') {
-                        inputDireccion.value = data.display_name;
-                        inputDireccion.dataset.auto = 'true';
-                        localStorage.setItem('checkout_direccion', data.display_name);
+                        if (!inputDireccion.value || inputDireccion.dataset.auto === 'true') {
+                            inputDireccion.value = data.display_name;
+                            inputDireccion.dataset.auto = 'true';
+                            localStorage.setItem('checkout_direccion', data.display_name);
 
-                        if (typeof mostrarToast === 'function') {
-                            mostrarToast('Dirección detectada automáticamente.', 'success');
+                            if (typeof mostrarToast === 'function') {
+                                mostrarToast('Dirección detectada automáticamente.', 'success');
+                            }
                         }
                     }
-                }
-            })
-            .catch(error => {
-                console.error('Error al obtener la dirección:', error);
-            });
+                })
+                .catch(error => {
+                    console.error('Error al obtener la dirección:', error);
+                });
         }
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -464,11 +493,18 @@
                 if (radio) radio.checked = true;
             }
 
-            if (direccionGuardada) {
-                const inputDir = document.getElementById('direccion');
+            // Lógica modificada para priorizar la dirección de la Base de Datos sobre LocalStorage
+            const inputDir = document.getElementById('direccion');
+
+            if (inputDir.value.trim() !== '') {
+                // Si ya tiene valor (vino de la BD), lo marcamos como auto
+                inputDir.dataset.auto = 'true';
+            } else if (direccionGuardada) {
+                // Si está vacío (cliente nuevo), usamos lo que haya en LocalStorage
                 inputDir.value = direccionGuardada;
                 inputDir.dataset.auto = 'true';
             }
+
             if (referenciaGuardada) document.getElementById('referencia').value = referenciaGuardada;
             if (latitudGuardada) document.getElementById('latitud').value = latitudGuardada;
             if (longitudGuardada) document.getElementById('longitud').value = longitudGuardada;

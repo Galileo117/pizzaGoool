@@ -7,6 +7,7 @@ use App\Models\DetallePedido;
 use App\Models\Pago;
 use App\Models\Pedido;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class PedidoController extends Controller
 {
@@ -33,40 +34,55 @@ class PedidoController extends Controller
             $total += $item['precio'] * $item['cantidad'];
         }
 
-        $pedido = Pedido::create([
-            'usuario_id' => auth()->id(),
-            'total' => $total,
-            'estado' => 'pendiente',
-            'metodo_pago' => $request->metodo_pago,
-            'tipo_entrega' => $request->tipo_entrega,
-            'direccion' => $request->direccion ?? null,
-            'referencia' => $request->referencia ?? null,
-            'latitud' => $request->latitud ?? null,
-            'longitud' => $request->longitud ?? null,
-        ]);
+        try {
+            // Iniciamos la transacción. Si algo falla, todo se revierte (Rollback).
+            DB::beginTransaction();
 
-        foreach ($carrito as $item) {
-            DetallePedido::create([
-                'pedido_id' => $pedido->id,
-                'producto_id' => $item['producto_id'],
-                'cantidad' => $item['cantidad'],
-                'precio_unitario' => $item['precio'],
+            $pedido = Pedido::create([
+                'usuario_id' => auth()->id(),
+                'total' => $total,
+                'estado' => 'pendiente',
+                'metodo_pago' => $request->metodo_pago,
+                'tipo_entrega' => $request->tipo_entrega,
+                'direccion' => $request->direccion ?? null,
+                'referencia' => $request->referencia ?? null,
+                'latitud' => $request->latitud ?? null,
+                'longitud' => $request->longitud ?? null,
             ]);
+
+            foreach ($carrito as $item) {
+                DetallePedido::create([
+                    'pedido_id' => $pedido->id,
+                    'producto_id' => $item['producto_id'],
+                    'cantidad' => $item['cantidad'],
+                    'precio_unitario' => $item['precio'],
+                ]);
+            }
+
+            Pago::create([
+                'pedido_id' => $pedido->id,
+                'monto' => $total,
+                'metodo' => $request->metodo_pago,
+                'estado_pago' => 'pendiente',
+                'codigo_qr' => null,
+            ]);
+
+            // Si todo salió bien, confirmamos los cambios en la BD
+            DB::commit();
+
+            session()->forget('carrito');
+
+            return redirect()
+                ->route('cliente.seguimiento', $pedido->id)
+                ->with('success', '¡Pedido creado correctamente!');
+        } catch (\Exception $e) {
+            // Si hay un error, deshacemos todo
+            DB::rollBack();
+
+            return redirect()->back()
+                ->with('error', 'Ocurrió un error al procesar tu pedido. Inténtalo de nuevo.')
+                ->withInput();
         }
-
-        Pago::create([
-            'pedido_id' => $pedido->id,
-            'monto' => $total,
-            'metodo' => $request->metodo_pago,
-            'estado_pago' => 'pendiente',
-            'codigo_qr' => null,
-        ]);
-
-        session()->forget('carrito');
-
-        return redirect()
-            ->route('cliente.seguimiento', $pedido->id)
-            ->with('success', '¡Pedido creado correctamente!');
     }
 
     public function cancelar($pedidoId)
