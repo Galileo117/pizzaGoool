@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\Usuario;
+use App\Models\Cliente;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
@@ -22,42 +24,49 @@ class RegisteredUserController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            'nombres' => ['required', 'string', 'max:100', 'min:2'],
-            'apellidos' => ['required', 'string', 'max:100', 'min:2'],
+            'nombres' => ['required', 'string', 'max:50', 'regex:/^[\pL\s]+$/u'],
+            'apellidos' => ['required', 'string', 'max:50', 'regex:/^[\pL\s]+$/u'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:150', 'unique:usuarios,email'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'telefono' => ['nullable', 'string', 'max:15', 'unique:usuarios,telefono', 'regex:/^[0-9]+$/'],
+            'telefono' => ['nullable', 'string', 'regex:/^[67]\d{7}$/'],
         ], [
-            // Mensajes de error personalizados
             'nombres.required' => 'El nombre es obligatorio.',
-            'nombres.min' => 'El nombre debe tener al menos 2 letras.',
-            'nombres.max' => 'El nombre no puede exceder los 100 caracteres.',
+            'nombres.regex' => 'El nombre solo puede contener letras.',
+            'nombres.max' => 'El nombre no puede exceder los 50 caracteres.',
             'apellidos.required' => 'El apellido es obligatorio.',
-            'apellidos.min' => 'El apellido debe tener al menos 2 letras.',
-            'apellidos.max' => 'El apellido no puede exceder los 100 caracteres.',
+            'apellidos.regex' => 'El apellido solo puede contener letras.',
+            'apellidos.max' => 'El apellido no puede exceder los 50 caracteres.',
             'email.required' => 'El correo electrónico es obligatorio.',
             'email.email' => 'Ingresa un correo electrónico válido.',
-            'email.max' => 'El correo no puede exceder los 150 caracteres.',
             'email.unique' => 'Este correo ya está registrado.',
-            'telefono.max' => 'El teléfono no puede tener más de 15 dígitos.',
-            'telefono.unique' => 'Este teléfono ya está registrado en otra cuenta.',
-            'telefono.regex' => 'El teléfono solo debe contener números.',
+            'telefono.regex' => 'El teléfono debe ser un celular boliviano válido (8 dígitos, empezar con 6 o 7).',
             'password.required' => 'La contraseña es obligatoria.',
             'password.confirmed' => 'Las contraseñas no coinciden.',
             'password.min' => 'La contraseña debe tener al menos 8 caracteres.',
         ]);
 
-        $user = Usuario::create([
-            'nombres' => $request->nombres,
-            'apellidos' => $request->apellidos,
-            'email' => $request->email,
-            'telefono' => $request->telefono,
-            'password' => Hash::make($request->password),
-            'rol' => 'cliente',
-        ]);
+        // Usar transacción para asegurar integridad de datos
+        $user = DB::transaction(function () use ($request) {
+
+            // 1. Crear el usuario para el login
+            $usuario = Usuario::create([
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'rol' => 'cliente',
+            ]);
+
+            // 2. Crear el perfil de cliente asociado
+            Cliente::create([
+                'usuario_id' => $usuario->id,
+                'nombres' => $request->nombres,
+                'apellidos' => $request->apellidos,
+                'telefono' => $request->telefono,
+            ]);
+
+            return $usuario;
+        });
 
         event(new Registered($user));
-
         Auth::login($user);
 
         return redirect(route('cliente.home'));

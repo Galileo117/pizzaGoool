@@ -14,12 +14,9 @@ class Usuario extends Authenticatable
     protected $table = 'usuarios';
 
     protected $fillable = [
-        'nombres',
-        'apellidos',
         'email',
         'password',
         'rol',
-        'telefono',
     ];
 
     protected $hidden = [
@@ -32,5 +29,23 @@ class Usuario extends Authenticatable
         return [
             'password' => 'hashed',
         ];
+    }
+
+    // Relación con el perfil de cliente
+    public function cliente()
+    {
+        return $this->hasOne(Cliente::class, 'usuario_id');
+    }
+
+    // Relación con el perfil de repartidor
+    public function repartidor()
+    {
+        return $this->hasOne(Repartidor::class, 'usuario_id');
+    }
+
+    // Relación con el perfil de empleado (Cajero o Administrador)
+    public function empleado()
+    {
+        return $this->hasOne(Empleado::class, 'usuario_id');
     }
 }
