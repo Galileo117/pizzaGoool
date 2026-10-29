@@ -111,9 +111,8 @@
                 {{-- Perfil de usuario --}}
                 <div class="flex items-center gap-3">
                     <div class="text-right hidden sm:block">
-                        {{-- CORREGIDO: nombres y apellidos --}}
                         <p class="text-sm font-bold text-gray-800 leading-tight">{{ auth()->user()->nombre_completo }}
-                            {{ auth()->user()->apellidos }}</p>
+                        </p>
                         <p class="text-[11px] font-semibold text-goool-green uppercase tracking-wider">
                             {{ auth()->user()->rol }}</p>
                     </div>

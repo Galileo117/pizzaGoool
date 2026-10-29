@@ -11,7 +11,9 @@ class PedidoController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Pedido::with(['usuario', 'detallePedidos.producto', 'repartidor'])->orderBy('created_at', 'asc');
+        // Cargamos las relaciones para optimizar las consultas (Eager Loading)
+        $query = Pedido::with(['usuario.cliente', 'detallePedidos.producto', 'repartidor.repartidor'])
+            ->orderBy('created_at', 'asc');
 
         if ($request->has('estado') && $request->estado !== '') {
             $query->where('estado', $request->estado);
@@ -26,8 +28,10 @@ class PedidoController extends Controller
 
     public function show(Pedido $pedido)
     {
-        $pedido->load(['usuario', 'detallePedidos.producto', 'pago', 'repartidor']);
-        $repartidores = Usuario::where('rol', 'repartidor')->get();
+        $pedido->load(['usuario.cliente', 'detallePedidos.producto', 'pago', 'repartidor.repartidor']);
+
+        // Obtenemos a los usuarios que tienen el rol de repartidor y cargamos su perfil
+        $repartidores = Usuario::where('rol', 'repartidor')->with('repartidor')->get();
 
         return view('cajero.pedidos.show', compact('pedido', 'repartidores'));
     }
@@ -37,6 +41,11 @@ class PedidoController extends Controller
         $request->validate([
             'estado' => 'required|in:pendiente,preparacion,listo,en_reparto,entregado,cancelado',
         ]);
+
+        // Validación extra de seguridad: Evitar que el cajero cancele si ya está en reparto
+        if ($request->estado === 'cancelado' && in_array($pedido->estado, ['en_reparto', 'entregado'])) {
+            return redirect()->back()->with('error', 'No puedes cancelar un pedido que ya está en reparto o entregado.');
+        }
 
         $pedido->update(['estado' => $request->estado]);
 

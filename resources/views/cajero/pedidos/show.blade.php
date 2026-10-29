@@ -102,9 +102,7 @@
                             <i class="fa-solid fa-user text-goool-green"></i>
                         </div>
                         <div>
-                            {{-- CORREGIDO: nombres y apellidos --}}
-                            <p class="font-bold text-gray-800">{{ $pedido->usuario->nombres ?? 'N/A' }}
-                                {{ $pedido->usuario->apellidos ?? '' }}</p>
+                            <p class="font-bold text-gray-800">{{ $pedido->usuario->nombre_completo ?? 'N/A' }}</p>
                             <p class="text-xs text-gray-500">{{ $pedido->usuario->email ?? 'N/A' }}</p>
                         </div>
                     </div>
@@ -113,7 +111,7 @@
 
                     <p class="flex items-center gap-2 text-gray-700">
                         <i class="fa-solid fa-phone text-goool-green w-4"></i>
-                        {{ $pedido->usuario->telefono ?? '—' }}
+                        {{ $pedido->usuario->telefono_contacto ?? '—' }}
                     </p>
 
                     @if ($pedido->tipo_entrega === 'contraentrega')
@@ -134,10 +132,8 @@
                         </h3>
                     </div>
                     <div class="p-5">
-                        {{-- CORREGIDO: nombres y apellidos --}}
-                        <p class="font-bold text-gray-800">{{ $pedido->repartidor->nombres }}
-                            {{ $pedido->repartidor->apellidos }}</p>
-                        <p class="text-xs text-gray-500">{{ $pedido->repartidor->telefono ?? 'Sin teléfono' }}</p>
+                        <p class="font-bold text-gray-800">{{ $pedido->repartidor->nombre_completo }}</p>
+                        <p class="text-xs text-gray-500">{{ $pedido->repartidor->telefono_contacto ?? 'Sin teléfono' }}</p>
                     </div>
                 </div>
             @endif
@@ -202,9 +198,7 @@
                                 class="w-full border border-gray-300 rounded-lg p-3 mb-3 focus:border-goool-green focus:outline-none">
                                 <option value="">-- Seleccionar repartidor --</option>
                                 @foreach ($repartidores as $rep)
-                                    {{-- CORREGIDO: nombres y apellidos --}}
-                                    <option value="{{ $rep->id }}">{{ $rep->nombres }} {{ $rep->apellidos }}
-                                    </option>
+                                    <option value="{{ $rep->id }}">{{ $rep->nombre_completo }}</option>
                                 @endforeach
                             </select>
                             <button type="submit"
@@ -215,20 +209,15 @@
                     @endif
 
                     @if ($pedido->estado === 'en_reparto')
-                        <form action="{{ route('cajero.pedidos.cambiar_estado', $pedido->id) }}" method="POST">
-                            @csrf
-                            @method('PATCH')
-                            <input type="hidden" name="estado" value="entregado">
-                            <button type="submit"
-                                class="w-full bg-gray-500 text-white font-bold py-3 rounded-lg hover:bg-gray-600 transition">
-                                <i class="fa-solid fa-house"></i> Marcar como Entregado
-                            </button>
-                        </form>
+                        <div class="bg-purple-50 border border-purple-200 text-purple-800 p-3 rounded-lg text-sm">
+                            <i class="fa-solid fa-motorcycle"></i>
+                            El pedido está en camino. El repartidor confirmará la entrega desde su panel.
+                        </div>
                     @endif
 
-                    @if (!in_array($pedido->estado, ['entregado', 'cancelado']))
+                    {{-- CORREGIDO: Solo permitir cancelar si está pendiente o en preparación --}}
+                    @if (in_array($pedido->estado, ['pendiente', 'preparacion']))
                         <hr class="border-gray-200">
-                        {{-- Botón que abre el modal de cancelar --}}
                         <button type="button" onclick="abrirModalCancelar()"
                             class="w-full bg-red-500 text-white font-bold py-3 rounded-lg hover:bg-red-600 transition">
                             <i class="fa-solid fa-xmark"></i> Cancelar Pedido

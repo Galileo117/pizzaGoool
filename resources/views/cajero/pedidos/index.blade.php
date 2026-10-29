@@ -49,9 +49,7 @@
                         <tr class="hover:bg-gray-50">
                             <td class="px-4 py-3 font-bold text-goool-green">
                                 #{{ str_pad($pedido->id, 6, '0', STR_PAD_LEFT) }}</td>
-                            {{-- CORREGIDO: nombres y apellidos --}}
-                            <td class="px-4 py-3 text-gray-700">{{ $pedido->usuario->nombres ?? 'N/A' }}
-                                {{ $pedido->usuario->apellidos ?? '' }}</td>
+                            <td class="px-4 py-3 text-gray-700">{{ $pedido->usuario->nombre_completo ?? 'N/A' }}</td>
                             <td class="px-4 py-3 font-bold text-gray-800">Bs. {{ number_format($pedido->total, 2) }}</td>
                             <td class="px-4 py-3 text-gray-600">
                                 <i
@@ -124,9 +122,7 @@
                 <div class="p-4 space-y-2 text-sm">
                     <div class="flex justify-between">
                         <span class="text-gray-500 font-semibold">Cliente</span>
-                        {{-- CORREGIDO: nombres y apellidos --}}
-                        <span class="font-bold text-gray-800">{{ $pedido->usuario->nombres ?? 'N/A' }}
-                            {{ $pedido->usuario->apellidos ?? '' }}</span>
+                        <span class="font-bold text-gray-800">{{ $pedido->usuario->nombre_completo ?? 'N/A' }}</span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-gray-500 font-semibold">Total</span>
