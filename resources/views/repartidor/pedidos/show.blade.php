@@ -119,13 +119,6 @@
                                     class="inline-flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg transition">
                                     <i class="fa-solid fa-map"></i> Abrir en Google Maps
                                 </a>
-
-                                @if ($pedido->usuario && $pedido->usuario->telefono_contacto)
-                                    <a href="tel:{{ $pedido->usuario->telefono_contacto }}"
-                                        class="inline-flex items-center justify-center gap-2 bg-goool-green hover:bg-goool-green-dark text-white font-bold py-3 px-4 rounded-lg transition">
-                                        <i class="fa-solid fa-phone"></i> Llamar al cliente
-                                    </a>
-                                @endif
                             </div>
                         @else
                             <div class="bg-yellow-50 border border-yellow-200 text-yellow-800 p-4 rounded-lg text-sm mb-4">
