@@ -117,8 +117,8 @@
                                     Abrir en Google Maps
                                 </a>
 
-                                @if ($pedido->usuario && $pedido->usuario->telefono)
-                                    <a href="tel:{{ $pedido->usuario->telefono }}"
+                                @if ($pedido->usuario && $pedido->usuario->telefono_contacto)
+                                    <a href="tel:{{ $pedido->usuario->telefono_contacto }}"
                                         class="inline-flex items-center justify-center gap-2 bg-goool-green hover:bg-goool-green-dark text-white font-bold py-3 px-4 rounded-lg transition">
                                         <i class="fa-solid fa-phone"></i>
                                         Llamar al cliente
@@ -131,8 +131,8 @@
                                 El cliente no marcó la ubicación exacta en el mapa.
                             </div>
 
-                            @if ($pedido->usuario && $pedido->usuario->telefono)
-                                <a href="tel:{{ $pedido->usuario->telefono }}"
+                            @if ($pedido->usuario && $pedido->usuario->telefono_contacto)
+                                <a href="tel:{{ $pedido->usuario->telefono_contacto }}"
                                     class="inline-flex items-center justify-center gap-2 bg-goool-green hover:bg-goool-green-dark text-white font-bold py-3 px-4 rounded-lg transition w-full">
                                     <i class="fa-solid fa-phone"></i>
                                     Llamar al cliente
@@ -157,20 +157,19 @@
                             <i class="fa-solid fa-user text-goool-green"></i>
                         </div>
                         <div class="min-w-0">
-                            {{-- CORREGIDO: nombres y apellidos --}}
-                            <p class="font-bold text-gray-800 truncate">{{ $pedido->usuario->nombres ?? 'N/A' }}
-                                {{ $pedido->usuario->apellidos ?? '' }}</p>
+                            <p class="font-bold text-gray-800 truncate">{{ $pedido->usuario->nombre_completo ?? 'N/A' }}
+                            </p>
                             <p class="text-xs text-gray-500 truncate">{{ $pedido->usuario->email ?? 'N/A' }}</p>
                         </div>
                     </div>
 
                     <hr class="border-gray-200">
 
-                    @if ($pedido->usuario && $pedido->usuario->telefono)
-                        <a href="tel:{{ $pedido->usuario->telefono }}"
+                    @if ($pedido->usuario && $pedido->usuario->telefono_contacto)
+                        <a href="tel:{{ $pedido->usuario->telefono_contacto }}"
                             class="flex items-center gap-2 text-goool-green font-semibold hover:underline">
                             <i class="fa-solid fa-phone w-4"></i>
-                            {{ $pedido->usuario->telefono }}
+                            {{ $pedido->usuario->telefono_contacto }}
                         </a>
                     @endif
                 </div>

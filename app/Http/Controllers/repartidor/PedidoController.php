@@ -12,7 +12,8 @@ class PedidoController extends Controller
         $repartidorId = auth()->id();
 
         // Pedidos asignados a este repartidor que aún no están entregados
-        $pedidos = Pedido::where('repartidor_id', $repartidorId)
+        $pedidos = Pedido::with(['usuario.cliente', 'detallePedidos.producto'])
+            ->where('repartidor_id', $repartidorId)
             ->whereIn('estado', ['en_reparto', 'entregado'])
             ->orderBy('updated_at', 'desc')
             ->paginate(10);
@@ -27,7 +28,7 @@ class PedidoController extends Controller
             abort(403, 'No tienes permiso para ver este pedido.');
         }
 
-        $pedido->load(['usuario', 'detallePedidos.producto']);
+        $pedido->load(['usuario.cliente', 'detallePedidos.producto']);
 
         return view('repartidor.pedidos.show', compact('pedido'));
     }

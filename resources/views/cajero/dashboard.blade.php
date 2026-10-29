@@ -5,7 +5,7 @@
 
 @section('content')
     <div class="mb-6">
-        <h2 class="text-2xl font-bold text-goool-green-dark">Bienvenido, {{ auth()->user()->nombres }}</h2>
+        <h2 class="text-2xl font-bold text-goool-green-dark">Bienvenido, {{ auth()->user()->nombre_completo }}</h2>
         <p class="text-gray-600">Aquí gestionarás los pedidos en tiempo real.</p>
     </div>
 

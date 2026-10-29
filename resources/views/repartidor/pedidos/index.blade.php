@@ -29,10 +29,8 @@
                             <td class="px-4 py-3 font-bold text-goool-green">
                                 #{{ str_pad($pedido->id, 6, '0', STR_PAD_LEFT) }}</td>
                             <td class="px-4 py-3 text-gray-700">
-                                {{-- CORREGIDO: nombres y apellidos --}}
-                                <p class="font-semibold">{{ $pedido->usuario->nombres ?? 'N/A' }}
-                                    {{ $pedido->usuario->apellidos ?? '' }}</p>
-                                <p class="text-xs text-gray-500">{{ $pedido->usuario->telefono ?? '—' }}</p>
+                                <p class="font-semibold">{{ $pedido->usuario->nombre_completo ?? 'N/A' }}</p>
+                                <p class="text-xs text-gray-500">{{ $pedido->usuario->telefono_contacto ?? '—' }}</p>
                             </td>
                             <td class="px-4 py-3 text-gray-600 text-xs">
                                 {{ $pedido->direccion ?? 'Recoger en local' }}
@@ -92,13 +90,12 @@
                 <div class="p-4 space-y-3">
                     <div class="flex justify-between items-center">
                         <span class="text-xs text-gray-500 font-semibold uppercase">Cliente</span>
-                        {{-- CORREGIDO: nombres y apellidos --}}
-                        <span class="text-sm font-bold text-gray-800">{{ $pedido->usuario->nombres ?? 'N/A' }}
-                            {{ $pedido->usuario->apellidos ?? '' }}</span>
+                        <span
+                            class="text-sm font-bold text-gray-800">{{ $pedido->usuario->nombre_completo ?? 'N/A' }}</span>
                     </div>
                     <div class="flex justify-between items-center">
                         <span class="text-xs text-gray-500 font-semibold uppercase">Teléfono</span>
-                        <span class="text-sm text-gray-700">{{ $pedido->usuario->telefono ?? '—' }}</span>
+                        <span class="text-sm text-gray-700">{{ $pedido->usuario->telefono_contacto ?? '—' }}</span>
                     </div>
                     <div class="flex justify-between items-center">
                         <span class="text-xs text-gray-500 font-semibold uppercase">Total</span>
