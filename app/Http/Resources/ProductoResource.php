@@ -5,6 +5,9 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * Define el contrato JSON de producto y su categoría cuando está cargada.
+ */
 class ProductoResource extends JsonResource
 {
     public function toArray(Request $request): array
@@ -15,7 +18,7 @@ class ProductoResource extends JsonResource
             'descripcion' => $this->descripcion,
             'precio' => (float) $this->precio,
             'imagen' => $this->imagen
-                ? asset('storage/' . $this->imagen)
+                ? asset('storage/'.$this->imagen)
                 : null,
             'disponible' => (bool) $this->disponible,
             'categoria' => new CategoriaResource(

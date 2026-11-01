@@ -1,3 +1,4 @@
+{{-- Cola de pedidos para caja; filtros y estados corresponden a Cajero\PedidoController. --}}
 @extends('layouts.cajero')
 
 @section('title', 'Gestionar Pedidos - Panel de Cajero')

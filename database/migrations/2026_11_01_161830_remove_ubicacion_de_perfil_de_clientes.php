@@ -5,6 +5,9 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
+/**
+ * Archiva ubicación de perfil antes de retirarla; las coordenadas del pedido no cambian.
+ */
 return new class extends Migration
 {
     public function up(): void

@@ -1,3 +1,4 @@
+{{-- Resumen del repartidor autenticado con acceso a sus entregas asignadas. --}}
 @extends('layouts.repartidor')
 
 @section('title', 'Dashboard - Panel de Repartidor')

@@ -1,5 +1,6 @@
 @extends('layouts.cliente')
 
+{{-- Perfil de contacto del cliente; cada pedido captura su propia dirección y ubicación de entrega. --}}
 @section('title', 'Mi Perfil - Pizza Goool')
 
 @section('content')

@@ -9,6 +9,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
+/**
+ * Confirma la contraseña antes de permitir acciones web sensibles.
+ */
 class ConfirmablePasswordController extends Controller
 {
     /**

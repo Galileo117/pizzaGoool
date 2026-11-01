@@ -1,3 +1,4 @@
+{{-- Formulario para establecer una contraseña nueva usando el token de recuperación. --}}
 <x-guest-layout>
     <form method="POST" action="{{ route('password.store') }}">
         @csrf

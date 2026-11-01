@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Producto;
-use Illuminate\Http\Request;
 
+/**
+ * Prepara los productos destacados y deriva cada rol a su panel correspondiente.
+ */
 class InicioController extends Controller
 {
     public function index()

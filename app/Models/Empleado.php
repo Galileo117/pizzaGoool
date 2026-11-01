@@ -5,6 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Perfil laboral de las cuentas con rol de administración o caja.
+ */
 class Empleado extends Model
 {
     use HasFactory;
@@ -16,7 +19,7 @@ class Empleado extends Model
         'nombres',
         'apellidos',
         'telefono',
-        'cargo'
+        'cargo',
     ];
 
     public function usuario()

@@ -2,9 +2,12 @@
 
 namespace App\Livewire;
 
-use Livewire\Component;
 use Livewire\Attributes\On;
+use Livewire\Component;
 
+/**
+ * Refresca el número de unidades cuando el carrito emite su evento de actualización.
+ */
 class ContadorCarrito extends Component
 {
     public $cantidad = 0;

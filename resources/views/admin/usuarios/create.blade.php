@@ -1,3 +1,4 @@
+{{-- Formulario administrativo que crea una cuenta y su perfil según el rol elegido. --}}
 @extends('layouts.admin')
 
 @section('title', 'Nuevo Usuario - Panel de Administración')

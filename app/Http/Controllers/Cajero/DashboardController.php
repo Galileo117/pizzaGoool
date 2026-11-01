@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Cajero;
 use App\Http\Controllers\Controller;
 use App\Models\Pedido;
 
+/**
+ * Prepara el resumen de pedidos para la pantalla inicial de caja.
+ */
 class DashboardController extends Controller
 {
     public function index()

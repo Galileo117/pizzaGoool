@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Configuracion;
 use Illuminate\Http\Request;
 
+/**
+ * Administra valores configurables del sistema, incluido el QR de pago.
+ */
 class ConfiguracionController extends Controller
 {
     public function index()

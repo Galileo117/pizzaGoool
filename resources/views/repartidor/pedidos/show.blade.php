@@ -1,3 +1,4 @@
+{{-- Detalle de entrega asignada, incluida dirección y ubicación capturadas en el pedido. --}}
 @extends('layouts.repartidor')
 
 @section('title', 'Detalle del Pedido - Panel de Repartidor')

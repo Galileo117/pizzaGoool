@@ -1,3 +1,4 @@
+{{-- Navegación Breeze para escritorio y móvil; los enlaces dependen de sesión y rol. --}}
 <nav x-data="{ open: false }" class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm"
     role="navigation" aria-label="Navegación principal">
 

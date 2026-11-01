@@ -5,6 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Producto del catálogo; sus detalles históricos permanecen ligados a pedidos.
+ */
 class Producto extends Model
 {
     use HasFactory;

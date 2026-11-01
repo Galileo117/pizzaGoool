@@ -6,11 +6,15 @@ use App\Http\Controllers\Controller;
 use App\Models\Categoria;
 use Illuminate\Http\Request;
 
+/**
+ * Gestiona el ciclo CRUD de categorías desde el panel administrativo.
+ */
 class CategoriaController extends Controller
 {
     public function index()
     {
         $categorias = Categoria::withCount('productos')->orderBy('nombre')->paginate(10);
+
         return view('admin.categorias.index', compact('categorias'));
     }
 
@@ -40,7 +44,7 @@ class CategoriaController extends Controller
     public function update(Request $request, Categoria $categoria)
     {
         $request->validate([
-            'nombre' => 'required|string|max:255|unique:categorias,nombre,' . $categoria->id,
+            'nombre' => 'required|string|max:255|unique:categorias,nombre,'.$categoria->id,
             'descripcion' => 'nullable|string',
         ]);
 

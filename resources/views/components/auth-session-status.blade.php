@@ -1,3 +1,4 @@
+{{-- Presenta el mensaje de estado temporal de autenticación recibido como prop. --}}
 @props(['status'])
 
 @if ($status)

@@ -1,3 +1,4 @@
+{{-- Navegación y estructura comunes para las pantallas del rol cajero. --}}
 <!DOCTYPE html>
 <html lang="es">
 

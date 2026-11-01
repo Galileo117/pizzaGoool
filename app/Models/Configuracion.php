@@ -5,6 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Configuración clave-valor utilizada por las pantallas administrativas y la API.
+ */
 class Configuracion extends Model
 {
     use HasFactory;
@@ -19,6 +22,7 @@ class Configuracion extends Model
     public static function obtener(string $clave, $default = null)
     {
         $config = self::where('clave', $clave)->first();
+
         return $config ? $config->valor : $default;
     }
 

@@ -1,5 +1,6 @@
 @extends('layouts.cliente')
 
+{{-- Confirma carrito, pago y entrega; la dirección y el mapa pertenecen a este pedido, no al perfil. --}}
 @section('title', 'Checkout - Pizza Goool')
 
 @push('styles')

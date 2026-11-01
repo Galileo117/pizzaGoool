@@ -6,6 +6,9 @@ use App\Models\Usuario;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
+/**
+ * Valida los datos personales editables del usuario y su perfil asociado.
+ */
 class ProfileUpdateRequest extends FormRequest
 {
     public function rules(): array

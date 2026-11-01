@@ -5,6 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Datos operativos del repartidor asociados a su cuenta de usuario.
+ */
 class Repartidor extends Model
 {
     use HasFactory;
@@ -19,7 +22,7 @@ class Repartidor extends Model
         'ci',
         'vehiculo',
         'placa',
-        'licencia_conducir'
+        'licencia_conducir',
     ];
 
     public function usuario()

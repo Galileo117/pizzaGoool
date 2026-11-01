@@ -1,3 +1,4 @@
+{{-- Solicita el enlace de recuperación; los mensajes provienen del flujo de password broker. --}}
 <x-guest-layout>
 
     <div class="w-full">

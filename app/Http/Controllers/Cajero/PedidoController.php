@@ -7,6 +7,9 @@ use App\Models\Pedido;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
 
+/**
+ * Permite a caja revisar pedidos, validar sus transiciones y asignar repartidores.
+ */
 class PedidoController extends Controller
 {
     public function index(Request $request)

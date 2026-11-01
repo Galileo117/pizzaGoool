@@ -5,6 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Perfil personal del cliente; la dirección y ubicación se capturan por pedido.
+ */
 class Cliente extends Model
 {
     use HasFactory;

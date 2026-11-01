@@ -1,3 +1,4 @@
+{{-- Consulta administrativa del historial de pedidos; las acciones de operación están en caja. --}}
 @extends('layouts.admin')
 
 @section('title', 'Pedidos - Panel de Administración')

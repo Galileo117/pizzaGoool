@@ -7,6 +7,9 @@ use App\Models\Pedido;
 use App\Models\Producto;
 use App\Models\Usuario;
 
+/**
+ * Prepara métricas y accesos de la portada administrativa.
+ */
 class DashboardController extends Controller
 {
     public function index()

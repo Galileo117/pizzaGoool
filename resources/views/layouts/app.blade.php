@@ -1,3 +1,4 @@
+{{-- Layout autenticado de Breeze, usado por dashboard y formularios de cuenta. --}}
 <!DOCTYPE html>
 <html lang="es">
 

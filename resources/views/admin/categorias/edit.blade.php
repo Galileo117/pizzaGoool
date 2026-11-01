@@ -1,3 +1,4 @@
+{{-- Formulario administrativo para actualizar la categoría recibida por el controlador. --}}
 @extends('layouts.admin')
 
 @section('title', 'Editar Categoría - Panel de Administración')

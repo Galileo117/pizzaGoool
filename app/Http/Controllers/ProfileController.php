@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 
+/**
+ * Actualiza datos personales de la cuenta sin guardar una dirección predeterminada.
+ */
 class ProfileController extends Controller
 {
     public function edit(Request $request): View

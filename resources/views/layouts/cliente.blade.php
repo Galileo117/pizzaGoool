@@ -1,3 +1,4 @@
+{{-- Layout del storefront: navegación pública/cliente y stacks para estilos/scripts de sus páginas. --}}
 <!DOCTYPE html>
 <html lang="es">
 

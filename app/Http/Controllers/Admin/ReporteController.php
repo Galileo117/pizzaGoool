@@ -5,9 +5,13 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\DetallePedido;
 use App\Models\Pedido;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * Construye reportes HTML/PDF usando los filtros de ventas recibidos.
+ */
 class ReporteController extends Controller
 {
     public function index(Request $request)
@@ -75,6 +79,7 @@ class ReporteController extends Controller
             'ventasPorMetodo'
         ));
     }
+
     public function pdf(Request $request)
     {
         $fechaInicio = $request->input('fecha_inicio', now()->subDays(30)->format('Y-m-d'));
@@ -123,7 +128,7 @@ class ReporteController extends Controller
             ->groupBy('metodo_pago')
             ->get();
 
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.reportes.pdf', compact(
+        $pdf = Pdf::loadView('admin.reportes.pdf', compact(
             'fechaInicio',
             'fechaFin',
             'totalVentas',
@@ -134,6 +139,6 @@ class ReporteController extends Controller
             'ventasPorMetodo'
         ));
 
-        return $pdf->download('reporte-ventas-' . $fechaInicio . '-al-' . $fechaFin . '.pdf');
+        return $pdf->download('reporte-ventas-'.$fechaInicio.'-al-'.$fechaFin.'.pdf');
     }
 }

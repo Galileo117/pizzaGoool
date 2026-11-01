@@ -8,6 +8,9 @@ use App\Models\Producto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
+/**
+ * Administra el catálogo y protege referencias de productos en pedidos históricos.
+ */
 class ProductoController extends Controller
 {
     public function index()

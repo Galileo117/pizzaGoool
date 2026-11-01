@@ -7,6 +7,9 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
+/**
+ * Decide si mostrar la verificación pendiente o continuar al área del usuario.
+ */
 class EmailVerificationPromptController extends Controller
 {
     /**

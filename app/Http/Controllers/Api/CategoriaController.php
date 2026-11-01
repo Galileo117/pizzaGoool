@@ -7,6 +7,9 @@ use App\Http\Resources\CategoriaResource;
 use App\Http\Traits\ApiResponse;
 use App\Models\Categoria;
 
+/**
+ * Publica categorías en el formato JSON consumido por el catálogo móvil.
+ */
 class CategoriaController extends Controller
 {
     use ApiResponse;

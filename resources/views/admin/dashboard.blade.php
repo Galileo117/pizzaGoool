@@ -1,3 +1,4 @@
+{{-- Resumen de actividad para usuarios con rol de administrador. --}}
 @extends('layouts.admin')
 
 @section('title', 'Dashboard - Panel de Administración')

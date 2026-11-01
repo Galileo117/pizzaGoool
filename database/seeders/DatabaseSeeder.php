@@ -14,6 +14,9 @@ use App\Models\Usuario;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
+/**
+ * Crea datos de demostración para roles, catálogo y el historial de pedidos.
+ */
 class DatabaseSeeder extends Seeder
 {
     public function run(): void

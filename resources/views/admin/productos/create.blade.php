@@ -1,3 +1,4 @@
+{{-- Formulario para registrar un producto y asociarlo a una categoría existente. --}}
 @extends('layouts.admin')
 
 @section('title', 'Nuevo Producto - Panel de Administración')

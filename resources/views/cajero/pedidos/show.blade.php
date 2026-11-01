@@ -1,3 +1,4 @@
+{{-- Detalle operativo para caja: transición válida y asignación del repartidor. --}}
 @extends('layouts.cajero')
 
 @section('title', 'Detalle del Pedido - Panel de Cajero')

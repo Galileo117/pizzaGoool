@@ -5,6 +5,9 @@ namespace App\View\Components;
 use Illuminate\View\Component;
 use Illuminate\View\View;
 
+/**
+ * Resuelve el layout de aplicación para vistas autenticadas de Breeze.
+ */
 class AppLayout extends Component
 {
     /**

@@ -1,3 +1,4 @@
+{{-- Vista del componente Livewire que permite editar cantidades y quitar productos del carrito. --}}
 <div class="max-w-7xl mx-auto px-4 py-6 sm:py-8">
 
     @if ($contexto === 'catalogo')

@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Traits\ApiResponse;
 use App\Models\Configuracion;
 
+/**
+ * Expone únicamente la configuración permitida para clientes API.
+ */
 class ConfiguracionController extends Controller
 {
     use ApiResponse;
@@ -20,7 +23,7 @@ class ConfiguracionController extends Controller
         $mensajeQr = Configuracion::obtener('mensaje_qr', 'Escanea este código QR desde tu aplicación bancaria para realizar el pago.');
 
         return $this->successResponse([
-            'imagen_qr' => $imagenQr ? asset('storage/' . $imagenQr) : null,
+            'imagen_qr' => $imagenQr ? asset('storage/'.$imagenQr) : null,
             'mensaje_qr' => $mensajeQr,
         ], 'Configuración pública.');
     }

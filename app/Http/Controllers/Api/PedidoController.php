@@ -13,10 +13,16 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
+/**
+ * Expone las operaciones de pedidos móviles con aislamiento por usuario autenticado.
+ */
 class PedidoController extends Controller
 {
     use ApiResponse;
 
+    /**
+     * Construye la compra desde precios de catálogo actuales, no desde importes del cliente.
+     */
     public function store(Request $request)
     {
         $request->validate([

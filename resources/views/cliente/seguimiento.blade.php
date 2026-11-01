@@ -1,3 +1,4 @@
+{{-- Seguimiento del pedido propietario; la ruta verifica que pertenezca al usuario autenticado. --}}
 @extends('layouts.cliente')
 
 @section('title', 'Seguimiento - Pizza Goool')

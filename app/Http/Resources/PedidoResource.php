@@ -5,6 +5,9 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * Mantiene el contrato JSON de pedidos y expone relaciones sólo cuando se cargaron.
+ */
 class PedidoResource extends JsonResource
 {
     public function toArray(Request $request): array

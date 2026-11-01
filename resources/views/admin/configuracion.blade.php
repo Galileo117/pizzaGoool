@@ -1,3 +1,4 @@
+{{-- Administración del QR usado como medio de pago; envía cambios a ConfiguracionController. --}}
 @extends('layouts.admin')
 
 @section('title', 'Configuración del QR - Panel de Administración')

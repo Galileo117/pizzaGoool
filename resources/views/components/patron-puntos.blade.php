@@ -1,3 +1,4 @@
+{{-- Decoración visual no interactiva; las props controlan posición, opacidad y color. --}}
 @props([
     'posicion' => 'arriba-derecha',
     'color' => 'text-goool-yellow',

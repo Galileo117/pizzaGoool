@@ -1,3 +1,4 @@
+{{-- Filtros y resumen de ventas; el controlador comparte los criterios con la exportación PDF. --}}
 @extends('layouts.admin')
 
 @section('title', 'Reportes de Ventas - Panel de Administración')

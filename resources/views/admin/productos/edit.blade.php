@@ -1,3 +1,4 @@
+{{-- Formulario administrativo para actualizar el producto seleccionado. --}}
 @extends('layouts.admin')
 
 @section('title', 'Editar Producto - Panel de Administración')

@@ -8,6 +8,9 @@ use App\Http\Traits\ApiResponse;
 use App\Models\Producto;
 use Illuminate\Http\Request;
 
+/**
+ * Provee el catálogo disponible y el detalle de productos para la app móvil.
+ */
 class ProductoController extends Controller
 {
     use ApiResponse;
@@ -26,7 +29,7 @@ class ProductoController extends Controller
 
         // Búsqueda por nombre
         if ($request->filled('buscar')) {
-            $query->where('nombre', 'LIKE', '%' . $request->buscar . '%');
+            $query->where('nombre', 'LIKE', '%'.$request->buscar.'%');
         }
 
         $productos = $query->orderBy('created_at', 'desc')->get();
@@ -44,7 +47,7 @@ class ProductoController extends Controller
     {
         $producto = Producto::with('categoria')->find($id);
 
-        if (!$producto) {
+        if (! $producto) {
             return $this->notFoundResponse('Producto no encontrado.');
         }
 

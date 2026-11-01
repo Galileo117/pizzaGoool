@@ -5,6 +5,9 @@ namespace App\View\Components;
 use Illuminate\View\Component;
 use Illuminate\View\View;
 
+/**
+ * Resuelve el layout compartido por pantallas públicas de autenticación.
+ */
 class GuestLayout extends Component
 {
     /**

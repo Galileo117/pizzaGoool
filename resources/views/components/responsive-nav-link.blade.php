@@ -1,3 +1,4 @@
+{{-- Enlace de navegación móvil con estilo según la ruta activa. --}}
 @props(['active'])
 
 @php

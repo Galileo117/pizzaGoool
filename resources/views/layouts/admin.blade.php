@@ -1,3 +1,4 @@
+{{-- Marco compartido del panel administrativo; las páginas hijas inyectan título y contenido. --}}
 <!DOCTYPE html>
 <html lang="es">
 

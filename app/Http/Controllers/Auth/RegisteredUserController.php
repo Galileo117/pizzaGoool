@@ -14,6 +14,9 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
 
+/**
+ * Registra cuentas web y crea su perfil según las reglas del formulario.
+ */
 class RegisteredUserController extends Controller
 {
     public function create(): View

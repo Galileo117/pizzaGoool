@@ -9,6 +9,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
+/**
+ * Atiende el inicio y cierre de sesión web.
+ */
 class AuthenticatedSessionController extends Controller
 {
     /**

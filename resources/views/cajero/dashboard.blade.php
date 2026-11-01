@@ -1,3 +1,4 @@
+{{-- Resumen operativo para caja; muestra el acceso a la cola de pedidos pendientes. --}}
 @extends('layouts.cajero')
 
 @section('title', 'Dashboard - Panel de Cajero')

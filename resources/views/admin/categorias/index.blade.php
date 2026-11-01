@@ -1,3 +1,4 @@
+{{-- Listado administrativo de categorías y accesos a crear, editar o eliminar. --}}
 @extends('layouts.admin')
 
 @section('title', 'Categorías - Panel de Administración')

@@ -4,6 +4,9 @@ namespace App\Http\Traits;
 
 use Illuminate\Http\JsonResponse;
 
+/**
+ * Normaliza el sobre de respuestas JSON y los códigos de error de la API.
+ */
 trait ApiResponse
 {
     /**
@@ -16,7 +19,7 @@ trait ApiResponse
             'message' => $message,
         ];
 
-        if (!is_null($data)) {
+        if (! is_null($data)) {
             $response['data'] = $data;
         }
 
@@ -33,7 +36,7 @@ trait ApiResponse
             'message' => $message,
         ];
 
-        if (!is_null($errors)) {
+        if (! is_null($errors)) {
             $response['errors'] = $errors;
         }
 

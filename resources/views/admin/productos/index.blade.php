@@ -1,3 +1,4 @@
+{{-- Catálogo administrativo para gestionar disponibilidad y datos de productos. --}}
 @extends('layouts.admin')
 
 @section('title', 'Productos - Panel de Administración')

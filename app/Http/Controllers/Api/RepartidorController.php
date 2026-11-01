@@ -8,6 +8,9 @@ use App\Http\Traits\ApiResponse;
 use App\Models\Pedido;
 use Illuminate\Http\Request;
 
+/**
+ * Expone al repartidor móvil sólo las entregas vinculadas a su cuenta.
+ */
 class RepartidorController extends Controller
 {
     use ApiResponse;

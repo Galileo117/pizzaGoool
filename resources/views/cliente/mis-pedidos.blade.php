@@ -1,3 +1,4 @@
+{{-- Historial del cliente autenticado, con detalle y acciones permitidas por estado. --}}
 @extends('layouts.cliente')
 
 @section('title', 'Mis Pedidos - Pizza Goool')

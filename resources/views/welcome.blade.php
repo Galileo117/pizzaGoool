@@ -1,3 +1,4 @@
+{{-- Página inicial pública con el catálogo destacado preparado por InicioController. --}}
 @extends('layouts.cliente')
 
 @section('title', 'Inicio - Pizza Goool')

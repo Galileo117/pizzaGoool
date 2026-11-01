@@ -1,3 +1,4 @@
+{{-- Listado de cuentas administrables con sus perfiles y roles asignados. --}}
 @extends('layouts.admin')
 
 @section('title', 'Usuarios - Panel de Administración')

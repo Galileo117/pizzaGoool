@@ -7,8 +7,14 @@ use App\Models\Categoria;
 use App\Models\Producto;
 use Illuminate\Http\Request;
 
+/**
+ * Presenta el catálogo y gestiona el carrito web guardado en la sesión.
+ */
 class CatalogoController extends Controller
 {
+    /**
+     * Sincroniza el carrito con productos vigentes antes de mostrar el checkout.
+     */
     public function mostrarCheckout()
     {
         $carrito = session()->get('carrito', []);

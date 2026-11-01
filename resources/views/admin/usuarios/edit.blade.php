@@ -1,3 +1,4 @@
+{{-- Edición de cuenta/perfil; los campos disponibles dependen del rol del usuario. --}}
 @extends('layouts.admin')
 
 @section('title', 'Editar Usuario - Panel de Administración')

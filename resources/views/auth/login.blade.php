@@ -1,3 +1,4 @@
+{{-- Inicio de sesión web; LoginRequest valida credenciales y limita intentos. --}}
 <x-guest-layout>
 
     {{-- LOGO --}}

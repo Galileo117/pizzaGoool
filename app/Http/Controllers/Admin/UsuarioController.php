@@ -13,6 +13,9 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules;
 
+/**
+ * Administra cuentas y perfiles específicos según el rol asignado.
+ */
 class UsuarioController extends Controller
 {
     public function index(Request $request)

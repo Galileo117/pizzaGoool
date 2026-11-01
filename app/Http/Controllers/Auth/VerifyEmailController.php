@@ -7,6 +7,9 @@ use Illuminate\Auth\Events\Verified;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\RedirectResponse;
 
+/**
+ * Marca como verificado el correo después de validar la firma del enlace.
+ */
 class VerifyEmailController extends Controller
 {
     /**

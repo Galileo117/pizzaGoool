@@ -1,3 +1,4 @@
+{{-- Layout mínimo compartido por login, registro y flujos de contraseña/verificación. --}}
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 

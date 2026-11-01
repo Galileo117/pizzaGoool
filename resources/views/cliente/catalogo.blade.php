@@ -1,3 +1,4 @@
+{{-- Catálogo público con filtros y carrito; el contenido llega de CatalogoController. --}}
 @extends('layouts.cliente')
 
 @section('title', 'Catálogo - Pizza Goool')

@@ -1,3 +1,4 @@
+{{-- Modal Alpine reutilizable; el contenido y el estado de apertura los entrega quien lo invoca. --}}
 @props([
     'name',
     'show' => false,

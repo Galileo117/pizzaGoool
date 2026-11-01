@@ -11,8 +11,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
+/**
+ * Crea pedidos web y ofrece al cliente su historial y cancelación permitida.
+ */
 class PedidoController extends Controller
 {
+    /**
+     * Revalida catálogo/precios y persiste pedido, líneas y pago en una transacción.
+     */
     public function procesar(Request $request)
     {
         $carrito = session()->get('carrito', []);

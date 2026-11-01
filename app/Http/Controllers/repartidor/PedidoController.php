@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Pedido;
 use Illuminate\Http\Request;
 
+/**
+ * Limita la consulta y las acciones del panel a los pedidos asignados al repartidor.
+ */
 class PedidoController extends Controller
 {
     public function index()

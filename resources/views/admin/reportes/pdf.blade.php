@@ -1,3 +1,4 @@
+{{-- Plantilla imprimible del reporte; conservar sus datos en sincronía con el reporte HTML. --}}
 <!DOCTYPE html>
 <html lang="es">
 <head>

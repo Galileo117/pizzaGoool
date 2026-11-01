@@ -12,6 +12,9 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\Validation\ValidationException;
 
+/**
+ * Gestiona cuentas/token Sanctum y proyecta los datos del perfil de cliente.
+ */
 class AuthController extends Controller
 {
     use ApiResponse;
@@ -37,6 +40,7 @@ class AuthController extends Controller
             return $this->validationErrorResponse($e->errors());
         }
 
+        // Cuenta y perfil se crean juntos para evitar usuarios cliente incompletos.
         $usuario = DB::transaction(function () use ($datos) {
             $usuario = Usuario::create([
                 'email' => $datos['email'],

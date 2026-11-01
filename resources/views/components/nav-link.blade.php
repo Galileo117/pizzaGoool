@@ -1,3 +1,4 @@
+{{-- Enlace de navegación de escritorio; la vista llamadora informa si la ruta está activa. --}}
 @props(['active'])
 
 @php

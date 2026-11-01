@@ -5,6 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Estado de pago asociado a un único pedido.
+ */
 class Pago extends Model
 {
     use HasFactory;

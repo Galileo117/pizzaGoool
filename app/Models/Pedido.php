@@ -5,6 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Registro histórico de una compra, incluyendo su entrega y estado operativo.
+ */
 class Pedido extends Model
 {
     use HasFactory;
@@ -44,6 +47,9 @@ class Pedido extends Model
         return $this->hasOne(Pago::class);
     }
 
+    /**
+     * Comprueba la máquina de estados compartida por caja y repartidores.
+     */
     public function puedeCambiarEstado(string $nuevoEstado): bool
     {
         $transiciones = [

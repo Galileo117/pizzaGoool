@@ -8,6 +8,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 
+/**
+ * Cambia la contraseña autenticada después de validar la contraseña actual.
+ */
 class PasswordController extends Controller
 {
     /**

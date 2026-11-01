@@ -1,3 +1,4 @@
+{{-- Formulario administrativo para crear una categoría del catálogo. --}}
 @extends('layouts.admin')
 
 @section('title', 'Nueva Categoría - Panel de Administración')

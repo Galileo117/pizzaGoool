@@ -5,6 +5,9 @@ namespace App\Http\Controllers\repartidor;
 use App\Http\Controllers\Controller;
 use App\Models\Pedido;
 
+/**
+ * Prepara los indicadores de entrega del repartidor autenticado.
+ */
 class DashboardController extends Controller
 {
     public function index()

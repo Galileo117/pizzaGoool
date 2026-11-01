@@ -2,9 +2,12 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\ServiceProvider;
 
+/**
+ * Punto de registro de servicios y configuración global de la aplicación.
+ */
 class AppServiceProvider extends ServiceProvider
 {
     /**

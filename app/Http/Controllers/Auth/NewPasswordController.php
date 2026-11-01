@@ -14,6 +14,9 @@ use Illuminate\Validation\Rules;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
+/**
+ * Verifica el token de recuperación y guarda la nueva contraseña.
+ */
 class NewPasswordController extends Controller
 {
     /**

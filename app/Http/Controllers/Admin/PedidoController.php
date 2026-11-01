@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Pedido;
 use Illuminate\Http\Request;
 
+/**
+ * Provee la consulta de pedidos del panel administrativo.
+ */
 class PedidoController extends Controller
 {
     public function index(Request $request)

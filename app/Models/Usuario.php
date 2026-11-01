@@ -7,6 +7,9 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
+/**
+ * Cuenta autenticable común; los datos personales viven en el perfil asociado al rol.
+ */
 class Usuario extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;

@@ -18,6 +18,9 @@ use App\Http\Controllers\repartidor\PedidoController as RepartidorPedidoControll
 use App\Models\Pedido;
 use Illuminate\Support\Facades\Route;
 
+/*
+ * Rutas HTML agrupadas por rol; los alias de autorización se registran en bootstrap/app.php.
+ */
 // Rutas públicas
 Route::get('/', [InicioController::class, 'index'])->name('cliente.home');
 Route::get('/catalogo', [CatalogoController::class, 'index'])->name('cliente.catalogo');

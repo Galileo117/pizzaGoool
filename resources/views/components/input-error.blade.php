@@ -1,3 +1,4 @@
+{{-- Muestra mensajes de validación asociados a un campo del formulario. --}}
 @props(['messages'])
 
 @if ($messages)

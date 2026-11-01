@@ -1,3 +1,4 @@
+{{-- Lista de pedidos asignados al repartidor actual; no incluye pedidos de otras cuentas. --}}
 @extends('layouts.repartidor')
 
 @section('title', 'Mis Entregas - Panel de Repartidor')

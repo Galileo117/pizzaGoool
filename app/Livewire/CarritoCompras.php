@@ -4,11 +4,14 @@ namespace App\Livewire;
 
 use App\Models\Producto;
 use Livewire\Component;
-use Livewire\Attributes\On;
 
+/**
+ * Mantiene el carrito de sesión reactivo mientras el usuario ajusta productos.
+ */
 class CarritoCompras extends Component
 {
     public $carrito = [];
+
     public $total = 0;
 
     public function mount()
@@ -42,6 +45,7 @@ class CarritoCompras extends Component
     {
         if ($cantidad <= 0) {
             $this->quitarDelCarrito($productoId);
+
             return;
         }
 

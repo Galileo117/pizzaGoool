@@ -2,11 +2,15 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoriaController;
+use App\Http\Controllers\Api\ConfiguracionController;
 use App\Http\Controllers\Api\PedidoController;
 use App\Http\Controllers\Api\ProductoController;
 use App\Http\Controllers\Api\RepartidorController;
 use Illuminate\Support\Facades\Route;
 
+/*
+ * Contrato HTTP para el cliente móvil: catálogo público y acciones privadas vía Sanctum.
+ */
 /*
 |--------------------------------------------------------------------------
 | Rutas Públicas (sin autenticación)
@@ -29,7 +33,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::get('/categorias', [CategoriaController::class, 'index']);
 Route::get('/productos', [ProductoController::class, 'index']);
 Route::get('/productos/{id}', [ProductoController::class, 'show']);
-Route::get('/configuracion', [App\Http\Controllers\Api\ConfiguracionController::class, 'publica']);
+Route::get('/configuracion', [ConfiguracionController::class, 'publica']);
 /*
 |--------------------------------------------------------------------------
 | Rutas Protegidas (requieren token de Sanctum)

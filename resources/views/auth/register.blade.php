@@ -1,3 +1,4 @@
+{{-- Registro web de clientes; su controlador crea cuenta y perfil asociado. --}}
 <x-guest-layout>
 
     {{-- LOGO --}}

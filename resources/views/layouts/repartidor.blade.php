@@ -1,3 +1,4 @@
+{{-- Layout del panel de repartidor con recursos visuales para la vista de entregas. --}}
 <!DOCTYPE html>
 <html lang="es">
 
