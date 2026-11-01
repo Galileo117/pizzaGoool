@@ -77,7 +77,9 @@
                                     </a>
                                     @if ($usuario->id !== auth()->id())
                                         <form action="{{ route('admin.usuarios.destroy', $usuario->id) }}" method="POST"
-                                            onsubmit="return confirm('¿Estás seguro de eliminar este usuario?');">
+                                            data-confirm-title="Eliminar usuario"
+                                            data-confirm-message="¿Estás seguro de que deseas eliminar este usuario?"
+                                            data-confirm-confirm-label="Sí, eliminar">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="text-red-600 hover:text-red-800 p-2"
@@ -137,7 +139,9 @@
                     </a>
                     @if ($usuario->id !== auth()->id())
                         <form action="{{ route('admin.usuarios.destroy', $usuario->id) }}" method="POST" class="flex-1"
-                            onsubmit="return confirm('¿Eliminar este usuario?');">
+                            data-confirm-title="Eliminar usuario"
+                            data-confirm-message="¿Estás seguro de que deseas eliminar este usuario?"
+                            data-confirm-confirm-label="Sí, eliminar">
                             @csrf
                             @method('DELETE')
                             <button type="submit"

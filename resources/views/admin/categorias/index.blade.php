@@ -39,7 +39,10 @@
                         <td class="px-4 py-3 text-center">
                             <div class="flex justify-center gap-2">
                                 <a href="{{ route('admin.categorias.edit', $categoria->id) }}" class="text-blue-600 hover:text-blue-800 p-2"><i class="fa-solid fa-pen"></i></a>
-                                <form action="{{ route('admin.categorias.destroy', $categoria->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de eliminar esta categoría?');">
+                                <form action="{{ route('admin.categorias.destroy', $categoria->id) }}" method="POST"
+                                    data-confirm-title="Eliminar categoría"
+                                    data-confirm-message="¿Estás seguro de que deseas eliminar esta categoría?"
+                                    data-confirm-confirm-label="Sí, eliminar">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="text-red-600 hover:text-red-800 p-2"><i class="fa-solid fa-trash"></i></button>
@@ -77,7 +80,10 @@
                     <a href="{{ route('admin.categorias.edit', $categoria->id) }}" class="flex-1 bg-blue-500 text-white text-center font-bold py-2 rounded-lg text-sm hover:bg-blue-600 transition">
                         <i class="fa-solid fa-pen"></i> Editar
                     </a>
-                    <form action="{{ route('admin.categorias.destroy', $categoria->id) }}" method="POST" class="flex-1" onsubmit="return confirm('¿Eliminar esta categoría?');">
+                    <form action="{{ route('admin.categorias.destroy', $categoria->id) }}" method="POST" class="flex-1"
+                        data-confirm-title="Eliminar categoría"
+                        data-confirm-message="¿Estás seguro de que deseas eliminar esta categoría?"
+                        data-confirm-confirm-label="Sí, eliminar">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="w-full bg-red-500 text-white font-bold py-2 rounded-lg text-sm hover:bg-red-600 transition">

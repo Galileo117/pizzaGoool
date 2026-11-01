@@ -178,7 +178,10 @@
                         </div>
 
                         <form action="{{ route('cajero.pedidos.cambiar_estado', $pedido->id) }}" method="POST"
-                            onsubmit="return confirm('¿Confirmas que el cliente retiró el pedido?');">
+                            data-confirm-title="Confirmar entrega"
+                            data-confirm-message="¿Confirmas que el cliente retiró el pedido?"
+                            data-confirm-confirm-label="Sí, marcar entregado"
+                            data-confirm-variant="success">
                             @csrf
                             @method('PATCH')
                             <input type="hidden" name="estado" value="entregado">

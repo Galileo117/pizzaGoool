@@ -75,6 +75,7 @@
 
     </main>
 
+    @include('components.confirmation-dialog')
 </body>
 
 </html>

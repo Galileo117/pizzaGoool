@@ -156,6 +156,8 @@
         </div>
     </div>
 
+    @include('components.confirmation-dialog')
+
     <script>
         function toggleMenu() {
             const menu = document.getElementById('mobile-menu');

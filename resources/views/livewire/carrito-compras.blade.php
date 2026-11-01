@@ -100,7 +100,10 @@
 
                     <button wire:click="vaciarCarrito"
                         class="text-white/70 hover:text-white text-sm transition-colors duration-200 flex items-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-goool-yellow focus:ring-offset-2 focus:ring-offset-goool-green rounded-lg px-2 py-1"
-                        onclick="return confirm('¿Estás seguro de vaciar el carrito completamente?')"
+                        data-confirm-click
+                        data-confirm-title="Vaciar carrito"
+                        data-confirm-message="¿Estás seguro de que deseas vaciar completamente el carrito?"
+                        data-confirm-confirm-label="Sí, vaciar carrito"
                         aria-label="Vaciar carrito">
                         <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
                         Vaciar

@@ -237,7 +237,10 @@
                                         </span>
                                     </h2>
 
-                                    <button onclick="vaciarCarrito()"
+                                    <button onclick="vaciarCarrito()" data-confirm-click
+                                        data-confirm-title="Vaciar carrito"
+                                        data-confirm-message="¿Estás seguro de que deseas vaciar el carrito?"
+                                        data-confirm-confirm-label="Sí, vaciar carrito"
                                         class="text-white/70 hover:text-white text-sm transition-colors duration-200 flex items-center gap-1.5">
                                         <i class="fa-solid fa-trash-can"></i> Vaciar
                                     </button>
@@ -339,8 +342,6 @@
         }
 
         function vaciarCarrito() {
-            if (!confirm('¿Estás seguro de vaciar el carrito?')) return;
-
             fetch('/catalogo/vaciar', {
                     method: 'POST',
                     headers: {

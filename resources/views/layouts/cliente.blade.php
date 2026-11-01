@@ -359,6 +359,7 @@
 
     {{-- Contenedor de notificaciones tipo toast --}}
     <div id="toast-container" class="fixed top-24 right-4 z-[9999] space-y-3 pointer-events-none"></div>
+    @include('components.confirmation-dialog')
 
     <script>
         function toggleMenuCliente() {

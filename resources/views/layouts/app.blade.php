@@ -120,6 +120,7 @@
     </footer>
 
     @stack('scripts')
+    @include('components.confirmation-dialog')
 </body>
 
 </html>

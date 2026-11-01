@@ -2,3 +2,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+#confirmation-dialog::backdrop {
+    background: rgb(15 23 42 / 60%);
+    backdrop-filter: blur(2px);
+}

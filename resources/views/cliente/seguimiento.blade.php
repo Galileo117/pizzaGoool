@@ -218,12 +218,14 @@
             @endif
 
             @if (strtolower($pedido->estado) === 'pendiente')
-                <form action="{{ route('cliente.cancelar_pedido', $pedido->id) }}" method="POST" class="inline">
+                <form action="{{ route('cliente.cancelar_pedido', $pedido->id) }}" method="POST" class="inline"
+                    data-confirm-title="Cancelar pedido"
+                    data-confirm-message="¿Estás seguro de que deseas cancelar este pedido?"
+                    data-confirm-confirm-label="Sí, cancelar pedido">
                     @csrf
                     @method('DELETE')
                     <button type="submit"
-                        class="inline-flex items-center justify-center gap-2 bg-red-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-red-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-                        onclick="return confirm('¿Estás seguro de cancelar este pedido?')">
+                        class="inline-flex items-center justify-center gap-2 bg-red-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-red-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
                         <i class="fa-solid fa-xmark" aria-hidden="true"></i>
                         Cancelar Pedido
                     </button>
