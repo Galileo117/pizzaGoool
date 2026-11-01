@@ -61,6 +61,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::resource('usuarios', UsuarioController::class);
     Route::get('reportes', [ReporteController::class, 'index'])->name('reportes.index');
     Route::get('reportes/pdf', [ReporteController::class, 'pdf'])->name('reportes.pdf');
+    Route::get('reportes/excel', [ReporteController::class, 'excel'])->name('reportes.excel');
     Route::get('configuracion', [ConfiguracionController::class, 'index'])->name('configuracion');
     Route::post('configuracion/qr', [ConfiguracionController::class, 'guardarQR'])->name('configuracion.guardar_qr');
 });

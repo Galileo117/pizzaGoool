@@ -1,339 +1,398 @@
-{{-- Filtros y resumen de ventas; el controlador comparte los criterios con la exportación PDF. --}}
+{{-- Centro de reportes administrativos con filtros comunes y exportación del período seleccionado. --}}
 @extends('layouts.admin')
 
-@section('title', 'Reportes de Ventas - Panel de Administración')
-@section('page_title', 'Reportes de Ventas')
+@section('title', 'Reportes - Panel de Administración')
+@section('page_title', 'Reportes')
 
 @section('content')
-    <!-- Header -->
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+    <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-            <h2 class="text-xl font-bold text-goool-green-dark">Reportes de Ventas</h2>
-            <p class="text-gray-600 text-sm">Analiza las ventas del negocio por rango de fechas.</p>
+            <p class="mb-1 text-sm font-semibold uppercase tracking-wide text-goool-green">Administración</p>
+            <h2 class="text-xl font-bold text-goool-green-dark">{{ $nombreReporte }}</h2>
+            <p class="mt-1 text-sm text-gray-600">Consulta el desempeño de las ventas web y los pedidos del período.</p>
         </div>
-        <a href="{{ route('admin.reportes.pdf', ['fecha_inicio' => $fechaInicio, 'fecha_fin' => $fechaFin]) }}"
-            target="_blank"
-            class="bg-red-500 text-white font-bold px-5 py-3 rounded-lg hover:bg-red-600 transition flex items-center gap-2 w-full sm:w-auto justify-center shadow-sm">
-            <i class="fa-solid fa-file-pdf"></i> Exportar PDF
-        </a>
+        <div class="flex flex-col gap-2 sm:flex-row">
+            <a href="{{ route('admin.reportes.pdf', ['reporte' => $tipoReporte, 'fecha_inicio' => $fechaInicio, 'fecha_fin' => $fechaFin]) }}"
+                class="inline-flex items-center justify-center gap-2 rounded-lg bg-red-600 px-4 py-3 font-bold text-white shadow-sm transition hover:bg-red-700">
+                <i class="fa-solid fa-file-pdf"></i>
+                Descargar PDF
+            </a>
+            <a href="{{ route('admin.reportes.excel', ['fecha_inicio' => $fechaInicio, 'fecha_fin' => $fechaFin]) }}"
+                class="inline-flex items-center justify-center gap-2 rounded-lg bg-goool-green px-4 py-3 font-bold text-white shadow-sm transition hover:bg-goool-green-dark">
+                <i class="fa-solid fa-file-excel"></i>
+                Descargar Excel
+            </a>
+        </div>
     </div>
 
-    <!-- Filtro por fechas -->
-    <div class="bg-white rounded-xl shadow-md p-4 sm:p-6 border border-gray-200 mb-6">
-        <form method="GET" action="{{ route('admin.reportes.index') }}"
-            class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+    <section class="mb-6 rounded-xl border border-gray-200 bg-white p-4 shadow-sm sm:p-6" aria-label="Filtros de reportes">
+        <form method="GET" action="{{ route('admin.reportes.index') }}" class="grid grid-cols-1 gap-4 md:grid-cols-4">
+            <input type="hidden" name="reporte" value="{{ $tipoReporte }}">
             <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-1">Fecha Inicio</label>
-                <input type="date" name="fecha_inicio" value="{{ $fechaInicio }}"
-                    class="w-full border border-gray-300 rounded-lg p-3 focus:border-goool-green focus:outline-none">
+                <label for="fecha_inicio" class="mb-1 block text-sm font-semibold text-gray-700">Desde</label>
+                <input id="fecha_inicio" type="date" name="fecha_inicio" value="{{ $fechaInicio }}"
+                    class="w-full rounded-lg border border-gray-300 p-3 focus:border-goool-green focus:outline-none focus:ring-2 focus:ring-goool-green/20">
             </div>
             <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-1">Fecha Fin</label>
-                <input type="date" name="fecha_fin" value="{{ $fechaFin }}"
-                    class="w-full border border-gray-300 rounded-lg p-3 focus:border-goool-green focus:outline-none">
+                <label for="fecha_fin" class="mb-1 block text-sm font-semibold text-gray-700">Hasta</label>
+                <input id="fecha_fin" type="date" name="fecha_fin" value="{{ $fechaFin }}"
+                    class="w-full rounded-lg border border-gray-300 p-3 focus:border-goool-green focus:outline-none focus:ring-2 focus:ring-goool-green/20">
             </div>
-            <div>
-                <button type="submit"
-                    class="w-full bg-goool-green text-white font-bold py-3 rounded-lg hover:bg-goool-green-dark transition flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-filter"></i> Filtrar
-                </button>
-            </div>
-            <div>
-                {{-- Botón de limpiar filtros --}}
-                <a href="{{ route('admin.reportes.index') }}"
-                    class="w-full bg-gray-100 text-gray-700 border border-gray-200 font-bold py-3 rounded-lg hover:bg-gray-200 transition flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-rotate-left"></i> Limpiar
-                </a>
-            </div>
+            <button type="submit"
+                class="inline-flex items-center justify-center gap-2 self-end rounded-lg bg-goool-green px-4 py-3 font-bold text-white transition hover:bg-goool-green-dark">
+                <i class="fa-solid fa-filter"></i>
+                Aplicar filtros
+            </button>
+            <a href="{{ route('admin.reportes.index', ['reporte' => $tipoReporte]) }}"
+                class="inline-flex items-center justify-center gap-2 self-end rounded-lg border border-gray-300 bg-gray-50 px-4 py-3 font-semibold text-gray-700 transition hover:bg-gray-100">
+                <i class="fa-solid fa-rotate-left"></i>
+                Restablecer
+            </a>
         </form>
-    </div>
+        @if ($errors->any())
+            <p class="mt-3 text-sm font-medium text-red-600">{{ $errors->first() }}</p>
+        @endif
+    </section>
 
-    <!-- Métricas principales -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-8">
-        <div class="bg-white rounded-xl shadow-md p-4 sm:p-6 border-l-4 border-goool-green">
-            <div class="flex justify-between items-center">
-                <div>
-                    <p class="text-gray-500 text-xs sm:text-sm font-semibold">Ventas Totales</p>
-                    <p class="text-2xl sm:text-3xl font-bold text-goool-green-dark">Bs. {{ number_format($totalVentas, 2) }}
-                    </p>
-                </div>
-                <div class="bg-goool-green-light/30 p-2 sm:p-3 rounded-full flex-shrink-0">
-                    <i class="fa-solid fa-money-bill-wave text-xl sm:text-2xl text-goool-green"></i>
-                </div>
-            </div>
-        </div>
+    @php
+        $iconosReportes = [
+            'resumen' => 'fa-chart-line',
+            'productos' => 'fa-pizza-slice',
+            'pedidos' => 'fa-receipt',
+            'pagos' => 'fa-credit-card',
+            'detalle' => 'fa-list-check',
+        ];
+    @endphp
+    <nav class="mb-6 flex gap-2 overflow-x-auto rounded-xl border border-gray-200 bg-white p-2 shadow-sm"
+        aria-label="Tipos de reportes">
+        @foreach ($reportesDisponibles as $clave => $etiqueta)
+            <a href="{{ route('admin.reportes.index', ['reporte' => $clave, 'fecha_inicio' => $fechaInicio, 'fecha_fin' => $fechaFin]) }}"
+                @class([
+                    'inline-flex shrink-0 items-center gap-2 rounded-lg px-4 py-3 text-sm font-bold transition',
+                    'bg-goool-green text-white shadow-sm' => $tipoReporte === $clave,
+                    'text-gray-600 hover:bg-gray-100 hover:text-goool-green-dark' => $tipoReporte !== $clave,
+                ])
+                @if ($tipoReporte === $clave) aria-current="page" @endif>
+                <i class="fa-solid {{ $iconosReportes[$clave] }}"></i>
+                {{ $etiqueta }}
+            </a>
+        @endforeach
+    </nav>
 
-        <div class="bg-white rounded-xl shadow-md p-4 sm:p-6 border-l-4 border-blue-500">
-            <div class="flex justify-between items-center">
-                <div>
-                    <p class="text-gray-500 text-xs sm:text-sm font-semibold">Total Pedidos</p>
-                    <p class="text-2xl sm:text-3xl font-bold text-blue-600">{{ $totalPedidos }}</p>
-                </div>
-                <div class="bg-blue-100 p-2 sm:p-3 rounded-full flex-shrink-0">
-                    <i class="fa-solid fa-receipt text-xl sm:text-2xl text-blue-600"></i>
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-xl shadow-md p-4 sm:p-6 border-l-4 border-goool-yellow">
-            <div class="flex justify-between items-center">
-                <div>
-                    <p class="text-gray-500 text-xs sm:text-sm font-semibold">Promedio por Pedido</p>
-                    <p class="text-2xl sm:text-3xl font-bold text-yellow-600">Bs. {{ number_format($ticketPromedio, 2) }}
-                    </p>
-                    <p class="text-xs text-gray-400 mt-1 italic">Monto promedio por cliente</p>
-                </div>
-                <div class="bg-yellow-100 p-2 sm:p-3 rounded-full flex-shrink-0">
-                    <i class="fa-solid fa-chart-line text-xl sm:text-2xl text-yellow-600"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Gráficos -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200">
-            <div class="bg-goool-green px-4 sm:px-6 py-3">
-                <h3 class="text-white font-bold text-sm"><i class="fa-solid fa-chart-line"></i> VENTAS POR DÍA</h3>
-            </div>
-            <div class="p-4 sm:p-6">
-                <div class="h-64 relative">
-                    <canvas id="graficoVentas"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200">
-            <div class="bg-goool-green px-4 sm:px-6 py-3">
-                <h3 class="text-white font-bold text-sm"><i class="fa-solid fa-chart-bar"></i> PRODUCTOS MÁS VENDIDOS</h3>
-            </div>
-            <div class="p-4 sm:p-6">
-                <div class="h-64 relative">
-                    <canvas id="graficoProductos"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Productos más vendidos (tabla) y métodos de pago -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <!-- Productos más vendidos -->
-        <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200">
-            <div class="bg-goool-green px-4 sm:px-6 py-3">
-                <h3 class="text-white font-bold text-sm"><i class="fa-solid fa-trophy"></i> TOP PRODUCTOS</h3>
-            </div>
-            <div class="p-4 sm:p-6">
-                @forelse($productosMasVendidos as $item)
-                    <div class="flex justify-between items-center py-3 border-b border-gray-100 last:border-0">
-                        <div class="flex items-center gap-3">
-                            <div
-                                class="bg-goool-green-light/30 w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0">
-                                <i class="fa-solid fa-pizza-slice text-goool-green"></i>
-                            </div>
-                            <div class="min-w-0">
-                                <p class="font-semibold text-gray-800 text-sm truncate">
-                                    {{ $item->producto->nombre ?? 'Producto eliminado' }}</p>
-                                <p class="text-xs text-gray-500">{{ $item->total_vendido }} unidades vendidas</p>
-                            </div>
+    @if ($tipoReporte === 'resumen')
+        <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            @foreach ([
+                ['Ventas Totales', 'Bs. '.number_format($resumen['ventas_completadas'], 2), 'fa-money-bill-wave', 'border-goool-green', 'text-goool-green-dark', 'bg-goool-green-light/30'],
+                ['Pedidos Entregados', number_format($resumen['pedidos_completados']), 'fa-receipt', 'border-blue-500', 'text-blue-600', 'bg-blue-100'],
+                ['Pedidos Activos', number_format($resumen['pedidos_activos']), 'fa-clock', 'border-goool-yellow', 'text-yellow-600', 'bg-yellow-100'],
+                ['Pedidos Cancelados', number_format($resumen['pedidos_cancelados']), 'fa-circle-xmark', 'border-red-500', 'text-red-600', 'bg-red-100'],
+            ] as [$etiqueta, $valor, $icono, $borde, $color, $fondo])
+                <article class="rounded-xl border border-gray-200 border-l-4 {{ $borde }} bg-white p-4 shadow-md sm:p-6">
+                    <div class="flex items-center justify-between gap-3">
+                        <div>
+                            <p class="text-xs font-semibold text-gray-500 sm:text-sm">{{ $etiqueta }}</p>
+                            <p class="mt-1 text-2xl font-bold {{ $color }} sm:text-3xl">{{ $valor }}</p>
                         </div>
-                        <span class="font-bold text-goool-green text-sm whitespace-nowrap ml-2">Bs.
-                            {{ number_format($item->total_ingresos, 2) }}</span>
+                        <span class="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full {{ $fondo }} {{ $color }} sm:h-14 sm:w-14">
+                            <i class="fa-solid {{ $icono }} text-xl sm:text-2xl"></i>
+                        </span>
                     </div>
-                @empty
-                    <p class="text-center text-gray-400 py-4">No hay ventas en este período.</p>
-                @endforelse
-            </div>
+                </article>
+            @endforeach
         </div>
 
-        <!-- Métodos de pago -->
-        <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200">
-            <div class="bg-goool-green px-4 sm:px-6 py-3">
-                <h3 class="text-white font-bold text-sm"><i class="fa-solid fa-credit-card"></i> MÉTODOS DE PAGO</h3>
-            </div>
-            <div class="p-4 sm:p-6">
-                <div class="h-64 relative">
-                    <canvas id="graficoMetodos"></canvas>
+        <div class="mb-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
+            <section class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-md">
+                <div class="bg-goool-green px-4 py-3 sm:px-6">
+                    <h3 class="text-sm font-bold text-white"><i class="fa-solid fa-chart-line mr-2"></i>VENTAS POR DÍA</h3>
                 </div>
+                <div class="p-4 sm:p-6">
+                    <div class="relative h-64">
+                    <canvas id="graficoVentas" aria-label="Gráfico de ventas completadas por día"></canvas>
+                    </div>
+                </div>
+            </section>
+            <section class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-md">
+                <div class="bg-goool-green px-4 py-3 sm:px-6">
+                    <h3 class="text-sm font-bold text-white"><i class="fa-solid fa-chart-bar mr-2"></i>PRODUCTOS MÁS VENDIDOS</h3>
+                </div>
+                <div class="p-4 sm:p-6">
+                    <div class="relative h-64">
+                    <canvas id="graficoProductos" aria-label="Gráfico de unidades vendidas por producto"></canvas>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div class="mb-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
+            <section class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-md">
+                <div class="bg-goool-green px-4 py-3 sm:px-6">
+                    <h3 class="text-sm font-bold text-white"><i class="fa-solid fa-chart-pie mr-2"></i>COMPARACIÓN DEL PERÍODO</h3>
+                </div>
+                <dl class="grid grid-cols-1 gap-4 p-4 sm:grid-cols-2 sm:p-6">
+                    <div class="rounded-lg bg-gray-50 p-4">
+                        <dt class="text-sm text-gray-500">Ticket promedio</dt>
+                        <dd class="mt-1 text-xl font-bold text-gray-800">Bs. {{ number_format($resumen['ticket_promedio'], 2) }}</dd>
+                    </div>
+                    <div class="rounded-lg bg-gray-50 p-4">
+                        <dt class="text-sm text-gray-500">Período anterior</dt>
+                        <dd class="mt-1 text-xl font-bold text-gray-800">Bs. {{ number_format($resumen['ventas_periodo_anterior'], 2) }}</dd>
+                    </div>
+                    <div class="rounded-lg bg-gray-50 p-4 sm:col-span-2">
+                        <dt class="text-sm text-gray-500">Variación frente al período anterior</dt>
+                        <dd class="mt-1 text-xl font-bold {{ $resumen['variacion_porcentual'] >= 0 ? 'text-green-700' : 'text-red-700' }}">
+                            {{ number_format($resumen['variacion_porcentual'], 2) }}%
+                        </dd>
+                    </div>
+                </dl>
+            </section>
+            <section class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-md">
+                <div class="bg-goool-green px-4 py-3 sm:px-6">
+                    <h3 class="text-sm font-bold text-white"><i class="fa-solid fa-trophy mr-2"></i>TOP PRODUCTOS</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-gray-50 text-xs uppercase text-gray-500">
+                            <tr>
+                                <th class="px-5 py-3">Producto</th>
+                                <th class="px-5 py-3 text-right">Unidades</th>
+                                <th class="px-5 py-3 text-right">Ingresos</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            @forelse ($productosDestacados as $producto)
+                                <tr>
+                                    <td class="px-5 py-3 font-medium text-gray-800">{{ $producto->producto }}</td>
+                                    <td class="px-5 py-3 text-right">{{ number_format($producto->unidades_vendidas) }}</td>
+                                    <td class="px-5 py-3 text-right font-semibold">Bs. {{ number_format($producto->ingresos, 2) }}</td>
+                                </tr>
+                            @empty
+                                <tr><td colspan="3" class="px-5 py-8 text-center text-gray-500">No hay ventas completadas en este período.</td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <section class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-md">
+            <div class="bg-goool-green px-4 py-3 sm:px-6">
+                <h3 class="text-sm font-bold text-white"><i class="fa-solid fa-calendar-days mr-2"></i>DETALLE DIARIO DE VENTAS</h3>
             </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-gray-50 text-xs uppercase text-gray-500">
+                        <tr><th class="px-5 py-3">Fecha</th><th class="px-5 py-3 text-right">Pedidos entregados</th><th class="px-5 py-3 text-right">Ventas completadas</th></tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        @forelse ($ventasPorDia as $dia)
+                            <tr>
+                                <td class="px-5 py-3">{{ \Carbon\Carbon::parse($dia->fecha)->format('d/m/Y') }}</td>
+                                <td class="px-5 py-3 text-right">{{ number_format($dia->total_pedidos) }}</td>
+                                <td class="px-5 py-3 text-right font-semibold">Bs. {{ number_format($dia->total_ventas, 2) }}</td>
+                            </tr>
+                        @empty
+                            <tr><td colspan="3" class="px-5 py-8 text-center text-gray-500">No hay ventas completadas en este período.</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    @elseif ($tipoReporte === 'productos')
+        <div class="mb-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
+            <section class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-md">
+                <div class="bg-goool-green px-4 py-3 sm:px-6">
+                    <h3 class="text-sm font-bold text-white"><i class="fa-solid fa-tags mr-2"></i>VENTAS POR CATEGORÍA</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-gray-50 text-xs uppercase text-gray-500">
+                            <tr><th class="px-5 py-3">Categoría</th><th class="px-5 py-3 text-right">Productos</th><th class="px-5 py-3 text-right">Unidades</th><th class="px-5 py-3 text-right">Ingresos</th></tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            @forelse ($ventasPorCategoria as $categoria)
+                                <tr>
+                                    <td class="px-5 py-3 font-medium">{{ $categoria->categoria }}</td>
+                                    <td class="px-5 py-3 text-right">{{ number_format($categoria->productos_vendidos) }}</td>
+                                    <td class="px-5 py-3 text-right">{{ number_format($categoria->unidades_vendidas) }}</td>
+                                    <td class="px-5 py-3 text-right font-semibold">Bs. {{ number_format($categoria->ingresos, 2) }}</td>
+                                </tr>
+                            @empty
+                                <tr><td colspan="4" class="px-5 py-8 text-center text-gray-500">No hay ventas por categoría en este período.</td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            <section class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-md">
+                <div class="bg-goool-green px-4 py-3 sm:px-6">
+                    <h3 class="text-sm font-bold text-white"><i class="fa-solid fa-pizza-slice mr-2"></i>PRODUCTOS MÁS VENDIDOS</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-gray-50 text-xs uppercase text-gray-500">
+                            <tr><th class="px-5 py-3">Producto</th><th class="px-5 py-3">Categoría</th><th class="px-5 py-3 text-right">Unidades</th><th class="px-5 py-3 text-right">Ingresos</th></tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            @forelse ($productos as $producto)
+                                <tr>
+                                    <td class="px-5 py-3 font-medium">{{ $producto->producto }}</td>
+                                    <td class="px-5 py-3">{{ $producto->categoria }}</td>
+                                    <td class="px-5 py-3 text-right">{{ number_format($producto->unidades_vendidas) }}</td>
+                                    <td class="px-5 py-3 text-right font-semibold">Bs. {{ number_format($producto->ingresos, 2) }}</td>
+                                </tr>
+                            @empty
+                                <tr><td colspan="4" class="px-5 py-8 text-center text-gray-500">No hay productos vendidos en este período.</td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+                <div class="border-t border-gray-100 px-5 py-3">{{ $productos->links() }}</div>
+            </section>
         </div>
-    </div>
-
-    <!-- Detalle por día -->
-    <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200">
-        <div class="bg-goool-green px-4 sm:px-6 py-3">
-            <h3 class="text-white font-bold text-sm"><i class="fa-solid fa-calendar"></i> DETALLE POR DÍA</h3>
+    @elseif ($tipoReporte === 'pedidos')
+        <div class="mb-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
+            <section class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-md">
+                <div class="bg-goool-green px-4 py-3 sm:px-6"><h3 class="text-sm font-bold text-white"><i class="fa-solid fa-list-check mr-2"></i>PEDIDOS POR ESTADO</h3></div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-gray-50 text-xs uppercase text-gray-500">
+                            <tr><th class="px-5 py-3">Estado</th><th class="px-5 py-3 text-right">Pedidos</th><th class="px-5 py-3 text-right">Monto de pedidos</th></tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            @forelse ($pedidosPorEstado as $fila)
+                                <tr>
+                                    <td class="px-5 py-3 font-medium">{{ ucfirst(str_replace('_', ' ', $fila->estado)) }}</td>
+                                    <td class="px-5 py-3 text-right">{{ number_format($fila->total_pedidos) }}</td>
+                                    <td class="px-5 py-3 text-right">Bs. {{ number_format($fila->monto_asociado, 2) }}</td>
+                                </tr>
+                            @empty
+                                <tr><td colspan="3" class="px-5 py-8 text-center text-gray-500">No hay pedidos en este período.</td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            <section class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-md">
+                <div class="bg-goool-green px-4 py-3 sm:px-6"><h3 class="text-sm font-bold text-white"><i class="fa-solid fa-truck-fast mr-2"></i>MODALIDAD DE ENTREGA</h3></div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-gray-50 text-xs uppercase text-gray-500">
+                            <tr><th class="px-5 py-3">Modalidad</th><th class="px-5 py-3 text-right">Pedidos</th><th class="px-5 py-3 text-right">Ventas completadas</th></tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            @forelse ($pedidosPorTipo as $fila)
+                                <tr>
+                                    <td class="px-5 py-3 font-medium">{{ $fila->tipo_entrega === 'contraentrega' ? 'Delivery' : 'Recojo en local' }}</td>
+                                    <td class="px-5 py-3 text-right">{{ number_format($fila->total_pedidos) }}</td>
+                                    <td class="px-5 py-3 text-right">Bs. {{ number_format($fila->ventas_completadas, 2) }}</td>
+                                </tr>
+                            @empty
+                                <tr><td colspan="3" class="px-5 py-8 text-center text-gray-500">No hay pedidos en este período.</td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </section>
         </div>
-
-        {{-- Tabla (escritorio) --}}
-        <div class="hidden md:block overflow-x-auto">
-            <table class="w-full text-sm">
-                <thead class="bg-gray-50 border-b border-gray-200">
-                    <tr>
-                        <th class="px-4 py-3 text-left font-semibold text-gray-600">Fecha</th>
-                        <th class="px-4 py-3 text-center font-semibold text-gray-600">Pedidos</th>
-                        <th class="px-4 py-3 text-right font-semibold text-gray-600">Total Ventas</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-100">
-                    @forelse($ventasPorDia as $dia)
-                        <tr class="hover:bg-gray-50">
-                            <td class="px-4 py-3 font-semibold text-gray-800">
-                                <i class="fa-solid fa-calendar-day text-goool-green"></i>
-                                {{ \Carbon\Carbon::parse($dia->fecha)->format('d/m/Y') }}
-                            </td>
-                            <td class="px-4 py-3 text-center text-gray-700">{{ $dia->total_pedidos }}</td>
-                            <td class="px-4 py-3 text-right font-bold text-goool-green">Bs.
-                                {{ number_format($dia->total_ventas, 2) }}</td>
-                        </tr>
-                    @empty
+    @elseif ($tipoReporte === 'pagos')
+        <section class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-md">
+            <div class="bg-goool-green px-4 py-3 sm:px-6"><h3 class="text-sm font-bold text-white"><i class="fa-solid fa-credit-card mr-2"></i>PAGOS POR MÉTODO Y ESTADO</h3></div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-gray-50 text-xs uppercase text-gray-500">
+                        <tr><th class="px-5 py-3">Método</th><th class="px-5 py-3">Estado</th><th class="px-5 py-3 text-right">Registros</th><th class="px-5 py-3 text-right">Monto registrado</th></tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        @forelse ($pagosPorMetodoYEstado as $pago)
+                            <tr>
+                                <td class="px-5 py-3 font-medium">{{ $pago->metodo === 'qr' ? 'Código QR' : ucfirst($pago->metodo) }}</td>
+                                <td class="px-5 py-3">{{ ucfirst($pago->estado_pago) }}</td>
+                                <td class="px-5 py-3 text-right">{{ number_format($pago->total_pagos) }}</td>
+                                <td class="px-5 py-3 text-right font-semibold">Bs. {{ number_format($pago->monto_registrado, 2) }}</td>
+                            </tr>
+                        @empty
+                            <tr><td colspan="4" class="px-5 py-8 text-center text-gray-500">No hay pagos registrados en este período.</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    @elseif ($tipoReporte === 'detalle')
+        <section class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-md">
+            <div class="bg-goool-green px-4 py-3 sm:px-6"><h3 class="text-sm font-bold text-white"><i class="fa-solid fa-file-lines mr-2"></i>DETALLE DE VENTAS</h3></div>
+            <div class="overflow-x-auto">
+                <table class="w-full min-w-[1100px] text-left text-sm">
+                    <thead class="bg-gray-50 text-xs uppercase text-gray-500">
                         <tr>
-                            <td colspan="3" class="px-4 py-8 text-center text-gray-400">
-                                <i class="fa-solid fa-chart-line text-4xl mb-2"></i>
-                                <p>No hay ventas en este período.</p>
-                            </td>
+                            <th class="px-4 py-3">Pedido / fecha</th><th class="px-4 py-3">Cliente</th><th class="px-4 py-3">Producto</th>
+                            <th class="px-4 py-3 text-right">Cantidad</th><th class="px-4 py-3 text-right">Precio unitario</th>
+                            <th class="px-4 py-3 text-right">Subtotal</th><th class="px-4 py-3">Pago registrado</th><th class="px-4 py-3">Entrega</th>
                         </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        @forelse ($detalleVentas as $fila)
+                            <tr>
+                                <td class="px-4 py-3">#{{ $fila->pedido_id }}<br><span class="text-xs text-gray-500">{{ \Carbon\Carbon::parse($fila->fecha)->format('d/m/Y H:i') }}</span></td>
+                                <td class="px-4 py-3">{{ trim(($fila->cliente_nombres ?? '').' '.($fila->cliente_apellidos ?? '')) ?: 'Cliente' }}<br><span class="text-xs text-gray-500">{{ $fila->cliente_email }}</span></td>
+                                <td class="px-4 py-3">{{ $fila->producto }}<br><span class="text-xs text-gray-500">{{ $fila->categoria }}</span></td>
+                                <td class="px-4 py-3 text-right">{{ number_format($fila->cantidad) }}</td>
+                                <td class="px-4 py-3 text-right">Bs. {{ number_format($fila->precio_unitario, 2) }}</td>
+                                <td class="px-4 py-3 text-right font-semibold">Bs. {{ number_format($fila->subtotal, 2) }}</td>
+                                <td class="px-4 py-3">{{ $fila->estados_pago ? str_replace(',', ', ', $fila->estados_pago) : 'Sin registro' }}</td>
+                                <td class="px-4 py-3">{{ $fila->tipo_entrega === 'contraentrega' ? 'Delivery' : 'Recojo en local' }}</td>
+                            </tr>
+                        @empty
+                            <tr><td colspan="8" class="px-4 py-8 text-center text-gray-500">No hay ventas completadas en este período.</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+            <div class="border-t border-gray-100 px-5 py-3">{{ $detalleVentas->links() }}</div>
+        </section>
+    @endif
 
-        {{-- Tarjetas (móvil) --}}
-        <div class="md:hidden p-4 space-y-3">
-            @forelse($ventasPorDia as $dia)
-                <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg border border-gray-200">
-                    <div>
-                        <p class="font-semibold text-gray-800 text-sm">
-                            <i class="fa-solid fa-calendar-day text-goool-green"></i>
-                            {{ \Carbon\Carbon::parse($dia->fecha)->format('d/m/Y') }}
-                        </p>
-                        <p class="text-xs text-gray-500">{{ $dia->total_pedidos }} pedidos</p>
-                    </div>
-                    <span class="font-bold text-goool-green text-sm">Bs. {{ number_format($dia->total_ventas, 2) }}</span>
-                </div>
-            @empty
-                <div class="text-center text-gray-400 py-8">
-                    <i class="fa-solid fa-chart-line text-4xl mb-2"></i>
-                    <p>No hay ventas en este período.</p>
-                </div>
-            @endforelse
-        </div>
-    </div>
+    @if ($tipoReporte === 'resumen')
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+            const ventasDiarias = @json($ventasPorDia);
+            const productosGrafico = @json($productosDestacados);
+            const ventasChart = document.getElementById('graficoVentas');
+            const productosChart = document.getElementById('graficoProductos');
 
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <script>
-        const ventasPorDia = @json($ventasPorDia);
-        const productosMasVendidos = @json($productosMasVendidos);
-        const ventasPorMetodo = @json($ventasPorMetodo);
-
-        // Gráfico de ventas por día (CON FECHAS CORREGIDAS)
-        const ctxVentas = document.getElementById('graficoVentas').getContext('2d');
-        new Chart(ctxVentas, {
-            type: 'line',
-            data: {
-                // Se agrega T12:00:00 para evitar desfase por zona horaria
-                labels: ventasPorDia.map(v => {
-                    const fecha = new Date(v.fecha + 'T12:00:00');
-                    return fecha.toLocaleDateString('es-ES', {
-                        day: '2-digit',
-                        month: '2-digit'
-                    });
-                }).reverse(),
-                datasets: [{
-                    label: 'Ventas (Bs.)',
-                    data: ventasPorDia.map(v => v.total_ventas).reverse(),
-                    borderColor: '#1B5E20',
-                    backgroundColor: 'rgba(27, 94, 32, 0.1)',
-                    borderWidth: 3,
-                    tension: 0.3,
-                    fill: true,
-                    pointBackgroundColor: '#FBC02D',
-                    pointBorderColor: '#1B5E20',
-                    pointRadius: 5,
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function(value) {
-                                return 'Bs. ' + value;
-                            }
-                        }
-                    }
-                }
+            if (ventasChart) {
+                new Chart(ventasChart, {
+                    type: 'line',
+                    data: {
+                        labels: ventasDiarias.map((fila) => fila.fecha),
+                        datasets: [{
+                            label: 'Ventas completadas (Bs.)',
+                            data: ventasDiarias.map((fila) => Number(fila.total_ventas)),
+                            borderColor: '#1b5e20',
+                            backgroundColor: 'rgba(27, 94, 32, 0.12)',
+                            fill: true,
+                            tension: 0.3,
+                        }],
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } },
+                });
             }
-        });
 
-        // Gráfico de productos más vendidos
-        const ctxProductos = document.getElementById('graficoProductos').getContext('2d');
-        new Chart(ctxProductos, {
-            type: 'bar',
-            data: {
-                labels: productosMasVendidos.map(p => p.producto ? p.producto.nombre : 'Eliminado'),
-                datasets: [{
-                    label: 'Unidades vendidas',
-                    data: productosMasVendidos.map(p => p.total_vendido),
-                    backgroundColor: ['#1B5E20', '#2E7D32', '#FBC02D', '#F57C00', '#9C27B0'],
-                    borderRadius: 8,
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            stepSize: 1
-                        }
-                    }
-                }
+            if (productosChart) {
+                new Chart(productosChart, {
+                    type: 'bar',
+                    data: {
+                        labels: productosGrafico.map((fila) => fila.producto),
+                        datasets: [{
+                            label: 'Unidades vendidas',
+                            data: productosGrafico.map((fila) => Number(fila.unidades_vendidas)),
+                            backgroundColor: '#1b5e20',
+                            borderRadius: 6,
+                        }],
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } },
+                });
             }
-        });
-
-        // Gráfico de métodos de pago
-        const ctxMetodos = document.getElementById('graficoMetodos').getContext('2d');
-        new Chart(ctxMetodos, {
-            type: 'doughnut',
-            data: {
-                labels: ventasPorMetodo.map(m => m.metodo_pago === 'qr' ? 'Código QR' : 'Efectivo'),
-                datasets: [{
-                    data: ventasPorMetodo.map(m => m.total_ventas),
-                    backgroundColor: ['#1B5E20', '#FBC02D'],
-                    borderWidth: 0,
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            padding: 20,
-                            font: {
-                                size: 12,
-                                weight: 'bold'
-                            }
-                        }
-                    }
-                }
-            }
-        });
-    </script>
+        </script>
+    @endif
 @endsection

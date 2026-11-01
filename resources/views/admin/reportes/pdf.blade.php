@@ -1,322 +1,175 @@
-{{-- Plantilla imprimible del reporte; conservar sus datos en sincronía con el reporte HTML. --}}
+{{-- Versión imprimible de cada informe; usa los mismos filtros y criterios que la pantalla y el Excel. --}}
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="utf-8">
-    <title>Reporte de Ventas - Pizza Goool</title>
+    <title>{{ $nombreReporte }} - Pizza Goool</title>
     <style>
-        @page {
-            margin: 30px 40px;
-        }
-        body {
-            font-family: DejaVu Sans, Arial, sans-serif;
-            font-size: 11px;
-            color: #222;
-            line-height: 1.5;
-        }
-        
-        /* Cabecera */
-        .header {
-            border-bottom: 3px solid #1B5E20;
-            padding-bottom: 12px;
-            margin-bottom: 20px;
-        }
-        .header-table {
-            width: 100%;
-        }
-        .header-table td {
-            vertical-align: middle;
-        }
-        .logo-cell {
-            width: 90px;
-        }
-        .logo-cell img {
-            height: 70px;
-        }
-        .title-cell h1 {
-            color: #1B5E20;
-            margin: 0;
-            font-size: 20px;
-            font-weight: bold;
-        }
-        .title-cell p {
-            margin: 3px 0 0;
-            color: #666;
-            font-size: 11px;
-        }
-        .period-cell {
-            text-align: right;
-            color: #666;
-            font-size: 10px;
-        }
-        .period-cell strong {
-            color: #222;
-            display: block;
-            font-size: 11px;
-            margin-bottom: 2px;
-        }
-        
-        /* Sección de título */
-        .section-title {
-            background: #f0f0f0;
-            color: #1B5E20;
-            padding: 7px 12px;
-            font-size: 11px;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-top: 18px;
-            margin-bottom: 0;
-            border-left: 4px solid #1B5E20;
-        }
-        
-        /* Métricas */
-        .metricas-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 15px;
-        }
-        .metricas-table td {
-            width: 33.33%;
-            background: #fafafa;
-            border: 1px solid #e0e0e0;
-            padding: 12px 15px;
-            vertical-align: middle;
-        }
-        .metrica-label {
-            color: #666;
-            font-size: 9px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 4px;
-        }
-        .metrica-value {
-            color: #1B5E20;
-            font-size: 18px;
-            font-weight: bold;
-        }
-        
-        /* Tablas */
-        table.data {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 12px;
-            border: 1px solid #d0d0d0;
-        }
-        table.data thead th {
-            background: #e8e8e8;
-            color: #222;
-            padding: 8px 10px;
-            text-align: left;
-            font-size: 10px;
-            font-weight: bold;
-            text-transform: uppercase;
-            border-bottom: 2px solid #1B5E20;
-        }
-        table.data thead th.text-center {
-            text-align: center;
-        }
-        table.data thead th.text-right {
-            text-align: right;
-        }
-        table.data tbody td {
-            padding: 7px 10px;
-            border-bottom: 1px solid #eee;
-            font-size: 10.5px;
-        }
-        table.data tbody td.text-center {
-            text-align: center;
-        }
-        table.data tbody td.text-right {
-            text-align: right;
-        }
-        table.data tbody td.text-bold {
-            font-weight: bold;
-            color: #1B5E20;
-        }
-        table.data tbody tr:nth-child(even) {
-            background: #fafafa;
-        }
-        
-        /* Bloque total final */
-        .total-final {
-            margin-top: 20px;
-            border: 2px solid #1B5E20;
-            background: #f9f9f9;
-            padding: 12px 20px;
-        }
-        .total-final table {
-            width: 100%;
-        }
-        .total-final td {
-            padding: 3px 0;
-        }
-        .total-final .label {
-            font-size: 11px;
-            text-transform: uppercase;
-            color: #555;
-            font-weight: bold;
-        }
-        .total-final .value {
-            font-size: 18px;
-            font-weight: bold;
-            color: #1B5E20;
-            text-align: right;
-        }
-        
-        /* Footer */
-        .footer {
-            position: fixed;
-            bottom: -10px;
-            left: 0;
-            right: 0;
-            text-align: center;
-            font-size: 9px;
-            color: #999;
-            border-top: 1px solid #ddd;
-            padding-top: 8px;
-        }
-        
-        .sin-datos {
-            text-align: center;
-            color: #999;
-            padding: 20px;
-            font-style: italic;
-        }
-
-        /* Nota explicativa */
-        .nota {
-            font-size: 9px;
-            color: #777;
-            margin-top: 3px;
-            font-style: italic;
-        }
+        @page { margin: 28px 32px; }
+        body { color: #252525; font-family: DejaVu Sans, Arial, sans-serif; font-size: 10px; line-height: 1.45; }
+        h1 { color: #1b5e20; font-size: 21px; margin: 0; }
+        h2 { border-left: 4px solid #1b5e20; color: #1b5e20; font-size: 12px; margin: 20px 0 0; padding: 6px 9px; text-transform: uppercase; }
+        p { margin: 4px 0; }
+        .header { border-bottom: 2px solid #1b5e20; margin-bottom: 14px; padding-bottom: 10px; }
+        .header-table, .metrics { width: 100%; }
+        .header-table td { vertical-align: middle; }
+        .logo-cell { padding-right: 14px; width: 78px; }
+        .logo-cell img { height: 58px; }
+        .period { color: #555; text-align: right; }
+        .metrics { border-collapse: collapse; margin: 10px 0; }
+        .metrics td { background: #f8faf8; border: 1px solid #d8e2d8; padding: 9px; width: 25%; }
+        .label { color: #64748b; font-size: 8px; text-transform: uppercase; }
+        .value { color: #1b5e20; font-size: 15px; font-weight: bold; margin-top: 3px; }
+        table.data { border-collapse: collapse; margin-top: 8px; width: 100%; }
+        .data th { background: #e8eee8; border-bottom: 2px solid #1b5e20; font-size: 8px; text-align: left; text-transform: uppercase; }
+        .data th, .data td { border-bottom: 1px solid #dfe5df; padding: 6px 5px; vertical-align: top; }
+        .data tr:nth-child(even) { background: #f8faf8; }
+        .right { text-align: right; }
+        .empty { color: #64748b; padding: 12px; text-align: center; }
+        .footer { border-top: 1px solid #ddd; bottom: -12px; color: #888; font-size: 8px; left: 0; position: fixed; right: 0; text-align: center; }
     </style>
 </head>
 <body>
-
-    <!-- CABECERA -->
-    <div class="header">
+    <header class="header">
         <table class="header-table">
             <tr>
                 <td class="logo-cell">
                     <img src="{{ public_path('img/logo.png') }}" alt="Pizza Goool">
                 </td>
-                <td class="title-cell">
+                <td>
                     <h1>Pizza Goool</h1>
-                    <p>Reporte de Ventas</p>
+                    <p>{{ $nombreReporte }}</p>
                 </td>
-                <td class="period-cell">
-                    <strong>Período del Reporte</strong>
-                    {{ \Carbon\Carbon::parse($fechaInicio)->format('d/m/Y') }} — {{ \Carbon\Carbon::parse($fechaFin)->format('d/m/Y') }}
+                <td class="period">
+                    <strong>Período</strong><br>
+                    {{ \Carbon\Carbon::parse($fechaInicio)->format('d/m/Y') }} al
+                    {{ \Carbon\Carbon::parse($fechaFin)->format('d/m/Y') }}
                 </td>
             </tr>
         </table>
-    </div>
+    </header>
 
-    <!-- MÉTRICAS PRINCIPALES -->
-    <div class="section-title">Resumen General</div>
-    <table class="metricas-table">
-        <tr>
-            <td>
-                <div class="metrica-label">Ventas Totales</div>
-                <div class="metrica-value">Bs. {{ number_format($totalVentas, 2) }}</div>
-            </td>
-            <td>
-                <div class="metrica-label">Total Pedidos</div>
-                <div class="metrica-value">{{ $totalPedidos }}</div>
-            </td>
-            <td>
-                <div class="metrica-label">Promedio por Pedido</div>
-                <div class="metrica-value">Bs. {{ number_format($ticketPromedio, 2) }}</div>
-                <div class="nota">Monto promedio que gasta cada cliente</div>
-            </td>
-        </tr>
-    </table>
-
-    <!-- PRODUCTOS MÁS VENDIDOS -->
-    <div class="section-title">Productos Más Vendidos</div>
-    <table class="data">
-        <thead>
+    @if ($tipoReporte === 'resumen')
+        <table class="metrics">
             <tr>
-                <th>Producto</th>
-                <th class="text-center">Unidades Vendidas</th>
-                <th class="text-right">Ingresos Generados</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($productosMasVendidos as $item)
-                <tr>
-                    <td>{{ $item->producto->nombre ?? 'Producto eliminado' }}</td>
-                    <td class="text-center">{{ $item->total_vendido }}</td>
-                    <td class="text-right text-bold">Bs. {{ number_format($item->total_ingresos, 2) }}</td>
-                </tr>
-            @empty
-                <tr><td colspan="3" class="sin-datos">No hay datos en este período.</td></tr>
-            @endforelse
-        </tbody>
-    </table>
-
-    <!-- MÉTODOS DE PAGO -->
-    <div class="section-title">Ventas por Método de Pago</div>
-    <table class="data">
-        <thead>
-            <tr>
-                <th>Método de Pago</th>
-                <th class="text-center">Cantidad de Pedidos</th>
-                <th class="text-right">Total Recaudado</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($ventasPorMetodo as $metodo)
-                <tr>
-                    <td>{{ $metodo->metodo_pago === 'qr' ? 'Código QR' : 'Efectivo' }}</td>
-                    <td class="text-center">{{ $metodo->total_pedidos }}</td>
-                    <td class="text-right text-bold">Bs. {{ number_format($metodo->total_ventas, 2) }}</td>
-                </tr>
-            @empty
-                <tr><td colspan="3" class="sin-datos">No hay datos en este período.</td></tr>
-            @endforelse
-        </tbody>
-    </table>
-
-    <!-- DETALLE POR DÍA -->
-    <div class="section-title">Detalle Diario de Ventas</div>
-    <table class="data">
-        <thead>
-            <tr>
-                <th>Fecha</th>
-                <th class="text-center">Pedidos Realizados</th>
-                <th class="text-right">Ventas del Día</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($ventasPorDia as $dia)
-                <tr>
-                    <td>{{ \Carbon\Carbon::parse($dia->fecha)->format('d/m/Y') }}</td>
-                    <td class="text-center">{{ $dia->total_pedidos }}</td>
-                    <td class="text-right text-bold">Bs. {{ number_format($dia->total_ventas, 2) }}</td>
-                </tr>
-            @empty
-                <tr><td colspan="3" class="sin-datos">No hay datos en este período.</td></tr>
-            @endforelse
-        </tbody>
-    </table>
-
-    <!-- TOTAL FINAL -->
-    <div class="total-final">
-        <table>
-            <tr>
-                <td class="label">Total General del Período</td>
-                <td class="value">Bs. {{ number_format($totalVentas, 2) }}</td>
+                <td><div class="label">Ventas completadas</div><div class="value">Bs. {{ number_format($resumen['ventas_completadas'], 2) }}</div></td>
+                <td><div class="label">Pedidos entregados</div><div class="value">{{ number_format($resumen['pedidos_completados']) }}</div></td>
+                <td><div class="label">Pedidos activos</div><div class="value">{{ number_format($resumen['pedidos_activos']) }}</div></td>
+                <td><div class="label">Pedidos cancelados</div><div class="value">{{ number_format($resumen['pedidos_cancelados']) }}</div></td>
             </tr>
         </table>
-    </div>
+        <table class="metrics">
+            <tr>
+                <td><div class="label">Ticket promedio</div><div class="value">Bs. {{ number_format($resumen['ticket_promedio'], 2) }}</div></td>
+                <td><div class="label">Ventas período anterior</div><div class="value">Bs. {{ number_format($resumen['ventas_periodo_anterior'], 2) }}</div></td>
+                <td colspan="2"><div class="label">Variación vs. período anterior</div><div class="value">{{ number_format($resumen['variacion_porcentual'], 2) }}%</div></td>
+            </tr>
+        </table>
 
-    <!-- FOOTER -->
-    <div class="footer">
-        Reporte generado el {{ now()->format('d/m/Y \a \l\a\s H:i') }} — Sistema Web Pizza Goool
-    </div>
+        <h2>Ventas diarias</h2>
+        <table class="data">
+            <thead><tr><th>Fecha</th><th class="right">Pedidos entregados</th><th class="right">Ventas completadas</th></tr></thead>
+            <tbody>
+                @forelse ($ventasPorDia as $dia)
+                    <tr><td>{{ \Carbon\Carbon::parse($dia->fecha)->format('d/m/Y') }}</td><td class="right">{{ $dia->total_pedidos }}</td><td class="right">Bs. {{ number_format($dia->total_ventas, 2) }}</td></tr>
+                @empty
+                    <tr><td colspan="3" class="empty">No hay ventas completadas en este período.</td></tr>
+                @endforelse
+            </tbody>
+        </table>
+        <h2>Productos destacados</h2>
+        <table class="data">
+            <thead><tr><th>Producto</th><th>Categoría</th><th class="right">Unidades</th><th class="right">Ingresos</th></tr></thead>
+            <tbody>
+                @forelse ($productosDestacados as $producto)
+                    <tr><td>{{ $producto->producto }}</td><td>{{ $producto->categoria }}</td><td class="right">{{ $producto->unidades_vendidas }}</td><td class="right">Bs. {{ number_format($producto->ingresos, 2) }}</td></tr>
+                @empty
+                    <tr><td colspan="4" class="empty">No hay productos vendidos en este período.</td></tr>
+                @endforelse
+            </tbody>
+        </table>
+    @elseif ($tipoReporte === 'productos')
+        <h2>Ventas por categoría</h2>
+        <table class="data">
+            <thead><tr><th>Categoría</th><th class="right">Productos</th><th class="right">Unidades</th><th class="right">Ingresos completados</th></tr></thead>
+            <tbody>
+                @forelse ($ventasPorCategoria as $categoria)
+                    <tr><td>{{ $categoria->categoria }}</td><td class="right">{{ $categoria->productos_vendidos }}</td><td class="right">{{ $categoria->unidades_vendidas }}</td><td class="right">Bs. {{ number_format($categoria->ingresos, 2) }}</td></tr>
+                @empty
+                    <tr><td colspan="4" class="empty">No hay ventas por categoría en este período.</td></tr>
+                @endforelse
+            </tbody>
+        </table>
+        <h2>Productos más vendidos</h2>
+        <table class="data">
+            <thead><tr><th>Producto</th><th>Categoría</th><th class="right">Unidades</th><th class="right">Ingresos completados</th></tr></thead>
+            <tbody>
+                @forelse ($productos as $producto)
+                    <tr><td>{{ $producto->producto }}</td><td>{{ $producto->categoria }}</td><td class="right">{{ $producto->unidades_vendidas }}</td><td class="right">Bs. {{ number_format($producto->ingresos, 2) }}</td></tr>
+                @empty
+                    <tr><td colspan="4" class="empty">No hay productos vendidos en este período.</td></tr>
+                @endforelse
+            </tbody>
+        </table>
+    @elseif ($tipoReporte === 'pedidos')
+        <h2>Pedidos por estado</h2>
+        <table class="data">
+            <thead><tr><th>Estado</th><th class="right">Pedidos</th><th class="right">Monto de pedidos</th></tr></thead>
+            <tbody>
+                @forelse ($pedidosPorEstado as $fila)
+                    <tr><td>{{ ucfirst(str_replace('_', ' ', $fila->estado)) }}</td><td class="right">{{ $fila->total_pedidos }}</td><td class="right">Bs. {{ number_format($fila->monto_asociado, 2) }}</td></tr>
+                @empty
+                    <tr><td colspan="3" class="empty">No hay pedidos en este período.</td></tr>
+                @endforelse
+            </tbody>
+        </table>
+        <h2>Pedidos por modalidad de entrega</h2>
+        <table class="data">
+            <thead><tr><th>Modalidad</th><th class="right">Pedidos</th><th class="right">Ventas completadas</th></tr></thead>
+            <tbody>
+                @forelse ($pedidosPorTipo as $fila)
+                    <tr><td>{{ $fila->tipo_entrega === 'contraentrega' ? 'Delivery' : 'Recojo en local' }}</td><td class="right">{{ $fila->total_pedidos }}</td><td class="right">Bs. {{ number_format($fila->ventas_completadas, 2) }}</td></tr>
+                @empty
+                    <tr><td colspan="3" class="empty">No hay pedidos en este período.</td></tr>
+                @endforelse
+            </tbody>
+        </table>
+    @elseif ($tipoReporte === 'pagos')
+        <h2>Pagos por método y estado</h2>
+        <table class="data">
+            <thead><tr><th>Método</th><th>Estado registrado</th><th class="right">Registros</th><th class="right">Monto registrado</th></tr></thead>
+            <tbody>
+                @forelse ($pagosPorMetodoYEstado as $pago)
+                    <tr><td>{{ $pago->metodo === 'qr' ? 'Código QR' : ucfirst($pago->metodo) }}</td><td>{{ ucfirst($pago->estado_pago) }}</td><td class="right">{{ $pago->total_pagos }}</td><td class="right">Bs. {{ number_format($pago->monto_registrado, 2) }}</td></tr>
+                @empty
+                    <tr><td colspan="4" class="empty">No hay pagos registrados en este período.</td></tr>
+                @endforelse
+            </tbody>
+        </table>
+    @elseif ($tipoReporte === 'detalle')
+        <h2>Detalle de ventas completadas</h2>
+        <table class="data">
+            <thead><tr><th>Pedido y fecha</th><th>Cliente</th><th>Producto</th><th>Categoría</th><th class="right">Cantidad</th><th class="right">Precio unitario</th><th class="right">Subtotal</th><th>Estados de pago</th><th>Entrega</th></tr></thead>
+            <tbody>
+                @forelse ($detalleVentas as $fila)
+                    <tr>
+                        <td>#{{ $fila->pedido_id }}<br>{{ \Carbon\Carbon::parse($fila->fecha)->format('d/m/Y H:i') }}</td>
+                        <td>{{ trim(($fila->cliente_nombres ?? '').' '.($fila->cliente_apellidos ?? '')) }}<br>{{ $fila->cliente_email }}</td>
+                        <td>{{ $fila->producto }}</td>
+                        <td>{{ $fila->categoria }}</td>
+                        <td class="right">{{ $fila->cantidad }}</td>
+                        <td class="right">Bs. {{ number_format($fila->precio_unitario, 2) }}</td>
+                        <td class="right">Bs. {{ number_format($fila->subtotal, 2) }}</td>
+                        <td>{{ $fila->estados_pago ? str_replace(',', ', ', $fila->estados_pago) : 'Sin registro' }}</td>
+                        <td>{{ $fila->tipo_entrega === 'contraentrega' ? 'Delivery' : 'Recojo en local' }}</td>
+                    </tr>
+                @empty
+                    <tr><td colspan="9" class="empty">No hay ventas completadas en este período.</td></tr>
+                @endforelse
+            </tbody>
+        </table>
+    @endif
 
+    <footer class="footer">Generado el {{ now()->format('d/m/Y H:i') }} — Sistema web Pizza Goool</footer>
 </body>
 </html>

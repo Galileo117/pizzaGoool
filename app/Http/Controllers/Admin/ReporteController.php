@@ -2,143 +2,154 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exports\ReportesExport;
 use App\Http\Controllers\Controller;
-use App\Models\DetallePedido;
-use App\Models\Pedido;
+use App\Services\Admin\ReportesService;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\CarbonImmutable;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Response;
+use Illuminate\Validation\ValidationException;
+use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 /**
- * Construye reportes HTML/PDF usando los filtros de ventas recibidos.
+ * Muestra los reportes administrativos y exporta sus datos en PDF o Excel.
  */
 class ReporteController extends Controller
 {
-    public function index(Request $request)
+    /**
+     * @var array<string, string>
+     */
+    private const REPORTES = [
+        'resumen' => 'Resumen de ventas',
+        'productos' => 'Productos y categorías',
+        'pedidos' => 'Pedidos y entregas',
+        'pagos' => 'Pagos',
+        'detalle' => 'Detalle de ventas',
+    ];
+
+    public function index(Request $request, ReportesService $reportes): View
     {
-        // Rango de fechas (por defecto: últimos 30 días)
-        $fechaInicio = $request->input('fecha_inicio', now()->subDays(30)->format('Y-m-d'));
-        $fechaFin = $request->input('fecha_fin', now()->format('Y-m-d'));
+        [$fechaInicio, $fechaFin, $tipo] = $this->filtros($request, true);
 
-        // Pedidos válidos (excluye cancelados)
-        $pedidosValidos = Pedido::whereBetween(DB::raw('DATE(created_at)'), [$fechaInicio, $fechaFin])
-            ->whereNotIn('estado', ['cancelado']);
+        $datos = match ($tipo) {
+            'resumen' => [
+                'resumen' => $reportes->resumen($fechaInicio, $fechaFin),
+                'ventasPorDia' => $reportes->ventasDiarias($fechaInicio, $fechaFin)->get(),
+                'productosDestacados' => $reportes->productosMasVendidos($fechaInicio, $fechaFin)
+                    ->limit(5)
+                    ->get(),
+            ],
+            'productos' => [
+                'ventasPorCategoria' => $reportes->ventasPorCategoria($fechaInicio, $fechaFin)->get(),
+                'productos' => $reportes->productosMasVendidos($fechaInicio, $fechaFin)
+                    ->paginate(25)
+                    ->withQueryString(),
+            ],
+            'pedidos' => [
+                'pedidosPorEstado' => $reportes->pedidosPorEstado($fechaInicio, $fechaFin)->get(),
+                'pedidosPorTipo' => $reportes->pedidosPorTipoEntrega($fechaInicio, $fechaFin)->get(),
+            ],
+            'pagos' => [
+                'pagosPorMetodoYEstado' => $reportes->pagosPorMetodoYEstado($fechaInicio, $fechaFin)->get(),
+            ],
+            'detalle' => [
+                'detalleVentas' => $reportes->detalleVentas($fechaInicio, $fechaFin)
+                    ->paginate(25)
+                    ->withQueryString(),
+            ],
+        };
 
-        // Métricas principales
-        $totalVentas = (clone $pedidosValidos)->sum('total');
-        $totalPedidos = (clone $pedidosValidos)->count();
-        $ticketPromedio = $totalPedidos > 0 ? $totalVentas / $totalPedidos : 0;
-
-        // Productos más vendidos
-        $productosMasVendidos = DetallePedido::select(
-            'producto_id',
-            DB::raw('SUM(cantidad) as total_vendido'),
-            DB::raw('SUM(cantidad * precio_unitario) as total_ingresos')
-        )
-            ->whereHas('pedido', function ($q) use ($fechaInicio, $fechaFin) {
-                $q->whereBetween(DB::raw('DATE(created_at)'), [$fechaInicio, $fechaFin])
-                    ->whereNotIn('estado', ['cancelado']);
-            })
-            ->with('producto')
-            ->groupBy('producto_id')
-            ->orderByDesc('total_vendido')
-            ->take(5)
-            ->get();
-
-        // Ventas por día
-        $ventasPorDia = Pedido::select(
-            DB::raw('DATE(created_at) as fecha'),
-            DB::raw('COUNT(*) as total_pedidos'),
-            DB::raw('SUM(total) as total_ventas')
-        )
-            ->whereBetween(DB::raw('DATE(created_at)'), [$fechaInicio, $fechaFin])
-            ->whereNotIn('estado', ['cancelado'])
-            ->groupBy(DB::raw('DATE(created_at)'))
-            ->orderBy('fecha', 'desc')
-            ->get();
-
-        // Ventas por método de pago
-        $ventasPorMetodo = Pedido::select(
-            'metodo_pago',
-            DB::raw('COUNT(*) as total_pedidos'),
-            DB::raw('SUM(total) as total_ventas')
-        )
-            ->whereBetween(DB::raw('DATE(created_at)'), [$fechaInicio, $fechaFin])
-            ->whereNotIn('estado', ['cancelado'])
-            ->groupBy('metodo_pago')
-            ->get();
-
-        return view('admin.reportes.index', compact(
-            'fechaInicio',
-            'fechaFin',
-            'totalVentas',
-            'totalPedidos',
-            'ticketPromedio',
-            'productosMasVendidos',
-            'ventasPorDia',
-            'ventasPorMetodo'
-        ));
+        return view('admin.reportes.index', [
+            'fechaInicio' => $fechaInicio,
+            'fechaFin' => $fechaFin,
+            'tipoReporte' => $tipo,
+            'nombreReporte' => self::REPORTES[$tipo],
+            'reportesDisponibles' => self::REPORTES,
+            ...$datos,
+        ]);
     }
 
-    public function pdf(Request $request)
+    public function pdf(Request $request, ReportesService $reportes): Response
     {
-        $fechaInicio = $request->input('fecha_inicio', now()->subDays(30)->format('Y-m-d'));
-        $fechaFin = $request->input('fecha_fin', now()->format('Y-m-d'));
+        [$fechaInicio, $fechaFin, $tipo] = $this->filtros($request, true);
+        $datos = match ($tipo) {
+            'resumen' => [
+                'resumen' => $reportes->resumen($fechaInicio, $fechaFin),
+                'ventasPorDia' => $reportes->ventasDiarias($fechaInicio, $fechaFin)->get(),
+                'productosDestacados' => $reportes->productosMasVendidos($fechaInicio, $fechaFin)
+                    ->limit(10)
+                    ->get(),
+            ],
+            'productos' => [
+                'ventasPorCategoria' => $reportes->ventasPorCategoria($fechaInicio, $fechaFin)->get(),
+                'productos' => $reportes->productosMasVendidos($fechaInicio, $fechaFin)->get(),
+            ],
+            'pedidos' => [
+                'pedidosPorEstado' => $reportes->pedidosPorEstado($fechaInicio, $fechaFin)->get(),
+                'pedidosPorTipo' => $reportes->pedidosPorTipoEntrega($fechaInicio, $fechaFin)->get(),
+            ],
+            'pagos' => [
+                'pagosPorMetodoYEstado' => $reportes->pagosPorMetodoYEstado($fechaInicio, $fechaFin)->get(),
+            ],
+            'detalle' => [
+                'detalleVentas' => $reportes->detalleVentas($fechaInicio, $fechaFin)->get(),
+            ],
+        };
 
-        $pedidosValidos = Pedido::whereBetween(DB::raw('DATE(created_at)'), [$fechaInicio, $fechaFin])
-            ->whereNotIn('estado', ['cancelado']);
+        $pdf = Pdf::loadView('admin.reportes.pdf', [
+            'fechaInicio' => $fechaInicio,
+            'fechaFin' => $fechaFin,
+            'tipoReporte' => $tipo,
+            'nombreReporte' => self::REPORTES[$tipo],
+            ...$datos,
+        ])->setPaper('a4', $tipo === 'detalle' ? 'landscape' : 'portrait');
 
-        $totalVentas = (clone $pedidosValidos)->sum('total');
-        $totalPedidos = (clone $pedidosValidos)->count();
-        $ticketPromedio = $totalPedidos > 0 ? $totalVentas / $totalPedidos : 0;
+        return $pdf->download('reporte-'.$tipo.'-'.$fechaInicio.'-al-'.$fechaFin.'.pdf');
+    }
 
-        $productosMasVendidos = DetallePedido::select(
-            'producto_id',
-            DB::raw('SUM(cantidad) as total_vendido'),
-            DB::raw('SUM(cantidad * precio_unitario) as total_ingresos')
-        )
-            ->whereHas('pedido', function ($q) use ($fechaInicio, $fechaFin) {
-                $q->whereBetween(DB::raw('DATE(created_at)'), [$fechaInicio, $fechaFin])
-                    ->whereNotIn('estado', ['cancelado']);
-            })
-            ->with('producto')
-            ->groupBy('producto_id')
-            ->orderByDesc('total_vendido')
-            ->take(10)
-            ->get();
+    public function excel(Request $request, ReportesService $reportes): BinaryFileResponse
+    {
+        [$fechaInicio, $fechaFin] = $this->filtros($request);
 
-        $ventasPorDia = Pedido::select(
-            DB::raw('DATE(created_at) as fecha'),
-            DB::raw('COUNT(*) as total_pedidos'),
-            DB::raw('SUM(total) as total_ventas')
-        )
-            ->whereBetween(DB::raw('DATE(created_at)'), [$fechaInicio, $fechaFin])
-            ->whereNotIn('estado', ['cancelado'])
-            ->groupBy(DB::raw('DATE(created_at)'))
-            ->orderBy('fecha', 'desc')
-            ->get();
+        return Excel::download(
+            new ReportesExport($reportes, $fechaInicio, $fechaFin),
+            'reporte-pizza-goool-'.$fechaInicio.'-al-'.$fechaFin.'.xlsx',
+        );
+    }
 
-        $ventasPorMetodo = Pedido::select(
-            'metodo_pago',
-            DB::raw('COUNT(*) as total_pedidos'),
-            DB::raw('SUM(total) as total_ventas')
-        )
-            ->whereBetween(DB::raw('DATE(created_at)'), [$fechaInicio, $fechaFin])
-            ->whereNotIn('estado', ['cancelado'])
-            ->groupBy('metodo_pago')
-            ->get();
+    /**
+     * @return array{0: string, 1: string, 2?: string}
+     */
+    private function filtros(Request $request, bool $incluirTipo = false): array
+    {
+        $reglas = [
+            'fecha_inicio' => ['nullable', 'date_format:Y-m-d'],
+            'fecha_fin' => ['nullable', 'date_format:Y-m-d'],
+        ];
 
-        $pdf = Pdf::loadView('admin.reportes.pdf', compact(
-            'fechaInicio',
-            'fechaFin',
-            'totalVentas',
-            'totalPedidos',
-            'ticketPromedio',
-            'productosMasVendidos',
-            'ventasPorDia',
-            'ventasPorMetodo'
-        ));
+        if ($incluirTipo) {
+            $reglas['reporte'] = ['nullable', 'in:'.implode(',', array_keys(self::REPORTES))];
+        }
 
-        return $pdf->download('reporte-ventas-'.$fechaInicio.'-al-'.$fechaFin.'.pdf');
+        $filtros = $request->validate($reglas);
+        $fechaInicio = $filtros['fecha_inicio'] ?? now()->subDays(30)->toDateString();
+        $fechaFin = $filtros['fecha_fin'] ?? now()->toDateString();
+
+        if (CarbonImmutable::parse($fechaInicio)->greaterThan(CarbonImmutable::parse($fechaFin))) {
+            throw ValidationException::withMessages([
+                'fecha_fin' => 'La fecha final debe ser igual o posterior a la fecha inicial.',
+            ]);
+        }
+
+        $resultado = [$fechaInicio, $fechaFin];
+
+        if ($incluirTipo) {
+            $resultado[] = $filtros['reporte'] ?? 'resumen';
+        }
+
+        return $resultado;
     }
 }
