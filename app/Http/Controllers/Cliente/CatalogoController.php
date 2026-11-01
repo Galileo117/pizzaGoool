@@ -9,6 +9,37 @@ use Illuminate\Http\Request;
 
 class CatalogoController extends Controller
 {
+    public function mostrarCheckout()
+    {
+        $carrito = session()->get('carrito', []);
+
+        if (empty($carrito)) {
+            return redirect()->route('cliente.catalogo')
+                ->with('error', 'Tu carrito está vacío.');
+        }
+
+        $idsProductos = array_column($carrito, 'producto_id');
+        $productos = Producto::whereIn('id', $idsProductos)
+            ->get()
+            ->keyBy('id');
+
+        foreach ($carrito as $clave => $item) {
+            $producto = $productos->get((int) ($item['producto_id'] ?? $clave));
+
+            if (! $producto || ! $producto->disponible) {
+                return redirect()->route('cliente.catalogo')
+                    ->with('error', 'El carrito contiene productos que ya no están disponibles.');
+            }
+
+            $carrito[$clave]['nombre'] = $producto->nombre;
+            $carrito[$clave]['precio'] = $producto->precio;
+        }
+
+        session()->put('carrito', $carrito);
+
+        return view('cliente.checkout');
+    }
+
     public function welcome()
     {
         $productos = Producto::where('disponible', true)
@@ -69,15 +100,23 @@ class CatalogoController extends Controller
 
     public function agregarAlCarrito(Request $request, $productoId)
     {
-        if (!auth()->check()) {
+        if (! auth()->check()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Debes iniciar sesión para agregar productos.',
-                'redirect' => route('login')
+                'redirect' => route('login'),
             ], 401);
         }
 
         $producto = Producto::findOrFail($productoId);
+
+        if (! $producto->disponible) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Este producto no está disponible.',
+            ], 422);
+        }
+
         $carrito = session()->get('carrito', []);
 
         if (isset($carrito[$productoId])) {
@@ -99,17 +138,17 @@ class CatalogoController extends Controller
             'success' => true,
             'message' => 'Producto agregado al carrito',
             'total' => $this->calcularTotal($carrito),
-            'cantidad_items' => $this->contarItems($carrito)
+            'cantidad_items' => $this->contarItems($carrito),
         ]);
     }
 
     public function guardarCarrito(Request $request)
     {
-        if (!auth()->check()) {
+        if (! auth()->check()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Debes iniciar sesión.',
-                'redirect' => route('login')
+                'redirect' => route('login'),
             ], 401);
         }
 
@@ -131,13 +170,13 @@ class CatalogoController extends Controller
         return response()->json([
             'success' => true,
             'total' => $this->calcularTotal($carrito),
-            'cantidad_items' => $this->contarItems($carrito)
+            'cantidad_items' => $this->contarItems($carrito),
         ]);
     }
 
     public function vaciarCarrito()
     {
-        if (!auth()->check()) {
+        if (! auth()->check()) {
             return response()->json(['success' => false], 401);
         }
 
@@ -152,6 +191,7 @@ class CatalogoController extends Controller
         foreach ($carrito as $item) {
             $total += $item['precio'] * $item['cantidad'];
         }
+
         return $total;
     }
 
@@ -161,6 +201,7 @@ class CatalogoController extends Controller
         foreach ($carrito as $item) {
             $cantidad += $item['cantidad'];
         }
+
         return $cantidad;
     }
 }

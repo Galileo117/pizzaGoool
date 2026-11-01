@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\DetallePedido;
 use App\Models\Pago;
 use App\Models\Pedido;
+use App\Models\Producto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class PedidoController extends Controller
 {
@@ -25,18 +27,57 @@ class PedidoController extends Controller
             'metodo_pago' => 'required|in:efectivo,qr',
             'direccion' => 'required_if:tipo_entrega,contraentrega|nullable|string|max:255',
             'referencia' => 'nullable|string|max:255',
-            'latitud' => 'nullable|numeric',
-            'longitud' => 'nullable|numeric',
+            'latitud' => 'nullable|numeric|between:-90,90',
+            'longitud' => 'nullable|numeric|between:-180,180',
         ]);
 
-        $total = 0;
-        foreach ($carrito as $item) {
-            $total += $item['precio'] * $item['cantidad'];
-        }
+        $pedido = DB::transaction(function () use ($request, $carrito) {
+            $idsProductos = array_column($carrito, 'producto_id');
+            $productos = Producto::whereIn('id', $idsProductos)
+                ->lockForUpdate()
+                ->get()
+                ->keyBy('id');
+            $totalCentavos = 0;
+            $detalles = [];
 
-        try {
-            // Iniciamos la transacción. Si algo falla, todo se revierte (Rollback).
-            DB::beginTransaction();
+            foreach ($carrito as $clave => $item) {
+                $producto = $productos->get((int) ($item['producto_id'] ?? $clave));
+
+                if (! $producto || ! $producto->disponible) {
+                    throw ValidationException::withMessages([
+                        'carrito' => 'El carrito contiene productos que ya no están disponibles.',
+                    ]);
+                }
+
+                $cantidad = filter_var($item['cantidad'] ?? null, FILTER_VALIDATE_INT);
+
+                if ($cantidad === false || $cantidad < 1 || $cantidad > 20) {
+                    throw ValidationException::withMessages([
+                        'carrito' => 'La cantidad de un producto del carrito no es válida.',
+                    ]);
+                }
+
+                $precioCentavos = (int) round((float) $producto->precio * 100);
+                $precioAnteriorCentavos = (int) round((float) ($item['precio'] ?? 0) * 100);
+
+                if ($precioAnteriorCentavos !== $precioCentavos) {
+                    $carrito[$clave]['precio'] = number_format($precioCentavos / 100, 2, '.', '');
+                    session()->put('carrito', $carrito);
+
+                    throw ValidationException::withMessages([
+                        'carrito' => 'El precio de un producto cambió. Revisa el total actualizado antes de confirmar.',
+                    ]);
+                }
+
+                $totalCentavos += $precioCentavos * $cantidad;
+                $detalles[] = [
+                    'producto_id' => $producto->id,
+                    'cantidad' => $cantidad,
+                    'precio_unitario' => number_format($precioCentavos / 100, 2, '.', ''),
+                ];
+            }
+
+            $total = number_format($totalCentavos / 100, 2, '.', '');
 
             $pedido = Pedido::create([
                 'usuario_id' => auth()->id(),
@@ -50,12 +91,12 @@ class PedidoController extends Controller
                 'longitud' => $request->longitud ?? null,
             ]);
 
-            foreach ($carrito as $item) {
+            foreach ($detalles as $detalle) {
                 DetallePedido::create([
                     'pedido_id' => $pedido->id,
-                    'producto_id' => $item['producto_id'],
-                    'cantidad' => $item['cantidad'],
-                    'precio_unitario' => $item['precio'],
+                    'producto_id' => $detalle['producto_id'],
+                    'cantidad' => $detalle['cantidad'],
+                    'precio_unitario' => $detalle['precio_unitario'],
                 ]);
             }
 
@@ -67,22 +108,14 @@ class PedidoController extends Controller
                 'codigo_qr' => null,
             ]);
 
-            // Si todo salió bien, confirmamos los cambios en la BD
-            DB::commit();
+            return $pedido;
+        });
 
-            session()->forget('carrito');
+        session()->forget('carrito');
 
-            return redirect()
-                ->route('cliente.seguimiento', $pedido->id)
-                ->with('success', '¡Pedido creado correctamente!');
-        } catch (\Exception $e) {
-            // Si hay un error, deshacemos todo
-            DB::rollBack();
-
-            return redirect()->back()
-                ->with('error', 'Ocurrió un error al procesar tu pedido. Inténtalo de nuevo.')
-                ->withInput();
-        }
+        return redirect()
+            ->route('cliente.seguimiento', $pedido->id)
+            ->with('success', '¡Pedido creado correctamente!');
     }
 
     public function cancelar($pedidoId)

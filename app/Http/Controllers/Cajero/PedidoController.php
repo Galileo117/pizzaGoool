@@ -42,9 +42,15 @@ class PedidoController extends Controller
             'estado' => 'required|in:pendiente,preparacion,listo,en_reparto,entregado,cancelado',
         ]);
 
-        // Validación extra de seguridad: Evitar que el cajero cancele si ya está en reparto
         if ($request->estado === 'cancelado' && in_array($pedido->estado, ['en_reparto', 'entregado'])) {
             return redirect()->back()->with('error', 'No puedes cancelar un pedido que ya está en reparto o entregado.');
+        }
+
+        if (
+            $request->estado === 'en_reparto'
+            || ! $pedido->puedeCambiarEstado($request->estado)
+        ) {
+            return redirect()->back()->with('error', 'La transición solicitada no es válida para este pedido.');
         }
 
         $pedido->update(['estado' => $request->estado]);
@@ -55,8 +61,24 @@ class PedidoController extends Controller
     public function asignarRepartidor(Request $request, Pedido $pedido)
     {
         $request->validate([
-            'repartidor_id' => 'required|exists:usuarios,id',
+            'repartidor_id' => 'required|exists:repartidores,usuario_id',
         ]);
+
+        $esRepartidor = Usuario::whereKey($request->repartidor_id)
+            ->where('rol', 'repartidor')
+            ->whereHas('repartidor')
+            ->exists();
+
+        if (! $esRepartidor) {
+            return redirect()->back()->with('error', 'La cuenta seleccionada no tiene un perfil de repartidor válido.');
+        }
+
+        if (
+            $pedido->tipo_entrega !== 'contraentrega'
+            || ! $pedido->puedeCambiarEstado('en_reparto')
+        ) {
+            return redirect()->back()->with('error', 'Solo se puede asignar un repartidor a un pedido de delivery listo.');
+        }
 
         $pedido->update([
             'repartidor_id' => $request->repartidor_id,

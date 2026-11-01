@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\Usuario;
 use App\Models\Cliente;
+use App\Models\Usuario;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -28,7 +28,7 @@ class RegisteredUserController extends Controller
             'apellidos' => ['required', 'string', 'max:50', 'regex:/^[\pL\s]+$/u'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:150', 'unique:usuarios,email'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'telefono' => ['nullable', 'string', 'regex:/^[67]\d{7}$/'],
+            'telefono' => ['nullable', 'string', 'regex:/^[67]\d{7}$/', 'unique:clientes,telefono'],
         ], [
             'nombres.required' => 'El nombre es obligatorio.',
             'nombres.regex' => 'El nombre solo puede contener letras.',

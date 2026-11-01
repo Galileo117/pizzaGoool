@@ -16,7 +16,6 @@ class Cliente extends Model
         'nombres',
         'apellidos',
         'telefono',
-        'direccion_entrega'
     ];
 
     // Relación inversa: Un cliente pertenece a un usuario

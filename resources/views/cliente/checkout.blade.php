@@ -20,6 +20,12 @@
             </p>
         </div>
 
+        @error('carrito')
+            <div class="mb-6 rounded-lg border border-red-200 bg-red-50 p-4 text-red-700" role="alert">
+                {{ $message }}
+            </div>
+        @enderror
+
         <form action="{{ route('cliente.procesar_pedido') }}" method="POST" class="space-y-6" id="form-checkout">
             @csrf
 
@@ -241,9 +247,8 @@
                         <label for="direccion" class="block text-sm font-semibold text-gray-700 mb-1.5">
                             Dirección Completa <span class="text-red-500">*</span>
                         </label>
-                        {{-- Cargamos la dirección guardada en el perfil del cliente --}}
                         <input type="text" id="direccion" name="direccion"
-                            value="{{ old('direccion', auth()->user()->cliente->direccion_entrega ?? '') }}"
+                            value="{{ old('direccion') }}"
                             class="w-full border-2 @error('direccion') border-red-500 @else border-gray-200 @enderror rounded-xl p-3 focus:border-goool-green focus:ring-2 focus:ring-goool-green/20 transition-all duration-200"
                             placeholder="Ej: Av. Siempre Viva 123, Zona Norte">
                         @error('direccion')

@@ -43,4 +43,20 @@ class Pedido extends Model
     {
         return $this->hasOne(Pago::class);
     }
+
+    public function puedeCambiarEstado(string $nuevoEstado): bool
+    {
+        $transiciones = [
+            'pendiente' => ['preparacion', 'cancelado'],
+            'preparacion' => ['listo', 'cancelado'],
+            'listo' => $this->tipo_entrega === 'recoger_local'
+                ? ['entregado']
+                : ['en_reparto'],
+            'en_reparto' => ['entregado', 'cancelado'],
+            'entregado' => [],
+            'cancelado' => [],
+        ];
+
+        return in_array($nuevoEstado, $transiciones[$this->estado] ?? [], true);
+    }
 }

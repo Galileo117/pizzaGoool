@@ -12,7 +12,7 @@ class PedidoResource extends JsonResource
         return [
             'id' => $this->id,
 
-            'codigo' => '#' . str_pad(
+            'codigo' => '#'.str_pad(
                 $this->id,
                 6,
                 '0',
@@ -44,33 +44,43 @@ class PedidoResource extends JsonResource
             'fecha_iso' => $this->created_at?->toIso8601String(),
 
             'usuario' => $this->whenLoaded('usuario', function () {
-                return [
-                    'id' => $this->usuario->id,
-                    'nombres' => $this->usuario->nombres,
-                    'apellidos' => $this->usuario->apellidos,
-                    'nombre_completo' => trim(
-                        $this->usuario->nombres . ' ' .
-                            ($this->usuario->apellidos ?? '')
-                    ),
-                    'telefono' => $this->usuario->telefono,
-                    'email' => $this->usuario->email,
-                ];
-            }),
+                $usuario = $this->usuario;
+                $cliente = $usuario?->cliente;
 
-            'repartidor' => $this->whenLoaded('repartidor', function () {
-                if (!$this->repartidor) {
+                if (! $usuario) {
                     return null;
                 }
 
                 return [
-                    'id' => $this->repartidor->id,
-                    'nombres' => $this->repartidor->nombres,
-                    'apellidos' => $this->repartidor->apellidos,
+                    'id' => $usuario->id,
+                    'nombres' => $cliente?->nombres,
+                    'apellidos' => $cliente?->apellidos,
                     'nombre_completo' => trim(
-                        $this->repartidor->nombres . ' ' .
-                            ($this->repartidor->apellidos ?? '')
+                        ($cliente?->nombres ?? '').' '.
+                            ($cliente?->apellidos ?? '')
                     ),
-                    'telefono' => $this->repartidor->telefono,
+                    'telefono' => $cliente?->telefono,
+                    'email' => $usuario->email,
+                ];
+            }),
+
+            'repartidor' => $this->whenLoaded('repartidor', function () {
+                $usuario = $this->repartidor;
+                $repartidor = $usuario?->repartidor;
+
+                if (! $usuario || ! $repartidor) {
+                    return null;
+                }
+
+                return [
+                    'id' => $usuario->id,
+                    'nombres' => $repartidor->nombres,
+                    'apellidos' => $repartidor->apellidos,
+                    'nombre_completo' => trim(
+                        $repartidor->nombres.' '.
+                            ($repartidor->apellidos ?? '')
+                    ),
+                    'telefono' => $repartidor->telefono,
                 ];
             }),
 
@@ -79,7 +89,7 @@ class PedidoResource extends JsonResource
             ),
 
             'pago' => $this->whenLoaded('pago', function () {
-                if (!$this->pago) {
+                if (! $this->pago) {
                     return null;
                 }
 

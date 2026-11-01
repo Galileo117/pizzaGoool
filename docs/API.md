@@ -36,6 +36,8 @@ Registrar un nuevo cliente.
 }
 ```
 
+`nombre` se acepta por compatibilidad con esta colección; también puede enviarse como `nombres`. `apellidos` es opcional.
+
 **Respuesta exitosa (201):**
 ```json
 {
@@ -45,7 +47,9 @@ Registrar un nuevo cliente.
         "token": "1|abc123...",
         "usuario": {
             "id": 1,
-            "nombre": "Juan Pérez",
+            "nombres": "Juan",
+            "apellidos": "Pérez",
+            "nombre_completo": "Juan Pérez",
             "email": "juan@example.com",
             "rol": "cliente",
             "telefono": "71234567"
@@ -75,7 +79,9 @@ Iniciar sesión y obtener un token.
         "token": "1|abc123...",
         "usuario": {
             "id": 4,
-            "nombre": "Cliente Maria",
+            "nombres": "Maria",
+            "apellidos": "Lopez",
+            "nombre_completo": "Maria Lopez",
             "email": "cliente@goool.com",
             "rol": "cliente",
             "telefono": "71234570"
@@ -116,9 +122,11 @@ Authorization: Bearer {token}
     "data": {
         "usuario": {
             "id": 4,
-            "nombre": "Cliente Maria",
-            "email": "cliente@goool.com",
-            "rol": "cliente",
+        "nombres": "Maria",
+        "apellidos": "Lopez",
+        "nombre_completo": "Maria Lopez",
+        "email": "cliente@goool.com",
+        "rol": "cliente",
             "telefono": "71234570",
             "created_at": "2026-09-29T15:04:33.000000Z"
         }
@@ -220,6 +228,14 @@ Crear un nuevo pedido.
         "longitud": -68.15,
         "fecha": "29/09/2026 15:30",
         "fecha_iso": "2026-09-29T15:30:00.000000Z",
+        "usuario": {
+            "id": 4,
+            "nombres": "Maria",
+            "apellidos": "Lopez",
+            "nombre_completo": "Maria Lopez",
+            "telefono": "71234570",
+            "email": "cliente@goool.com"
+        },
         "detalle": [
             {
                 "id": 1,
@@ -230,7 +246,14 @@ Crear un nuevo pedido.
                 "subtotal": 90.00
             }
         ],
-        "repartidor": null
+        "repartidor": null,
+        "pago": {
+            "id": 1,
+            "monto": 100.00,
+            "metodo": "efectivo",
+            "estado_pago": "pendiente",
+            "codigo_qr": null
+        }
     }
 }
 ```
@@ -240,6 +263,8 @@ Listar los pedidos del cliente autenticado.
 
 ### GET /pedidos/{id}
 Ver el detalle de un pedido específico.
+
+La relación de pago es de uno a uno. La respuesta mantiene `pago` como objeto o `null`; los detalles conservan el precio unitario confirmado al crear el pedido.
 
 ### DELETE /pedidos/{id}
 Cancelar un pedido (Solo si se encuentra en estado `pendiente`).

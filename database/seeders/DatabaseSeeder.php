@@ -86,12 +86,12 @@ class DatabaseSeeder extends Seeder
             ['Pedro', 'Quispe'],
             ['Ana', 'Flores'],
             ['Jorge', 'Condori'],
-            ['Lucia', 'Rojas']
+            ['Lucia', 'Rojas'],
         ];
 
         foreach ($nombresClientes as $index => $nombre) {
             $user = Usuario::create([
-                'email' => 'cliente' . ($index + 1) . '@goool.com',
+                'email' => 'cliente'.($index + 1).'@goool.com',
                 'password' => Hash::make('12345678'),
                 'rol' => 'cliente',
             ]);
@@ -100,8 +100,7 @@ class DatabaseSeeder extends Seeder
                 'usuario_id' => $user->id,
                 'nombres' => $nombre[0],
                 'apellidos' => $nombre[1],
-                'telefono' => '7000000' . $index,
-                'direccion_entrega' => 'Zona ' . ['Sopocachi', 'Miraflores', 'San Pedro', 'Obrajes', 'Calacoto'][$index] . ', Calle ' . fake()->numberBetween(1, 20),
+                'telefono' => '7000000'.$index,
             ]);
         }
 
@@ -148,7 +147,7 @@ class DatabaseSeeder extends Seeder
                 'estado' => $estado,
                 'metodo_pago' => $metodoPago,
                 'tipo_entrega' => $esDelivery ? 'contraentrega' : 'recoger_local',
-                'direccion' => $esDelivery ? $cliente->direccion_entrega : null,
+                'direccion' => $esDelivery ? 'Zona de prueba, Calle '.fake()->numberBetween(1, 20) : null,
                 'referencia' => $esDelivery ? 'Portón verde' : null,
                 'latitud' => $esDelivery ? -16.5 + (rand(-100, 100) / 1000) : null,
                 'longitud' => $esDelivery ? -68.15 + (rand(-100, 100) / 1000) : null,
@@ -160,7 +159,7 @@ class DatabaseSeeder extends Seeder
             $cantidadProductos = rand(1, 3);
             $productosUsados = array_rand($productosCreados, $cantidadProductos);
 
-            if (!is_array($productosUsados)) {
+            if (! is_array($productosUsados)) {
                 $productosUsados = [$productosUsados];
             }
 

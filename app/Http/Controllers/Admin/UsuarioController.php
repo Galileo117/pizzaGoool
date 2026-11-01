@@ -3,13 +3,14 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Usuario;
 use App\Models\Cliente;
 use App\Models\Empleado;
 use App\Models\Repartidor;
+use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules;
 
 class UsuarioController extends Controller
@@ -36,7 +37,7 @@ class UsuarioController extends Controller
     public function store(Request $request)
     {
         // Validaciones condicionales según el rol
-        $request->validate([
+        $reglas = [
             'email' => 'required|string|email|max:150|unique:usuarios,email',
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'rol' => 'required|in:admin,cajero,repartidor,cliente',
@@ -50,7 +51,13 @@ class UsuarioController extends Controller
             'ci' => 'required_if:rol,repartidor|nullable|string|max:15|unique:repartidores,ci',
             'placa' => 'required_if:rol,repartidor|nullable|string|max:15|unique:repartidores,placa',
             'licencia_conducir' => 'required_if:rol,repartidor|nullable|string|max:20|unique:repartidores,licencia_conducir',
-        ], [
+        ];
+
+        if ($request->rol === 'cliente') {
+            $reglas['telefono'] .= '|unique:clientes,telefono';
+        }
+
+        $request->validate($reglas, [
             'email.required' => 'El correo es obligatorio.',
             'email.unique' => 'Este correo ya está registrado.',
             'password.confirmed' => 'Las contraseñas no coinciden.',
@@ -115,24 +122,36 @@ class UsuarioController extends Controller
     {
         // Cargar las relaciones para tener acceso a los datos
         $usuario->load(['cliente', 'empleado', 'repartidor']);
+
         return view('admin.usuarios.edit', compact('usuario'));
     }
 
     public function update(Request $request, Usuario $usuario)
     {
         // Validaciones (similares al store)
-        $request->validate([
-            'email' => 'required|string|email|max:150|unique:usuarios,email,' . $usuario->id,
+        $reglas = [
+            'email' => 'required|string|email|max:150|unique:usuarios,email,'.$usuario->id,
             'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
             'rol' => 'required|in:admin,cajero,repartidor,cliente',
             'nombres' => 'required|string|max:50|regex:/^[\pL\s]+$/u',
             'apellidos' => 'required|string|max:50|regex:/^[\pL\s]+$/u',
             'telefono' => 'nullable|string|regex:/^[67]\d{7}$/',
 
-            'ci' => 'required_if:rol,repartidor|nullable|string|max:15|unique:repartidores,ci,' . ($usuario->repartidor ? $usuario->repartidor->id : 'NULL'),
-            'placa' => 'required_if:rol,repartidor|nullable|string|max:15|unique:repartidores,placa,' . ($usuario->repartidor ? $usuario->repartidor->id : 'NULL'),
-            'licencia_conducir' => 'required_if:rol,repartidor|nullable|string|max:20|unique:repartidores,licencia_conducir,' . ($usuario->repartidor ? $usuario->repartidor->id : 'NULL'),
-        ], [
+            'ci' => 'required_if:rol,repartidor|nullable|string|max:15|unique:repartidores,ci,'.($usuario->repartidor ? $usuario->repartidor->id : 'NULL'),
+            'placa' => 'required_if:rol,repartidor|nullable|string|max:15|unique:repartidores,placa,'.($usuario->repartidor ? $usuario->repartidor->id : 'NULL'),
+            'licencia_conducir' => 'required_if:rol,repartidor|nullable|string|max:20|unique:repartidores,licencia_conducir,'.($usuario->repartidor ? $usuario->repartidor->id : 'NULL'),
+        ];
+
+        if ($request->rol === 'cliente') {
+            $reglas['telefono'] = [
+                'nullable',
+                'string',
+                'regex:/^[67]\d{7}$/',
+                Rule::unique('clientes', 'telefono')->ignore($usuario->cliente?->id),
+            ];
+        }
+
+        $request->validate($reglas, [
             'email.unique' => 'Este correo ya está registrado.',
             'password.confirmed' => 'Las contraseñas no coinciden.',
             'nombres.regex' => 'El nombre solo debe contener letras.',
@@ -199,7 +218,11 @@ class UsuarioController extends Controller
                 ->with('error', 'No puedes eliminar tu propia cuenta.');
         }
 
-        // Al borrar el usuario, el ON DELETE CASCADE en la base de datos borrará su perfil automáticamente.
+        if ($usuario->pedidos()->exists() || $usuario->pedidosAsignados()->exists()) {
+            return redirect()->route('admin.usuarios.index')
+                ->with('error', 'No se puede eliminar una cuenta asociada a pedidos; el historial debe conservarse.');
+        }
+
         $usuario->delete();
 
         return redirect()->route('admin.usuarios.index')

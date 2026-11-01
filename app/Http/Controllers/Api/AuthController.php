@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Traits\ApiResponse;
+use App\Models\Cliente;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\Validation\ValidationException;
@@ -17,16 +19,17 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         try {
-            $request->validate([
-                'nombres' => 'required|string|max:100',
-                'apellidos' => 'nullable|string|max:100',
+            $datos = $request->validate([
+                'nombre' => 'required_without:nombres|string|max:50',
+                'nombres' => 'required_without:nombre|string|max:50',
+                'apellidos' => 'nullable|string|max:50',
                 'email' => 'required|string|email|max:150|unique:usuarios,email',
                 'password' => ['required', 'confirmed', Rules\Password::defaults()],
                 'telefono' => [
                     'nullable',
                     'string',
                     'regex:/^[0-9]{8,15}$/',
-                    'unique:usuarios,telefono',
+                    'unique:clientes,telefono',
                 ],
                 'device_name' => 'nullable|string|max:255',
             ]);
@@ -34,16 +37,26 @@ class AuthController extends Controller
             return $this->validationErrorResponse($e->errors());
         }
 
-        $usuario = Usuario::create([
-            'nombres' => $request->nombres,
-            'apellidos' => $request->apellidos,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'telefono' => $request->telefono,
-            'rol' => 'cliente',
-        ]);
+        $usuario = DB::transaction(function () use ($datos) {
+            $usuario = Usuario::create([
+                'email' => $datos['email'],
+                'password' => Hash::make($datos['password']),
+                'rol' => 'cliente',
+            ]);
 
-        $deviceName = $request->device_name ?? 'app-movil';
+            Cliente::create([
+                'usuario_id' => $usuario->id,
+                'nombres' => filled($datos['nombres'] ?? null)
+                    ? $datos['nombres']
+                    : $datos['nombre'],
+                'apellidos' => $datos['apellidos'] ?? '',
+                'telefono' => $datos['telefono'] ?? null,
+            ]);
+
+            return $usuario->load('cliente');
+        });
+
+        $deviceName = $datos['device_name'] ?? 'app-movil';
 
         $token = $usuario
             ->createToken($deviceName)
@@ -51,17 +64,7 @@ class AuthController extends Controller
 
         return $this->successResponse([
             'token' => $token,
-            'usuario' => [
-                'id' => $usuario->id,
-                'nombres' => $usuario->nombres,
-                'apellidos' => $usuario->apellidos,
-                'nombre_completo' => trim(
-                    $usuario->nombres . ' ' . ($usuario->apellidos ?? '')
-                ),
-                'email' => $usuario->email,
-                'rol' => $usuario->rol,
-                'telefono' => $usuario->telefono,
-            ],
+            'usuario' => $this->datosDeUsuario($usuario),
         ], 'Usuario registrado correctamente.', 201);
     }
 
@@ -79,12 +82,13 @@ class AuthController extends Controller
 
         $usuario = Usuario::where('email', $request->email)->first();
 
-        if (!$usuario || !Hash::check($request->password, $usuario->password)) {
+        if (! $usuario || ! Hash::check($request->password, $usuario->password)) {
             return $this->unauthorizedResponse(
                 'Las credenciales no coinciden.'
             );
         }
 
+        $usuario->loadMissing('cliente');
         $deviceName = $request->device_name ?? 'app-movil';
 
         $usuario->tokens()
@@ -97,17 +101,7 @@ class AuthController extends Controller
 
         return $this->successResponse([
             'token' => $token,
-            'usuario' => [
-                'id' => $usuario->id,
-                'nombres' => $usuario->nombres,
-                'apellidos' => $usuario->apellidos,
-                'nombre_completo' => trim(
-                    $usuario->nombres . ' ' . ($usuario->apellidos ?? '')
-                ),
-                'email' => $usuario->email,
-                'rol' => $usuario->rol,
-                'telefono' => $usuario->telefono,
-            ],
+            'usuario' => $this->datosDeUsuario($usuario),
         ], 'Login exitoso.');
     }
 
@@ -127,21 +121,29 @@ class AuthController extends Controller
 
     public function user(Request $request)
     {
-        $usuario = $request->user();
+        $usuario = $request->user()->loadMissing('cliente');
 
         return $this->successResponse([
-            'usuario' => [
-                'id' => $usuario->id,
-                'nombres' => $usuario->nombres,
-                'apellidos' => $usuario->apellidos,
-                'nombre_completo' => trim(
-                    $usuario->nombres . ' ' . ($usuario->apellidos ?? '')
-                ),
-                'email' => $usuario->email,
-                'rol' => $usuario->rol,
-                'telefono' => $usuario->telefono,
+            'usuario' => $this->datosDeUsuario($usuario) + [
                 'created_at' => $usuario->created_at,
             ],
         ], 'Datos del usuario.');
+    }
+
+    private function datosDeUsuario(Usuario $usuario): array
+    {
+        $cliente = $usuario->cliente;
+
+        return [
+            'id' => $usuario->id,
+            'nombres' => $cliente?->nombres,
+            'apellidos' => $cliente?->apellidos,
+            'nombre_completo' => trim(
+                ($cliente?->nombres ?? '').' '.($cliente?->apellidos ?? '')
+            ),
+            'email' => $usuario->email,
+            'rol' => $usuario->rol,
+            'telefono' => $cliente?->telefono,
+        ];
     }
 }

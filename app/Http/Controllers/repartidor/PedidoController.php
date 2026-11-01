@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Repartidor;
+namespace App\Http\Controllers\repartidor;
 
 use App\Http\Controllers\Controller;
 use App\Models\Pedido;
@@ -38,7 +38,7 @@ class PedidoController extends Controller
             abort(403, 'No tienes permiso para modificar este pedido.');
         }
 
-        if ($pedido->estado !== 'en_reparto') {
+        if (! $pedido->puedeCambiarEstado('entregado')) {
             return redirect()->back()->with('error', 'Este pedido no está en reparto.');
         }
 
@@ -55,13 +55,17 @@ class PedidoController extends Controller
             abort(403, 'No tienes permiso para modificar este pedido.');
         }
 
+        if (! $pedido->puedeCambiarEstado('cancelado')) {
+            return redirect()->back()->with('error', 'Este pedido ya no puede reportarse como fallido.');
+        }
+
         $request->validate([
-            'motivo' => 'required|string|max:255'
+            'motivo' => 'required|string|max:255',
         ]);
 
         $pedido->update([
             'estado' => 'cancelado',
-            'referencia' => $pedido->referencia . ' | Fallo: ' . $request->motivo
+            'referencia' => $pedido->referencia.' | Fallo: '.$request->motivo,
         ]);
 
         return redirect()->route('repartidor.pedidos.index')

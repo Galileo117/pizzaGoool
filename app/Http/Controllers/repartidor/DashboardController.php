@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Repartidor;
+namespace App\Http\Controllers\repartidor;
 
 use App\Http\Controllers\Controller;
 use App\Models\Pedido;

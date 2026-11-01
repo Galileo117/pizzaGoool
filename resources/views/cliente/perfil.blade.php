@@ -2,18 +2,6 @@
 
 @section('title', 'Mi Perfil - Pizza Goool')
 
-@push('styles')
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <style>
-        #mapa-perfil {
-            height: 250px;
-            width: 100%;
-            border-radius: 12px;
-            z-index: 1;
-        }
-    </style>
-@endpush
-
 @section('content')
     <div class="max-w-3xl mx-auto px-4 py-8 sm:py-12">
 
@@ -151,43 +139,6 @@
                     </div>
                 </div>
 
-                {{-- DIRECCIÓN DE ENTREGA --}}
-                <div>
-                    <label for="direccion_entrega" class="block text-sm font-bold text-gray-700 mb-1">
-                        Dirección de entrega por defecto
-                    </label>
-                    <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <i class="fa-solid fa-location-dot text-gray-400"></i>
-                        </div>
-                        <input type="text" id="direccion_entrega" name="direccion_entrega"
-                            value="{{ old('direccion_entrega', auth()->user()->cliente->direccion_entrega ?? '') }}"
-                            maxlength="255"
-                            class="w-full border-2 @error('direccion_entrega') border-red-500 @else border-gray-200 @enderror rounded-xl p-3 pl-10 focus:border-goool-green focus:ring-2 focus:ring-goool-green/20 transition-all duration-200"
-                            placeholder="Ej: Av. Mario Mercado, Edificio...">
-                    </div>
-                    <p class="text-xs text-gray-500 mt-1">Esta dirección se usará por defecto al momento de hacer tu
-                        pedido.</p>
-                    @error('direccion_entrega')
-                        <p class="text-red-500 text-xs mt-1 font-medium"><i class="fa-solid fa-circle-exclamation mr-1"></i>
-                            {{ $message }}</p>
-                    @enderror
-                </div>
-
-                {{-- MAPA PARA MARCAR LA UBICACIÓN --}}
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-1">
-                        <i class="fa-solid fa-map-location-dot text-goool-green"></i> Ubicación exacta en el mapa
-                    </label>
-                    <div id="mapa-perfil" class="mb-2 border-2 border-gray-200"></div>
-                    <p class="text-xs text-gray-500 mb-2">Toca el mapa para marcar tu casa. Así el repartidor llegará más
-                        rápido.</p>
-                    <input type="hidden" name="latitud" id="latitud"
-                        value="{{ old('latitud', auth()->user()->cliente->latitud ?? '') }}">
-                    <input type="hidden" name="longitud" id="longitud"
-                        value="{{ old('longitud', auth()->user()->cliente->longitud ?? '') }}">
-                </div>
-
                 <div class="pt-2">
                     <button type="submit"
                         class="bg-goool-green text-white font-bold px-6 py-3 rounded-xl hover:bg-goool-green-dark transition-all duration-200 w-full sm:w-auto flex items-center justify-center gap-2 shadow-sm">
@@ -219,7 +170,6 @@
 @endsection
 
 @push('scripts')
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         // Validación del teléfono en tiempo real
         function validarTelefono(input) {
@@ -234,75 +184,5 @@
                 errorMsg.classList.add('hidden');
             }
         }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const latInput = document.getElementById('latitud').value;
-            const lngInput = document.getElementById('longitud').value;
-
-            // Coordenadas iniciales (La Paz) o las que vienen de la BD
-            let latInicial = latInput ? parseFloat(latInput) : -16.5;
-            let lngInicial = lngInput ? parseFloat(lngInput) : -68.15;
-            let zoomInicial = latInput ? 16 : 13;
-
-            const map = L.map('mapa-perfil').setView([latInicial, lngInicial], zoomInicial);
-
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap contributors',
-                maxZoom: 19
-            }).addTo(map);
-
-            let marker;
-            // Si ya hay coordenadas guardadas, ponemos el marcador
-            if (latInput && lngInput) {
-                marker = L.marker([latInicial, lngInicial], {
-                    draggable: true
-                }).addTo(map);
-            }
-
-            // Función para actualizar los inputs ocultos
-            function actualizarInputs(lat, lng) {
-                document.getElementById('latitud').value = lat;
-                document.getElementById('longitud').value = lng;
-            }
-
-            // Evento al hacer clic en el mapa
-            map.on('click', function(e) {
-                const {
-                    lat,
-                    lng
-                } = e.latlng;
-
-                if (marker) {
-                    marker.setLatLng([lat, lng]);
-                } else {
-                    marker = L.marker([lat, lng], {
-                        draggable: true
-                    }).addTo(map);
-                }
-
-                actualizarInputs(lat, lng);
-
-                // Autocompletar la dirección si está vacía
-                const inputDireccion = document.getElementById('direccion_entrega');
-                if (!inputDireccion.value) {
-                    fetch(
-                            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1&accept-language=es`)
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data && data.display_name) {
-                                inputDireccion.value = data.display_name;
-                            }
-                        });
-                }
-            });
-
-            // Evento al arrastrar el marcador (si ya existe)
-            if (marker) {
-                marker.on('dragend', function(e) {
-                    const position = marker.getLatLng();
-                    actualizarInputs(position.lat, position.lng);
-                });
-            }
-        });
     </script>
 @endpush

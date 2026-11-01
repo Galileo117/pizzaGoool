@@ -1,19 +1,21 @@
 <?php
 
-use App\Http\Controllers\Cliente\CatalogoController;
-use App\Http\Controllers\Cliente\PedidoController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\InicioController;
-use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\ProductoController;
 use App\Http\Controllers\Admin\CategoriaController;
+use App\Http\Controllers\Admin\ConfiguracionController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\PedidoController as AdminPedidoController;
-use App\Http\Controllers\Admin\UsuarioController;
+use App\Http\Controllers\Admin\ProductoController;
 use App\Http\Controllers\Admin\ReporteController;
+use App\Http\Controllers\Admin\UsuarioController;
 use App\Http\Controllers\Cajero\DashboardController as CajeroDashboardController;
 use App\Http\Controllers\Cajero\PedidoController as CajeroPedidoController;
-use App\Http\Controllers\Repartidor\DashboardController as RepartidorDashboardController;
-use App\Http\Controllers\Repartidor\PedidoController as RepartidorPedidoController;
+use App\Http\Controllers\Cliente\CatalogoController;
+use App\Http\Controllers\Cliente\PedidoController;
+use App\Http\Controllers\InicioController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\repartidor\DashboardController as RepartidorDashboardController;
+use App\Http\Controllers\repartidor\PedidoController as RepartidorPedidoController;
+use App\Models\Pedido;
 use Illuminate\Support\Facades\Route;
 
 // Rutas públicas
@@ -26,22 +28,17 @@ Route::middleware(['auth', 'role:cliente'])->group(function () {
     Route::post('/catalogo/guardar_carrito', [CatalogoController::class, 'guardarCarrito'])->name('cliente.guardar_carrito');
     Route::post('/catalogo/vaciar', [CatalogoController::class, 'vaciarCarrito'])->name('cliente.vaciar_carrito');
 
-    Route::get('/checkout', function () {
-        $carrito = session('carrito', []);
-        if (empty($carrito)) {
-            return redirect()->route('cliente.catalogo')->with('error', 'Tu carrito está vacío.');
-        }
-        return view('cliente.checkout');
-    })->name('cliente.checkout');
+    Route::get('/checkout', [CatalogoController::class, 'mostrarCheckout'])->name('cliente.checkout');
 
     Route::post('/procesar_pedido', [PedidoController::class, 'procesar'])->name('cliente.procesar_pedido');
     Route::get('/mis-pedidos', [PedidoController::class, 'misPedidos'])->name('cliente.mis_pedidos');
 
     Route::get('/seguimiento/{pedido}', function ($pedidoId) {
-        $pedido = \App\Models\Pedido::with(['detallePedidos.producto', 'pago'])->findOrFail($pedidoId);
+        $pedido = Pedido::with(['detallePedidos.producto', 'pago'])->findOrFail($pedidoId);
         if ($pedido->usuario_id !== auth()->id()) {
             abort(403, 'No tienes permiso para ver este pedido.');
         }
+
         return view('cliente.seguimiento', compact('pedido'));
     })->name('cliente.seguimiento');
 
@@ -61,8 +58,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::resource('usuarios', UsuarioController::class);
     Route::get('reportes', [ReporteController::class, 'index'])->name('reportes.index');
     Route::get('reportes/pdf', [ReporteController::class, 'pdf'])->name('reportes.pdf');
-    Route::get('configuracion', [\App\Http\Controllers\Admin\ConfiguracionController::class, 'index'])->name('configuracion');
-    Route::post('configuracion/qr', [\App\Http\Controllers\Admin\ConfiguracionController::class, 'guardarQR'])->name('configuracion.guardar_qr');
+    Route::get('configuracion', [ConfiguracionController::class, 'index'])->name('configuracion');
+    Route::post('configuracion/qr', [ConfiguracionController::class, 'guardarQR'])->name('configuracion.guardar_qr');
 });
 
 // Rutas del Cajero
@@ -90,4 +87,4 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';

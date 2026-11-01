@@ -27,20 +27,20 @@ class PedidoController extends Controller
             'tipo_entrega' => 'required|in:recoger_local,contraentrega',
             'direccion' => 'required_if:tipo_entrega,contraentrega|nullable|string|max:255',
             'referencia' => 'nullable|string|max:255',
-            'latitud' => 'nullable|numeric',
-            'longitud' => 'nullable|numeric',
+            'latitud' => 'nullable|numeric|between:-90,90',
+            'longitud' => 'nullable|numeric|between:-180,180',
         ]);
 
         DB::beginTransaction();
 
         try {
-            $total = 0;
+            $totalCentavos = 0;
             $detalles = [];
 
             foreach ($request->items as $item) {
-                $producto = Producto::find($item['producto_id']);
+                $producto = Producto::lockForUpdate()->find($item['producto_id']);
 
-                if (!$producto || !$producto->disponible) {
+                if (! $producto || ! $producto->disponible) {
                     DB::rollBack();
 
                     return $this->errorResponse(
@@ -49,16 +49,17 @@ class PedidoController extends Controller
                     );
                 }
 
-                $subtotal = (float) $producto->precio * $item['cantidad'];
-
-                $total += $subtotal;
+                $precioCentavos = (int) round((float) $producto->precio * 100);
+                $totalCentavos += $precioCentavos * $item['cantidad'];
 
                 $detalles[] = [
                     'producto_id' => $producto->id,
                     'cantidad' => $item['cantidad'],
-                    'precio_unitario' => $producto->precio,
+                    'precio_unitario' => number_format($precioCentavos / 100, 2, '.', ''),
                 ];
             }
+
+            $total = number_format($totalCentavos / 100, 2, '.', '');
 
             $pedido = Pedido::create([
                 'usuario_id' => $request->user()->id,
@@ -92,8 +93,8 @@ class PedidoController extends Controller
             DB::commit();
 
             $pedido->load([
-                'usuario',
-                'repartidor',
+                'usuario.cliente',
+                'repartidor.repartidor',
                 'detallePedidos.producto',
                 'pago',
             ]);
@@ -122,8 +123,8 @@ class PedidoController extends Controller
             $request->user()->id
         )
             ->with([
-                'usuario',
-                'repartidor',
+                'usuario.cliente',
+                'repartidor.repartidor',
                 'detallePedidos.producto',
                 'pago',
             ])
@@ -143,14 +144,14 @@ class PedidoController extends Controller
             $request->user()->id
         )
             ->with([
-                'usuario',
-                'repartidor',
+                'usuario.cliente',
+                'repartidor.repartidor',
                 'detallePedidos.producto',
                 'pago',
             ])
             ->find($id);
 
-        if (!$pedido) {
+        if (! $pedido) {
             return $this->notFoundResponse(
                 'Pedido no encontrado.'
             );
@@ -169,7 +170,7 @@ class PedidoController extends Controller
             $request->user()->id
         )->find($id);
 
-        if (!$pedido) {
+        if (! $pedido) {
             return $this->notFoundResponse(
                 'Pedido no encontrado.'
             );

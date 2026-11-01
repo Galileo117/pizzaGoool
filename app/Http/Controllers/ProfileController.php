@@ -24,24 +24,15 @@ class ProfileController extends Controller
         DB::transaction(function () use ($request) {
             $user = $request->user();
 
-            // 1. Actualizamos la tabla usuarios (solo email)
             $user->email = $request->validated('email');
-
-            if ($user->isDirty('email')) {
-                $user->email_verified_at = null;
-            }
             $user->save();
 
-            // 2. Actualizamos la tabla clientes (perfil)
             $user->cliente()->updateOrCreate(
                 ['usuario_id' => $user->id],
                 [
                     'nombres' => $request->validated('nombres'),
                     'apellidos' => $request->validated('apellidos'),
                     'telefono' => $request->validated('telefono'),
-                    'direccion_entrega' => $request->validated('direccion_entrega'),
-                    'latitud' => $request->validated('latitud'),
-                    'longitud' => $request->validated('longitud'),
                 ]
             );
         });
@@ -56,6 +47,11 @@ class ProfileController extends Controller
         ]);
 
         $user = $request->user();
+
+        if ($user->pedidos()->exists() || $user->pedidosAsignados()->exists()) {
+            return Redirect::route('profile.edit')
+                ->with('error', 'No se puede eliminar una cuenta asociada a pedidos; el historial debe conservarse.');
+        }
 
         Auth::logout();
 

@@ -40,7 +40,7 @@ class ProductoController extends Controller
             'categoria_id',
             'nombre',
             'descripcion',
-            'precio'
+            'precio',
         ]);
 
         $data['descripcion'] = $request->descripcion ?? '';
@@ -82,7 +82,7 @@ class ProductoController extends Controller
             'categoria_id',
             'nombre',
             'descripcion',
-            'precio'
+            'precio',
         ]);
 
         $data['descripcion'] = $request->descripcion ?? '';
@@ -107,6 +107,12 @@ class ProductoController extends Controller
 
     public function destroy(Producto $producto)
     {
+        if ($producto->detallePedidos()->exists()) {
+            return redirect()
+                ->route('admin.productos.index')
+                ->with('error', 'No se puede eliminar un producto incluido en pedidos. Puedes marcarlo como no disponible.');
+        }
+
         if ($producto->imagen) {
             Storage::disk('public')->delete($producto->imagen);
         }

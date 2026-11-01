@@ -22,17 +22,15 @@ class ProfileUpdateRequest extends FormRequest
                 'lowercase',
                 'email',
                 'max:150',
-                Rule::unique(Usuario::class)->ignore($this->user()->id)
+                Rule::unique(Usuario::class)->ignore($this->user()->id),
             ],
             // El teléfono ahora es único en la tabla 'clientes'
             'telefono' => [
                 'nullable',
                 'string',
                 'regex:/^[67]\d{7}$/',
-                Rule::unique('clientes', 'telefono')->ignore($clienteId)
+                Rule::unique('clientes', 'telefono')->ignore($clienteId),
             ],
-            // Nueva regla para la dirección
-            'direccion_entrega' => ['nullable', 'string', 'max:255'],
         ];
     }
 
@@ -53,8 +51,6 @@ class ProfileUpdateRequest extends FormRequest
 
             'telefono.regex' => 'El teléfono debe ser un celular boliviano válido (8 dígitos, empezar con 6 o 7).',
             'telefono.unique' => 'Este teléfono ya está registrado en otra cuenta.',
-
-            'direccion_entrega.max' => 'La dirección no puede tener más de 255 caracteres.',
         ];
     }
 }

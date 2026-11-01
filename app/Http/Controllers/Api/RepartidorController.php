@@ -19,8 +19,8 @@ class RepartidorController extends Controller
             $request->user()->id
         )
             ->with([
-                'usuario',
-                'repartidor',
+                'usuario.cliente',
+                'repartidor.repartidor',
                 'detallePedidos.producto',
                 'pago',
             ])
@@ -40,14 +40,14 @@ class RepartidorController extends Controller
             $request->user()->id
         )
             ->with([
-                'usuario',
-                'repartidor',
+                'usuario.cliente',
+                'repartidor.repartidor',
                 'detallePedidos.producto',
                 'pago',
             ])
             ->find($id);
 
-        if (!$pedido) {
+        if (! $pedido) {
             return $this->notFoundResponse(
                 'Pedido no encontrado o no asignado a ti.'
             );
@@ -66,13 +66,13 @@ class RepartidorController extends Controller
             $request->user()->id
         )->find($id);
 
-        if (!$pedido) {
+        if (! $pedido) {
             return $this->notFoundResponse(
                 'Pedido no encontrado o no asignado a ti.'
             );
         }
 
-        if ($pedido->estado !== 'en_reparto') {
+        if (! $pedido->puedeCambiarEstado('entregado')) {
             return $this->errorResponse(
                 'Este pedido no está en reparto.',
                 422
@@ -84,8 +84,8 @@ class RepartidorController extends Controller
         ]);
 
         $pedido->load([
-            'usuario',
-            'repartidor',
+            'usuario.cliente',
+            'repartidor.repartidor',
             'detallePedidos.producto',
             'pago',
         ]);
