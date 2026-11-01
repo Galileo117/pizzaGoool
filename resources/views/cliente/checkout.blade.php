@@ -272,10 +272,18 @@
                             <i class="fa-solid fa-map-location-dot text-goool-green"></i>
                             Marca tu ubicación en el mapa (opcional pero recomendado)
                         </label>
+                        <div class="mb-3 flex flex-col items-start gap-2 sm:flex-row sm:items-center">
+                            <button type="button" id="usar-ubicacion-actual"
+                                class="inline-flex items-center gap-2 rounded-lg border border-goool-green px-4 py-2 text-sm font-semibold text-goool-green transition hover:bg-goool-green hover:text-white disabled:cursor-wait disabled:opacity-60">
+                                <i class="fa-solid fa-location-crosshairs"></i>
+                                Usar ubicación actual
+                            </button>
+                            <p id="estado-ubicacion" class="text-sm text-gray-600" role="status" aria-live="polite"></p>
+                        </div>
                         <div id="mapa" class="h-80 w-full rounded-xl border-2 border-gray-200 z-0"></div>
                         <p class="text-xs text-gray-500 mt-2">
                             <i class="fa-solid fa-circle-info"></i>
-                            Toca el mapa para marcar la ubicación exacta. Ayudará al repartidor a llegar más rápido.
+                            Usa tu ubicación actual o toca el mapa para marcar el punto exacto. Puedes mover el marcador.
                         </p>
 
                         <input type="hidden" name="latitud" id="latitud">
@@ -373,10 +381,11 @@
 
         function inicializarMapa() {
             if (mapaInicializado) return;
-            mapaInicializado = true;
 
             const mapaElement = document.getElementById('mapa');
             if (!mapaElement) return;
+
+            mapaInicializado = true;
 
             const latInicial = -16.5;
             const lngInicial = -68.15;
@@ -392,9 +401,7 @@
             const lngGuardada = document.getElementById('longitud').value;
 
             if (latGuardada && lngGuardada) {
-                marker = L.marker([latGuardada, lngGuardada], {
-                    draggable: true
-                }).addTo(map);
+                crearMarcador(Number(latGuardada), Number(lngGuardada));
                 map.setView([latGuardada, lngGuardada], 16);
             }
 
@@ -404,31 +411,39 @@
                     lng
                 } = e.latlng;
 
-                if (marker) {
-                    marker.setLatLng([lat, lng]);
-                } else {
-                    marker = L.marker([lat, lng], {
-                        draggable: true
-                    }).addTo(map);
-                }
-
-                document.getElementById('latitud').value = lat;
-                document.getElementById('longitud').value = lng;
-                localStorage.setItem('checkout_latitud', lat);
-                localStorage.setItem('checkout_longitud', lng);
-
-                obtenerDireccion(lat, lng);
-
-                marker.on('dragend', function() {
-                    const pos = marker.getLatLng();
-                    document.getElementById('latitud').value = pos.lat;
-                    document.getElementById('longitud').value = pos.lng;
-                    localStorage.setItem('checkout_latitud', pos.lat);
-                    localStorage.setItem('checkout_longitud', pos.lng);
-
-                    obtenerDireccion(pos.lat, pos.lng);
-                });
+                establecerUbicacion(lat, lng);
             });
+        }
+
+        function crearMarcador(lat, lng) {
+            marker = L.marker([lat, lng], {
+                draggable: true
+            }).addTo(map);
+
+            marker.on('dragend', function() {
+                const posicion = marker.getLatLng();
+                guardarCoordenadas(posicion.lat, posicion.lng);
+                obtenerDireccion(posicion.lat, posicion.lng);
+            });
+        }
+
+        function guardarCoordenadas(lat, lng) {
+            document.getElementById('latitud').value = lat;
+            document.getElementById('longitud').value = lng;
+            localStorage.setItem('checkout_latitud', lat);
+            localStorage.setItem('checkout_longitud', lng);
+        }
+
+        function establecerUbicacion(lat, lng) {
+            if (marker) {
+                marker.setLatLng([lat, lng]);
+            } else {
+                crearMarcador(lat, lng);
+            }
+
+            map.setView([lat, lng], 16);
+            guardarCoordenadas(lat, lng);
+            obtenerDireccion(lat, lng);
         }
 
         function obtenerDireccion(lat, lng) {
@@ -467,6 +482,44 @@
             const radiosEntrega = document.querySelectorAll('input[name="tipo_entrega"]');
             const divDireccion = document.getElementById('direccion_contraentrega');
             const mapaContainer = document.getElementById('mapa-container');
+            const botonUbicacion = document.getElementById('usar-ubicacion-actual');
+            const estadoUbicacion = document.getElementById('estado-ubicacion');
+
+            botonUbicacion.addEventListener('click', function() {
+                if (!navigator.geolocation) {
+                    estadoUbicacion.textContent =
+                        'Tu navegador no permite obtener la ubicación. Puedes marcarla manualmente en el mapa.';
+                    return;
+                }
+
+                botonUbicacion.disabled = true;
+                estadoUbicacion.textContent = 'Buscando tu ubicación...';
+
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        establecerUbicacion(position.coords.latitude, position.coords.longitude);
+                        estadoUbicacion.textContent =
+                            'Ubicación detectada. Revisa el marcador y muévelo si es necesario.';
+                        botonUbicacion.disabled = false;
+                    },
+                    function(error) {
+                        const mensajes = {
+                            1: 'No se concedió permiso para acceder a la ubicación.',
+                            2: 'No fue posible determinar tu ubicación.',
+                            3: 'Se agotó el tiempo para obtener tu ubicación.'
+                        };
+
+                        estadoUbicacion.textContent =
+                            `${mensajes[error.code] || 'Ocurrió un error al obtener la ubicación.'} Puedes marcarla manualmente en el mapa.`;
+                        botonUbicacion.disabled = false;
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 15000,
+                        maximumAge: 0
+                    }
+                );
+            });
 
             function toggleDireccion() {
                 const selected = document.querySelector('input[name="tipo_entrega"]:checked');

@@ -183,6 +183,7 @@ test('web checkout refreshes cart prices before the order is confirmed', functio
         ],
     ])->get(route('cliente.checkout'))
         ->assertOk()
+        ->assertSee('Usar ubicación actual')
         ->assertSessionHas('carrito.'.$producto->id.'.precio', '25.00');
 
     $this->post(route('cliente.procesar_pedido'), [
