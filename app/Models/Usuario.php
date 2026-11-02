@@ -6,13 +6,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Cuenta autenticable común; los datos personales viven en el perfil asociado al rol.
  */
 class Usuario extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    // Unificamos todos los traits en una sola línea para evitar errores
+    use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
 
     protected $table = 'usuarios';
 
@@ -66,15 +68,15 @@ class Usuario extends Authenticatable
     public function getNombreCompletoAttribute()
     {
         if ($this->rol === 'cliente' && $this->cliente) {
-            return $this->cliente->nombres.' '.$this->cliente->apellidos;
+            return $this->cliente->nombres . ' ' . $this->cliente->apellidos;
         }
 
         if ($this->rol === 'repartidor' && $this->repartidor) {
-            return $this->repartidor->nombres.' '.$this->repartidor->apellidos;
+            return $this->repartidor->nombres . ' ' . $this->repartidor->apellidos;
         }
 
         if ($this->empleado) {
-            return $this->empleado->nombres.' '.$this->empleado->apellidos;
+            return $this->empleado->nombres . ' ' . $this->empleado->apellidos;
         }
 
         return 'Usuario sin perfil';
