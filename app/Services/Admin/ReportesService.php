@@ -23,6 +23,7 @@ class ReportesService
             ->selectRaw("SUM(CASE WHEN estado = 'cancelado' THEN 1 ELSE 0 END) AS pedidos_cancelados")
             ->selectRaw("SUM(CASE WHEN estado NOT IN ('entregado', 'cancelado') THEN 1 ELSE 0 END) AS pedidos_activos")
             ->selectRaw("SUM(CASE WHEN estado = 'entregado' THEN total ELSE 0 END) AS ventas_completadas")
+            ->selectRaw("SUM(CASE WHEN estado = 'entregado' THEN costo_envio ELSE 0 END) AS costos_envio_completados")
             ->first();
 
         $duracionEnDias = (int) CarbonImmutable::parse($fechaInicio)
@@ -38,6 +39,7 @@ class ReportesService
             'pedidos_cancelados' => (int) ($totales->pedidos_cancelados ?? 0),
             'pedidos_activos' => (int) ($totales->pedidos_activos ?? 0),
             'ventas_completadas' => $ventasActuales,
+            'costos_envio_completados' => (float) ($totales->costos_envio_completados ?? 0),
             'ticket_promedio' => $this->pedidosEntregadosEnPeriodo($fechaInicio, $fechaFin)->avg('total') ?? 0,
             'ventas_periodo_anterior' => $ventasAnteriores,
             'variacion_porcentual' => $ventasAnteriores > 0
@@ -107,10 +109,11 @@ class ReportesService
     public function pedidosPorTipoEntrega(string $fechaInicio, string $fechaFin): Builder
     {
         return $this->pedidosEnPeriodo($fechaInicio, $fechaFin)
-            ->select('tipo_entrega')
+            ->selectRaw("CASE WHEN tipo_entrega IN ('delivery', 'contraentrega') THEN 'delivery' ELSE 'local' END AS tipo_entrega")
             ->selectRaw('COUNT(*) AS total_pedidos')
             ->selectRaw("SUM(CASE WHEN estado = 'entregado' THEN total ELSE 0 END) AS ventas_completadas")
-            ->groupBy('tipo_entrega')
+            ->selectRaw("SUM(CASE WHEN estado = 'entregado' THEN costo_envio ELSE 0 END) AS costos_envio")
+            ->groupByRaw("CASE WHEN tipo_entrega IN ('delivery', 'contraentrega') THEN 'delivery' ELSE 'local' END")
             ->orderBy('tipo_entrega');
     }
 
@@ -180,6 +183,7 @@ class ReportesService
             ['indicador' => 'Ticket promedio', 'valor' => $resumen['ticket_promedio']],
             ['indicador' => 'Ventas del período anterior', 'valor' => $resumen['ventas_periodo_anterior']],
             ['indicador' => 'Variación vs. período anterior (%)', 'valor' => $resumen['variacion_porcentual']],
+            ['indicador' => 'Costos de envío cobrados', 'valor' => $resumen['costos_envio_completados']],
         ]);
     }
 

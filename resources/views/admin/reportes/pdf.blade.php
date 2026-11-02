@@ -62,7 +62,8 @@
             <tr>
                 <td><div class="label">Ticket promedio</div><div class="value">Bs. {{ number_format($resumen['ticket_promedio'], 2) }}</div></td>
                 <td><div class="label">Ventas período anterior</div><div class="value">Bs. {{ number_format($resumen['ventas_periodo_anterior'], 2) }}</div></td>
-                <td colspan="2"><div class="label">Variación vs. período anterior</div><div class="value">{{ number_format($resumen['variacion_porcentual'], 2) }}%</div></td>
+                <td><div class="label">Variación vs. período anterior</div><div class="value">{{ number_format($resumen['variacion_porcentual'], 2) }}%</div></td>
+                <td><div class="label">Envíos cobrados</div><div class="value">Bs. {{ number_format($resumen['costos_envio_completados'], 2) }}</div></td>
             </tr>
         </table>
 
@@ -125,12 +126,12 @@
         </table>
         <h2>Pedidos por modalidad de entrega</h2>
         <table class="data">
-            <thead><tr><th>Modalidad</th><th class="right">Pedidos</th><th class="right">Ventas completadas</th></tr></thead>
+            <thead><tr><th>Modalidad</th><th class="right">Pedidos</th><th class="right">Ventas completadas</th><th class="right">Envíos cobrados</th></tr></thead>
             <tbody>
                 @forelse ($pedidosPorTipo as $fila)
-                    <tr><td>{{ $fila->tipo_entrega === 'contraentrega' ? 'Delivery' : 'Recojo en local' }}</td><td class="right">{{ $fila->total_pedidos }}</td><td class="right">Bs. {{ number_format($fila->ventas_completadas, 2) }}</td></tr>
+                    <tr><td>{{ $fila->tipo_entrega === 'delivery' ? 'Delivery' : 'Recojo en local' }}</td><td class="right">{{ $fila->total_pedidos }}</td><td class="right">Bs. {{ number_format($fila->ventas_completadas, 2) }}</td><td class="right">Bs. {{ number_format($fila->costos_envio, 2) }}</td></tr>
                 @empty
-                    <tr><td colspan="3" class="empty">No hay pedidos en este período.</td></tr>
+                    <tr><td colspan="4" class="empty">No hay pedidos en este período.</td></tr>
                 @endforelse
             </tbody>
         </table>
@@ -161,7 +162,7 @@
                         <td class="right">Bs. {{ number_format($fila->precio_unitario, 2) }}</td>
                         <td class="right">Bs. {{ number_format($fila->subtotal, 2) }}</td>
                         <td>{{ $fila->estados_pago ? str_replace(',', ', ', $fila->estados_pago) : 'Sin registro' }}</td>
-                        <td>{{ $fila->tipo_entrega === 'contraentrega' ? 'Delivery' : 'Recojo en local' }}</td>
+                        <td>{{ in_array($fila->tipo_entrega, ['delivery', 'contraentrega'], true) ? 'Delivery' : 'Recojo en local' }}</td>
                     </tr>
                 @empty
                     <tr><td colspan="9" class="empty">No hay ventas completadas en este período.</td></tr>

@@ -80,9 +80,10 @@
     </nav>
 
     @if ($tipoReporte === 'resumen')
-        <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
             @foreach ([
                 ['Ventas Totales', 'Bs. '.number_format($resumen['ventas_completadas'], 2), 'fa-money-bill-wave', 'border-goool-green', 'text-goool-green-dark', 'bg-goool-green-light/30'],
+                ['Envíos cobrados', 'Bs. '.number_format($resumen['costos_envio_completados'], 2), 'fa-truck-fast', 'border-goool-orange', 'text-goool-orange', 'bg-orange-100'],
                 ['Pedidos Entregados', number_format($resumen['pedidos_completados']), 'fa-receipt', 'border-blue-500', 'text-blue-600', 'bg-blue-100'],
                 ['Pedidos Activos', number_format($resumen['pedidos_activos']), 'fa-clock', 'border-goool-yellow', 'text-yellow-600', 'bg-yellow-100'],
                 ['Pedidos Cancelados', number_format($resumen['pedidos_cancelados']), 'fa-circle-xmark', 'border-red-500', 'text-red-600', 'bg-red-100'],
@@ -278,17 +279,18 @@
                 <div class="overflow-x-auto">
                     <table class="w-full text-left text-sm">
                         <thead class="bg-gray-50 text-xs uppercase text-gray-500">
-                            <tr><th class="px-5 py-3">Modalidad</th><th class="px-5 py-3 text-right">Pedidos</th><th class="px-5 py-3 text-right">Ventas completadas</th></tr>
+                            <tr><th class="px-5 py-3">Modalidad</th><th class="px-5 py-3 text-right">Pedidos</th><th class="px-5 py-3 text-right">Ventas completadas</th><th class="px-5 py-3 text-right">Envíos cobrados</th></tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
                             @forelse ($pedidosPorTipo as $fila)
                                 <tr>
-                                    <td class="px-5 py-3 font-medium">{{ $fila->tipo_entrega === 'contraentrega' ? 'Delivery' : 'Recojo en local' }}</td>
+                                    <td class="px-5 py-3 font-medium">{{ $fila->tipo_entrega === 'delivery' ? 'Delivery' : 'Recojo en local' }}</td>
                                     <td class="px-5 py-3 text-right">{{ number_format($fila->total_pedidos) }}</td>
                                     <td class="px-5 py-3 text-right">Bs. {{ number_format($fila->ventas_completadas, 2) }}</td>
+                                    <td class="px-5 py-3 text-right">Bs. {{ number_format($fila->costos_envio, 2) }}</td>
                                 </tr>
                             @empty
-                                <tr><td colspan="3" class="px-5 py-8 text-center text-gray-500">No hay pedidos en este período.</td></tr>
+                                <tr><td colspan="4" class="px-5 py-8 text-center text-gray-500">No hay pedidos en este período.</td></tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -340,7 +342,7 @@
                                 <td class="px-4 py-3 text-right">Bs. {{ number_format($fila->precio_unitario, 2) }}</td>
                                 <td class="px-4 py-3 text-right font-semibold">Bs. {{ number_format($fila->subtotal, 2) }}</td>
                                 <td class="px-4 py-3">{{ $fila->estados_pago ? str_replace(',', ', ', $fila->estados_pago) : 'Sin registro' }}</td>
-                                <td class="px-4 py-3">{{ $fila->tipo_entrega === 'contraentrega' ? 'Delivery' : 'Recojo en local' }}</td>
+                                <td class="px-4 py-3">{{ in_array($fila->tipo_entrega, ['delivery', 'contraentrega'], true) ? 'Delivery' : 'Recojo en local' }}</td>
                             </tr>
                         @empty
                             <tr><td colspan="8" class="px-4 py-8 text-center text-gray-500">No hay ventas completadas en este período.</td></tr>

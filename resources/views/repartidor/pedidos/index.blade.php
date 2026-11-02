@@ -36,7 +36,12 @@
                             <td class="px-4 py-3 text-gray-600 text-xs">
                                 {{ $pedido->direccion ?? 'Recoger en local' }}
                             </td>
-                            <td class="px-4 py-3 font-bold text-gray-800">Bs. {{ number_format($pedido->total, 2) }}</td>
+                            <td class="px-4 py-3 font-bold text-gray-800">
+                                Bs. {{ number_format($pedido->total, 2) }}
+                                <span class="block text-xs font-normal text-gray-500">
+                                    Envío: Bs. {{ number_format($pedido->costo_envio, 2) }}
+                                </span>
+                            </td>
                             <td class="px-4 py-3 text-center">
                                 @if ($pedido->estado === 'en_reparto')
                                     <span class="bg-purple-100 text-purple-700 text-xs font-bold px-2 py-1 rounded-full">
@@ -100,7 +105,12 @@
                     </div>
                     <div class="flex justify-between items-center">
                         <span class="text-xs text-gray-500 font-semibold uppercase">Total</span>
-                        <span class="text-sm font-bold text-goool-green">Bs. {{ number_format($pedido->total, 2) }}</span>
+                        <span class="text-right text-sm font-bold text-goool-green">
+                            Bs. {{ number_format($pedido->total, 2) }}
+                            <span class="block text-xs font-normal text-gray-500">
+                                Envío: Bs. {{ number_format($pedido->costo_envio, 2) }}
+                            </span>
+                        </span>
                     </div>
 
                     <hr class="border-gray-100">

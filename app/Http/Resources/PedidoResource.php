@@ -24,11 +24,13 @@ class PedidoResource extends JsonResource
 
             'total' => (float) $this->total,
 
+            'costo_envio' => (float) $this->costo_envio,
+
             'estado' => $this->estado,
 
             'metodo_pago' => $this->metodo_pago,
 
-            'tipo_entrega' => $this->tipo_entrega,
+            'tipo_entrega' => $this->esDelivery() ? 'contraentrega' : 'recoger_local',
 
             'direccion' => $this->direccion,
 

@@ -90,7 +90,7 @@
                             Tipo de Entrega
                         </span>
                         <p class="font-medium text-gray-800 mt-0.5">
-                            @if ($pedido->tipo_entrega === 'recoger_local')
+                            @if (! $pedido->esDelivery())
                                 <i class="fa-solid fa-store text-goool-green mr-1.5" aria-hidden="true"></i>
                                 Recoger en Local
                             @else
@@ -188,12 +188,24 @@
                     </div>
                 </div>
 
-                {{-- Total --}}
-                <div class="flex justify-between items-center pt-4 border-t-2 border-goool-green/20">
-                    <span class="text-lg font-bold text-gray-800">Total del Pedido</span>
-                    <span class="text-2xl sm:text-3xl font-extrabold text-goool-green">
-                        Bs. {{ number_format($pedido->total, 2) }}
-                    </span>
+                {{-- Desglose del pedido --}}
+                <div class="ml-auto max-w-sm space-y-2 border-t-2 border-goool-green/20 pt-4">
+                    <div class="flex justify-between gap-4 text-sm text-gray-600">
+                        <span>Productos</span>
+                        <span>Bs. {{ number_format(max(0, (float) $pedido->total - (float) $pedido->costo_envio), 2) }}</span>
+                    </div>
+                    @if ($pedido->esDelivery())
+                        <div class="flex justify-between gap-4 text-sm text-gray-600">
+                            <span>Costo de envío</span>
+                            <span>Bs. {{ number_format($pedido->costo_envio, 2) }}</span>
+                        </div>
+                    @endif
+                    <div class="flex justify-between items-center gap-4 border-t border-gray-200 pt-2">
+                        <span class="text-lg font-bold text-gray-800">Total del pedido</span>
+                        <span class="text-2xl sm:text-3xl font-extrabold text-goool-green">
+                            Bs. {{ number_format($pedido->total, 2) }}
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>

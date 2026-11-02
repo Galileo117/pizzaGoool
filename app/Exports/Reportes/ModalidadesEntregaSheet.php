@@ -26,7 +26,12 @@ class ModalidadesEntregaSheet extends ReporteSheet implements FromQuery, WithCol
 
     public function headings(): array
     {
-        return ['Modalidad de entrega', 'Cantidad de pedidos', 'Ventas completadas (Bs.)'];
+        return [
+            'Modalidad de entrega',
+            'Cantidad de pedidos',
+            'Ventas completadas (Bs.)',
+            'Envíos cobrados (Bs.)',
+        ];
     }
 
     public function columnFormats(): array
@@ -34,6 +39,7 @@ class ModalidadesEntregaSheet extends ReporteSheet implements FromQuery, WithCol
         return [
             'B' => NumberFormat::FORMAT_NUMBER,
             'C' => '#,##0.00',
+            'D' => '#,##0.00',
         ];
     }
 
@@ -43,9 +49,10 @@ class ModalidadesEntregaSheet extends ReporteSheet implements FromQuery, WithCol
     public function map(mixed $fila): array
     {
         return [
-            $fila->tipo_entrega === 'contraentrega' ? 'Delivery' : 'Recojo en local',
+            $fila->tipo_entrega === 'delivery' ? 'Delivery' : 'Recojo en local',
             (int) $fila->total_pedidos,
             (float) $fila->ventas_completadas,
+            (float) $fila->costos_envio,
         ];
     }
 

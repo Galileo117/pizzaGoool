@@ -82,10 +82,24 @@
                             </div>
                         @endforeach
                     </div>
+                    <div class="mt-5 ml-auto max-w-xs space-y-2 border-t border-gray-200 pt-4 text-sm">
+                        <div class="flex justify-between gap-4 text-gray-600">
+                            <span>Productos</span>
+                            <span>Bs. {{ number_format(max(0, (float) $pedido->total - (float) $pedido->costo_envio), 2) }}</span>
+                        </div>
+                        <div class="flex justify-between gap-4 text-gray-600">
+                            <span>Costo de envío</span>
+                            <span>Bs. {{ number_format($pedido->costo_envio, 2) }}</span>
+                        </div>
+                        <div class="flex justify-between gap-4 border-t border-gray-200 pt-2 font-bold text-gray-800">
+                            <span>Total a cobrar</span>
+                            <span>Bs. {{ number_format($pedido->total, 2) }}</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            @if ($pedido->tipo_entrega === 'contraentrega' && $pedido->direccion)
+            @if ($pedido->esDelivery() && $pedido->direccion)
                 <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200">
                     <div class="bg-goool-green px-6 py-3 flex justify-between items-center">
                         <h3 class="text-white font-bold text-sm">

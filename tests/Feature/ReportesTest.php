@@ -35,8 +35,14 @@ function crearAdministradorParaReportes(): Usuario
 /**
  * @return array{pedido: Pedido, producto: Producto}
  */
-function crearPedidoParaReporte(string $estado, string $total, string $fecha, string $estadoPago = 'pendiente'): array
-{
+function crearPedidoParaReporte(
+    string $estado,
+    string $total,
+    string $fecha,
+    string $estadoPago = 'pendiente',
+    string $tipoEntrega = 'recoger_local',
+    string $costoEnvio = '0.00',
+): array {
     $cliente = Usuario::create([
         'email' => uniqid('cliente-reporte', true).'@example.com',
         'password' => 'password123',
@@ -53,20 +59,23 @@ function crearPedidoParaReporte(string $estado, string $total, string $fecha, st
         'nombre' => uniqid('categoria-reporte-'),
     ]);
 
+    $subtotalProductos = number_format(max(0, (float) $total - (float) $costoEnvio), 2, '.', '');
+
     $producto = Producto::create([
         'categoria_id' => $categoria->id,
         'nombre' => 'Pizza de reporte',
         'descripcion' => 'Producto para reportes',
-        'precio' => $total,
+        'precio' => $subtotalProductos,
         'disponible' => true,
     ]);
 
     $pedido = Pedido::create([
         'usuario_id' => $cliente->id,
         'total' => $total,
+        'costo_envio' => $costoEnvio,
         'estado' => $estado,
         'metodo_pago' => 'efectivo',
-        'tipo_entrega' => 'recoger_local',
+        'tipo_entrega' => $tipoEntrega,
     ]);
     $pedido->created_at = $fecha;
     $pedido->updated_at = $fecha;
@@ -76,7 +85,7 @@ function crearPedidoParaReporte(string $estado, string $total, string $fecha, st
         'pedido_id' => $pedido->id,
         'producto_id' => $producto->id,
         'cantidad' => 1,
-        'precio_unitario' => $total,
+        'precio_unitario' => $subtotalProductos,
     ]);
 
     Pago::create([
@@ -138,6 +147,30 @@ test('admin detail report omits explanatory banners from the report content', fu
         ->assertOk()
         ->assertSee('DETALLE DE VENTAS')
         ->assertDontSee('Cada fila corresponde a un producto');
+});
+
+test('admin reports show delivery fees separately from completed sales', function () {
+    crearPedidoParaReporte('entregado', '32.50', '2026-10-15 12:00:00', 'pagado', 'delivery', '7.50');
+
+    $this->actingAs(crearAdministradorParaReportes())
+        ->get(route('admin.reportes.index', [
+            'reporte' => 'resumen',
+            'fecha_inicio' => '2026-10-01',
+            'fecha_fin' => '2026-10-31',
+        ]))
+        ->assertOk()
+        ->assertSee('Envíos cobrados')
+        ->assertSee('7.50');
+
+    $this->get(route('admin.reportes.index', [
+        'reporte' => 'pedidos',
+        'fecha_inicio' => '2026-10-01',
+        'fecha_fin' => '2026-10-31',
+    ]))
+        ->assertOk()
+        ->assertSee('Envíos cobrados')
+        ->assertSee('Delivery')
+        ->assertSee('7.50');
 });
 
 test('admin report dates must be valid and ordered', function () {
@@ -204,6 +237,7 @@ test('admin can download a workbook with all report sheets for the selected peri
 
 test('report sheets generate a valid XLSX workbook', function () {
     $completed = crearPedidoParaReporte('entregado', '50.00', '2026-10-15 12:00:00');
+    crearPedidoParaReporte('entregado', '32.50', '2026-10-15 12:00:00', 'pagado', 'delivery', '7.50');
     $categoria = Categoria::findOrFail($completed['producto']->categoria_id);
 
     $workbook = Excel::raw(
@@ -220,6 +254,7 @@ test('report sheets generate a valid XLSX workbook', function () {
         $spreadsheet = IOFactory::load($temporaryFile);
         $ventasDiarias = $spreadsheet->getSheetByName('Ventas diarias');
         $resumen = $spreadsheet->getSheetByName('Resumen');
+        $entregas = $spreadsheet->getSheetByName('Entrega');
 
         expect($spreadsheet->getSheetNames())->toBe([
             'Resumen',
@@ -236,11 +271,16 @@ test('report sheets generate a valid XLSX workbook', function () {
             ->and($ventasDiarias->getAutoFilter()->getRange())->toBe('A1:C2')
             ->and($ventasDiarias->getFreezePane())->toBe('A2')
             ->and($ventasDiarias->getCell('A2')->getStyle()->getNumberFormat()->getFormatCode())->toBe('dd/mm/yyyy')
-            ->and((float) $ventasDiarias->getCell('C2')->getValue())->toBe(50.0)
+            ->and((float) $ventasDiarias->getCell('C2')->getValue())->toBe(82.5)
+            ->and($resumen->getCell('A11')->getValue())->toBe('Costos de envío cobrados')
+            ->and((float) $resumen->getCell('B11')->getValue())->toBe(7.5)
             ->and($spreadsheet->getSheetByName('Categorías')->getCell('A2')->getValue())->toBe($categoria->nombre)
             ->and((float) $spreadsheet->getSheetByName('Categorías')->getCell('D2')->getValue())->toBe(50.0)
-            ->and($spreadsheet->getSheetByName('Entrega')->getCell('A2')->getValue())->toBe('Recojo en local')
-            ->and((float) $spreadsheet->getSheetByName('Entrega')->getCell('C2')->getValue())->toBe(50.0);
+            ->and($entregas->getCell('A2')->getValue())->toBe('Delivery')
+            ->and((float) $entregas->getCell('C2')->getValue())->toBe(32.5)
+            ->and((float) $entregas->getCell('D2')->getValue())->toBe(7.5)
+            ->and($entregas->getCell('A3')->getValue())->toBe('Recojo en local')
+            ->and((float) $entregas->getCell('C3')->getValue())->toBe(50.0);
     } finally {
         unlink($temporaryFile);
     }

@@ -59,8 +59,8 @@
                         <div class="flex gap-4 text-sm">
                             <span class="text-gray-500">
                                 <i
-                                    class="fa-solid {{ $pedido->tipo_entrega === 'contraentrega' ? 'fa-truck-fast' : 'fa-store' }} text-goool-green"></i>
-                                {{ $pedido->tipo_entrega === 'contraentrega' ? 'Delivery' : 'Recoger' }}
+                                    class="fa-solid {{ $pedido->esDelivery() ? 'fa-truck-fast' : 'fa-store' }} text-goool-green"></i>
+                                {{ $pedido->esDelivery() ? 'Delivery' : 'Recoger' }}
                             </span>
                             <span class="text-gray-500">
                                 <i
@@ -68,9 +68,16 @@
                                 {{ ucfirst($pedido->metodo_pago) }}
                             </span>
                         </div>
-                        <span class="text-2xl font-extrabold text-goool-green">
-                            Bs. {{ number_format($pedido->total, 2) }}
-                        </span>
+                        <div class="text-right">
+                            @if ($pedido->esDelivery())
+                                <p class="text-xs font-medium text-gray-500">
+                                    Envío: Bs. {{ number_format($pedido->costo_envio, 2) }}
+                                </p>
+                            @endif
+                            <p class="text-2xl font-extrabold text-goool-green">
+                                Bs. {{ number_format($pedido->total, 2) }}
+                            </p>
+                        </div>
                     </div>
 
                     <div class="mt-4 flex justify-end">

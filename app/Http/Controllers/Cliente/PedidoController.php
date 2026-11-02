@@ -30,9 +30,9 @@ class PedidoController extends Controller
         }
 
         $request->validate([
-            'tipo_entrega' => 'required|in:local,delivery',
+            'tipo_entrega' => 'required|in:local,delivery,recoger_local,contraentrega',
             'metodo_pago' => 'required|in:efectivo,qr',
-            'direccion' => 'required_if:tipo_entrega,delivery|nullable|string|max:255',
+            'direccion' => 'required_if:tipo_entrega,delivery,contraentrega|nullable|string|max:255',
             'referencia' => 'nullable|string|max:255',
             'latitud' => 'nullable|numeric|between:-90,90',
             'longitud' => 'nullable|numeric|between:-180,180',
@@ -86,7 +86,9 @@ class PedidoController extends Controller
 
             // --- LÓGICA DE COSTO DE ENVÍO ---
             $costoEnvioCentavos = 0;
-            if ($request->tipo_entrega === 'delivery') {
+            $esDelivery = in_array($request->tipo_entrega, ['delivery', 'contraentrega'], true);
+
+            if ($esDelivery) {
                 $costoEnvioDecimal = Configuracion::obtener('costo_envio', '10.00');
                 $costoEnvioCentavos = (int) round((float) $costoEnvioDecimal * 100);
             }
@@ -101,7 +103,7 @@ class PedidoController extends Controller
                 'costo_envio' => $costoEnvioFinal,
                 'estado' => 'pendiente',
                 'metodo_pago' => $request->metodo_pago,
-                'tipo_entrega' => $request->tipo_entrega,
+                'tipo_entrega' => $esDelivery ? 'delivery' : 'local',
                 'direccion' => $request->direccion ?? null,
                 'referencia' => $request->referencia ?? null,
                 'latitud' => $request->latitud ?? null,

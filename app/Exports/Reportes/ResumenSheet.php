@@ -43,6 +43,7 @@ class ResumenSheet extends ReporteSheet implements FromCollection, WithHeadings,
         $sheet->getStyle('B4:B7')->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_NUMBER);
         $sheet->getStyle('B8:B9')->getNumberFormat()->setFormatCode('#,##0.00 "Bs."');
         $sheet->getStyle('B10')->getNumberFormat()->setFormatCode('0.00"%"');
+        $sheet->getStyle('B11')->getNumberFormat()->setFormatCode('#,##0.00 "Bs."');
 
         return parent::styles($sheet);
     }

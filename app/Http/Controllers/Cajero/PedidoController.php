@@ -77,7 +77,7 @@ class PedidoController extends Controller
         }
 
         if (
-            $pedido->tipo_entrega !== 'contraentrega'
+            ! $pedido->esDelivery()
             || ! $pedido->puedeCambiarEstado('en_reparto')
         ) {
             return redirect()->back()->with('error', 'Solo se puede asignar un repartidor a un pedido de delivery listo.');

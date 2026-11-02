@@ -68,6 +68,22 @@
                             </div>
                         @endforeach
                     </div>
+                    <div class="mt-5 ml-auto max-w-xs space-y-2 border-t border-gray-200 pt-4 text-sm">
+                        <div class="flex justify-between gap-4 text-gray-600">
+                            <span>Productos</span>
+                            <span>Bs. {{ number_format(max(0, (float) $pedido->total - (float) $pedido->costo_envio), 2) }}</span>
+                        </div>
+                        @if ($pedido->esDelivery())
+                            <div class="flex justify-between gap-4 text-gray-600">
+                                <span>Costo de envío</span>
+                                <span>Bs. {{ number_format($pedido->costo_envio, 2) }}</span>
+                            </div>
+                        @endif
+                        <div class="flex justify-between gap-4 border-t border-gray-200 pt-2 font-bold text-gray-800">
+                            <span>Total del pedido</span>
+                            <span>Bs. {{ number_format($pedido->total, 2) }}</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -77,7 +93,7 @@
                         <i class="fa-solid fa-truck-fast"></i> Tipo de Entrega
                     </h3>
                     <p class="font-bold text-gray-800">
-                        {{ $pedido->tipo_entrega === 'contraentrega' ? 'Delivery a Domicilio' : 'Recoger en Local' }}
+                        {{ $pedido->esDelivery() ? 'Delivery a Domicilio' : 'Recoger en Local' }}
                     </p>
                 </div>
 
@@ -115,7 +131,7 @@
                         {{ $pedido->usuario->telefono_contacto ?? '—' }}
                     </p>
 
-                    @if ($pedido->tipo_entrega === 'contraentrega')
+                    @if ($pedido->esDelivery())
                         <hr class="border-gray-200">
                         <p class="text-gray-500 text-xs font-semibold uppercase">Dirección de Entrega</p>
                         <p class="text-gray-700">{{ $pedido->direccion }}</p>
@@ -171,7 +187,7 @@
                     @endif
 
                     {{-- LISTO + RECOGER: Entregar directamente --}}
-                    @if ($pedido->estado === 'listo' && $pedido->tipo_entrega === 'recoger_local')
+                    @if ($pedido->estado === 'listo' && ! $pedido->esDelivery())
                         <div class="bg-blue-50 border border-blue-200 text-blue-800 p-3 rounded-lg text-sm">
                             <i class="fa-solid fa-store"></i>
                             Este pedido es para <strong>Recoger en Local</strong>. El cliente lo retirará en el local.
@@ -193,7 +209,7 @@
                     @endif
 
                     {{-- LISTO + DELIVERY: Asignar repartidor --}}
-                    @if ($pedido->estado === 'listo' && $pedido->tipo_entrega === 'contraentrega')
+                    @if ($pedido->estado === 'listo' && $pedido->esDelivery())
                         <form action="{{ route('cajero.pedidos.asignar_repartidor', $pedido->id) }}" method="POST">
                             @csrf
                             @method('PATCH')

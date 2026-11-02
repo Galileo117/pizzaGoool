@@ -15,9 +15,10 @@ class Pedido extends Model
     protected $table = 'pedidos';
 
     protected $casts = [
-        'total'       => 'decimal:2',
+        'total' => 'decimal:2',
         'costo_envio' => 'decimal:2',
     ];
+
     protected $fillable = [
         'usuario_id',
         'repartidor_id',
@@ -52,6 +53,11 @@ class Pedido extends Model
         return $this->hasOne(Pago::class);
     }
 
+    public function esDelivery(): bool
+    {
+        return in_array($this->tipo_entrega, ['delivery', 'contraentrega'], true);
+    }
+
     /**
      * Comprueba la máquina de estados compartida por caja y repartidores.
      */
@@ -60,9 +66,7 @@ class Pedido extends Model
         $transiciones = [
             'pendiente' => ['preparacion', 'cancelado'],
             'preparacion' => ['listo', 'cancelado'],
-            'listo' => $this->tipo_entrega === 'recoger_local'
-                ? ['entregado']
-                : ['en_reparto'],
+            'listo' => $this->esDelivery() ? ['en_reparto'] : ['entregado'],
             'en_reparto' => ['entregado', 'cancelado'],
             'entregado' => [],
             'cancelado' => [],

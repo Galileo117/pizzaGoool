@@ -45,7 +45,14 @@
                     <tr class="hover:bg-gray-50">
                         <td class="px-4 py-3 font-bold text-goool-green">#{{ str_pad($pedido->id, 6, '0', STR_PAD_LEFT) }}</td>
                         <td class="px-4 py-3 text-gray-700">{{ $pedido->usuario->nombre ?? 'N/A' }}</td>
-                        <td class="px-4 py-3 font-bold text-gray-800">Bs. {{ number_format($pedido->total, 2) }}</td>
+                        <td class="px-4 py-3 font-bold text-gray-800">
+                            Bs. {{ number_format($pedido->total, 2) }}
+                            @if ($pedido->esDelivery())
+                                <span class="block text-xs font-normal text-gray-500">
+                                    Envío: Bs. {{ number_format($pedido->costo_envio, 2) }}
+                                </span>
+                            @endif
+                        </td>
                         <td class="px-4 py-3 text-gray-600">
                             <i class="fa-solid {{ $pedido->metodo_pago === 'qr' ? 'fa-qrcode' : 'fa-money-bill-wave' }} text-goool-green"></i>
                             {{ ucfirst($pedido->metodo_pago) }}
@@ -113,7 +120,14 @@
                     </div>
                     <div class="flex justify-between">
                         <span class="text-gray-500 font-semibold">Total</span>
-                        <span class="font-bold text-goool-green">Bs. {{ number_format($pedido->total, 2) }}</span>
+                        <span class="text-right font-bold text-goool-green">
+                            Bs. {{ number_format($pedido->total, 2) }}
+                            @if ($pedido->esDelivery())
+                                <span class="block text-xs font-normal text-gray-500">
+                                    Envío: Bs. {{ number_format($pedido->costo_envio, 2) }}
+                                </span>
+                            @endif
+                        </span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-gray-500 font-semibold">Pago</span>

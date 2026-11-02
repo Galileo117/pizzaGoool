@@ -44,18 +44,17 @@ class ConfiguracionController extends Controller
 
     public function guardarCostoEnvio(Request $request)
     {
-        // Validación estricta: requerido, numérico, mayor o igual a 0, máximo 9999.99
-        $request->validate([
-            'costo_envio' => 'required|numeric|min:0|max:9999.99',
+        $validated = $request->validate([
+            'costo_envio' => 'required|numeric|decimal:0,2|min:0|max:9999.99',
         ], [
             'costo_envio.required' => 'El monto es obligatorio.',
             'costo_envio.numeric' => 'Debe ingresar un número válido.',
+            'costo_envio.decimal' => 'El monto puede tener como máximo dos decimales.',
             'costo_envio.min' => 'El monto no puede ser negativo.',
             'costo_envio.max' => 'El monto máximo permitido es 9999.99.',
         ]);
 
-        // Guardamos siempre con 2 decimales para mantener la precisión
-        $valor = number_format((float) $request->costo_envio, 2, '.', '');
+        $valor = number_format((float) $validated['costo_envio'], 2, '.', '');
         Configuracion::guardar('costo_envio', $valor);
 
         return redirect()->back()->with('success', 'Costo de envío actualizado correctamente.');

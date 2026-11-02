@@ -74,7 +74,7 @@ class DetalleVentasSheet extends ReporteSheet implements FromQuery, WithColumnFo
             $fila->estados_pago === null
                 ? 'Sin registro'
                 : implode(', ', array_map('ucfirst', explode(',', $fila->estados_pago))),
-            $fila->tipo_entrega === 'contraentrega' ? 'Delivery' : 'Recojo en local',
+            in_array($fila->tipo_entrega, ['delivery', 'contraentrega'], true) ? 'Delivery' : 'Recojo en local',
         ];
     }
 

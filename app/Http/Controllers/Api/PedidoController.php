@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\PedidoResource;
 use App\Http\Traits\ApiResponse;
+use App\Models\Configuracion;
 use App\Models\DetallePedido;
 use App\Models\Pago;
 use App\Models\Pedido;
@@ -66,8 +67,9 @@ class PedidoController extends Controller
             }
 
             $costoEnvioCentavos = 0;
-            if ($request->tipo_entrega === 'contraentrega' || $request->tipo_entrega === 'delivery') {
-                // Nota: en tu API el valor es 'contraentrega', en web es 'delivery'. Ajusta según corresponda.
+            $esDelivery = $request->input('tipo_entrega') === 'contraentrega';
+
+            if ($esDelivery) {
                 $costoEnvioDecimal = Configuracion::obtener('costo_envio', '10.00');
                 $costoEnvioCentavos = (int) round((float) $costoEnvioDecimal * 100);
             }
@@ -82,7 +84,7 @@ class PedidoController extends Controller
                 'costo_envio' => $costoEnvioFinal, // <-- GUARDADO
                 'estado' => 'pendiente',
                 'metodo_pago' => $request->metodo_pago,
-                'tipo_entrega' => $request->tipo_entrega,
+                'tipo_entrega' => $esDelivery ? 'delivery' : 'local',
                 'direccion' => $request->direccion,
                 'referencia' => $request->referencia,
                 'latitud' => $request->latitud,
