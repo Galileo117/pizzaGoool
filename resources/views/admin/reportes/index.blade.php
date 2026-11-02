@@ -5,13 +5,13 @@
 @section('page_title', 'Reportes')
 
 @section('content')
-    <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div class="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
             <p class="mb-1 text-sm font-semibold uppercase tracking-wide text-goool-green">Administración</p>
             <h2 class="text-xl font-bold text-goool-green-dark">{{ $nombreReporte }}</h2>
             <p class="mt-1 text-sm text-gray-600">Consulta el desempeño de las ventas web y los pedidos del período.</p>
         </div>
-        <div class="flex flex-col gap-2 sm:flex-row">
+        <div class="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:flex">
             <a href="{{ route('admin.reportes.pdf', ['reporte' => $tipoReporte, 'fecha_inicio' => $fechaInicio, 'fecha_fin' => $fechaFin]) }}"
                 class="inline-flex items-center justify-center gap-2 rounded-lg bg-red-600 px-4 py-3 font-bold text-white shadow-sm transition hover:bg-red-700">
                 <i class="fa-solid fa-file-pdf"></i>
@@ -26,25 +26,25 @@
     </div>
 
     <section class="mb-6 rounded-xl border border-gray-200 bg-white p-4 shadow-sm sm:p-6" aria-label="Filtros de reportes">
-        <form method="GET" action="{{ route('admin.reportes.index') }}" class="grid grid-cols-1 gap-4 md:grid-cols-4">
+        <form method="GET" action="{{ route('admin.reportes.index') }}" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <input type="hidden" name="reporte" value="{{ $tipoReporte }}">
             <div>
                 <label for="fecha_inicio" class="mb-1 block text-sm font-semibold text-gray-700">Desde</label>
                 <input id="fecha_inicio" type="date" name="fecha_inicio" value="{{ $fechaInicio }}"
-                    class="w-full rounded-lg border border-gray-300 p-3 focus:border-goool-green focus:outline-none focus:ring-2 focus:ring-goool-green/20">
+                    class="min-w-0 w-full rounded-lg border border-gray-300 p-3 focus:border-goool-green focus:outline-none focus:ring-2 focus:ring-goool-green/20">
             </div>
             <div>
                 <label for="fecha_fin" class="mb-1 block text-sm font-semibold text-gray-700">Hasta</label>
                 <input id="fecha_fin" type="date" name="fecha_fin" value="{{ $fechaFin }}"
-                    class="w-full rounded-lg border border-gray-300 p-3 focus:border-goool-green focus:outline-none focus:ring-2 focus:ring-goool-green/20">
+                    class="min-w-0 w-full rounded-lg border border-gray-300 p-3 focus:border-goool-green focus:outline-none focus:ring-2 focus:ring-goool-green/20">
             </div>
             <button type="submit"
-                class="inline-flex items-center justify-center gap-2 self-end rounded-lg bg-goool-green px-4 py-3 font-bold text-white transition hover:bg-goool-green-dark">
+                class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-goool-green px-4 py-3 font-bold text-white transition hover:bg-goool-green-dark">
                 <i class="fa-solid fa-filter"></i>
                 Aplicar filtros
             </button>
             <a href="{{ route('admin.reportes.index', ['reporte' => $tipoReporte]) }}"
-                class="inline-flex items-center justify-center gap-2 self-end rounded-lg border border-gray-300 bg-gray-50 px-4 py-3 font-semibold text-gray-700 transition hover:bg-gray-100">
+                class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-gray-300 bg-gray-50 px-4 py-3 font-semibold text-gray-700 transition hover:bg-gray-100">
                 <i class="fa-solid fa-rotate-left"></i>
                 Restablecer
             </a>
@@ -63,12 +63,12 @@
             'detalle' => 'fa-list-check',
         ];
     @endphp
-    <nav class="mb-6 flex gap-2 overflow-x-auto rounded-xl border border-gray-200 bg-white p-2 shadow-sm"
+    <nav class="mb-6 grid grid-cols-1 gap-2 rounded-xl border border-gray-200 bg-white p-2 shadow-sm sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-5"
         aria-label="Tipos de reportes">
         @foreach ($reportesDisponibles as $clave => $etiqueta)
             <a href="{{ route('admin.reportes.index', ['reporte' => $clave, 'fecha_inicio' => $fechaInicio, 'fecha_fin' => $fechaFin]) }}"
                 @class([
-                    'inline-flex shrink-0 items-center gap-2 rounded-lg px-4 py-3 text-sm font-bold transition',
+                    'inline-flex min-w-0 items-center justify-center gap-2 rounded-lg px-3 py-3 text-center text-sm font-bold transition sm:px-4',
                     'bg-goool-green text-white shadow-sm' => $tipoReporte === $clave,
                     'text-gray-600 hover:bg-gray-100 hover:text-goool-green-dark' => $tipoReporte !== $clave,
                 ])
@@ -80,7 +80,7 @@
     </nav>
 
     @if ($tipoReporte === 'resumen')
-        <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
+        <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-5">
             @foreach ([
                 ['Ventas Totales', 'Bs. '.number_format($resumen['ventas_completadas'], 2), 'fa-money-bill-wave', 'border-goool-green', 'text-goool-green-dark', 'bg-goool-green-light/30'],
                 ['Envíos cobrados', 'Bs. '.number_format($resumen['costos_envio_completados'], 2), 'fa-truck-fast', 'border-goool-orange', 'text-goool-orange', 'bg-orange-100'],
@@ -88,13 +88,11 @@
                 ['Pedidos Activos', number_format($resumen['pedidos_activos']), 'fa-clock', 'border-goool-yellow', 'text-yellow-600', 'bg-yellow-100'],
                 ['Pedidos Cancelados', number_format($resumen['pedidos_cancelados']), 'fa-circle-xmark', 'border-red-500', 'text-red-600', 'bg-red-100'],
             ] as [$etiqueta, $valor, $icono, $borde, $color, $fondo])
-                <article class="rounded-xl border border-gray-200 border-l-4 {{ $borde }} bg-white p-4 shadow-md sm:p-6">
-                    <div class="flex items-center justify-between gap-3">
-                        <div>
-                            <p class="text-xs font-semibold text-gray-500 sm:text-sm">{{ $etiqueta }}</p>
-                            <p class="mt-1 text-2xl font-bold {{ $color }} sm:text-3xl">{{ $valor }}</p>
-                        </div>
-                        <span class="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full {{ $fondo }} {{ $color }} sm:h-14 sm:w-14">
+                <article class="min-w-0 rounded-xl border border-gray-200 border-l-4 {{ $borde }} bg-white p-4 shadow-md sm:p-5">
+                    <div class="relative min-h-20 min-w-0">
+                        <p class="break-words pr-12 text-xs font-semibold text-gray-500 sm:text-sm">{{ $etiqueta }}</p>
+                        <p class="mt-3 break-words text-2xl font-bold leading-tight {{ $color }} sm:text-2xl 2xl:text-3xl">{{ $valor }}</p>
+                        <span class="absolute right-0 top-0 flex h-10 w-10 items-center justify-center rounded-full {{ $fondo }} {{ $color }} sm:h-12 sm:w-12">
                             <i class="fa-solid {{ $icono }} text-xl sm:text-2xl"></i>
                         </span>
                     </div>
@@ -102,31 +100,31 @@
             @endforeach
         </div>
 
-        <div class="mb-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
-            <section class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-md">
+        <div class="mb-6 grid min-w-0 grid-cols-1 gap-6 xl:grid-cols-2">
+            <section class="min-w-0 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-md">
                 <div class="bg-goool-green px-4 py-3 sm:px-6">
                     <h3 class="text-sm font-bold text-white"><i class="fa-solid fa-chart-line mr-2"></i>VENTAS POR DÍA</h3>
                 </div>
                 <div class="p-4 sm:p-6">
-                    <div class="relative h-64">
-                    <canvas id="graficoVentas" aria-label="Gráfico de ventas completadas por día"></canvas>
+                    <div class="relative h-64 min-w-0">
+                        <canvas id="graficoVentas" aria-label="Gráfico de ventas completadas por día"></canvas>
                     </div>
                 </div>
             </section>
-            <section class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-md">
+            <section class="min-w-0 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-md">
                 <div class="bg-goool-green px-4 py-3 sm:px-6">
                     <h3 class="text-sm font-bold text-white"><i class="fa-solid fa-chart-bar mr-2"></i>PRODUCTOS MÁS VENDIDOS</h3>
                 </div>
                 <div class="p-4 sm:p-6">
-                    <div class="relative h-64">
-                    <canvas id="graficoProductos" aria-label="Gráfico de unidades vendidas por producto"></canvas>
+                    <div class="relative h-64 min-w-0">
+                        <canvas id="graficoProductos" aria-label="Gráfico de unidades vendidas por producto"></canvas>
                     </div>
                 </div>
             </section>
         </div>
 
-        <div class="mb-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
-            <section class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-md">
+        <div class="mb-6 grid min-w-0 grid-cols-1 gap-6 xl:grid-cols-2">
+            <section class="min-w-0 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-md">
                 <div class="bg-goool-green px-4 py-3 sm:px-6">
                     <h3 class="text-sm font-bold text-white"><i class="fa-solid fa-chart-pie mr-2"></i>COMPARACIÓN DEL PERÍODO</h3>
                 </div>
@@ -147,7 +145,7 @@
                     </div>
                 </dl>
             </section>
-            <section class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-md">
+            <section class="min-w-0 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-md">
                 <div class="bg-goool-green px-4 py-3 sm:px-6">
                     <h3 class="text-sm font-bold text-white"><i class="fa-solid fa-trophy mr-2"></i>TOP PRODUCTOS</h3>
                 </div>
@@ -200,8 +198,8 @@
             </div>
         </section>
     @elseif ($tipoReporte === 'productos')
-        <div class="mb-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
-            <section class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-md">
+        <div class="mb-6 grid min-w-0 grid-cols-1 gap-6 xl:grid-cols-2">
+            <section class="min-w-0 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-md">
                 <div class="bg-goool-green px-4 py-3 sm:px-6">
                     <h3 class="text-sm font-bold text-white"><i class="fa-solid fa-tags mr-2"></i>VENTAS POR CATEGORÍA</h3>
                 </div>
@@ -225,7 +223,7 @@
                     </table>
                 </div>
             </section>
-            <section class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-md">
+            <section class="min-w-0 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-md">
                 <div class="bg-goool-green px-4 py-3 sm:px-6">
                     <h3 class="text-sm font-bold text-white"><i class="fa-solid fa-pizza-slice mr-2"></i>PRODUCTOS MÁS VENDIDOS</h3>
                 </div>
@@ -252,8 +250,8 @@
             </section>
         </div>
     @elseif ($tipoReporte === 'pedidos')
-        <div class="mb-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
-            <section class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-md">
+        <div class="mb-6 grid min-w-0 grid-cols-1 gap-6 xl:grid-cols-2">
+            <section class="min-w-0 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-md">
                 <div class="bg-goool-green px-4 py-3 sm:px-6"><h3 class="text-sm font-bold text-white"><i class="fa-solid fa-list-check mr-2"></i>PEDIDOS POR ESTADO</h3></div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left text-sm">
@@ -274,7 +272,7 @@
                     </table>
                 </div>
             </section>
-            <section class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-md">
+            <section class="min-w-0 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-md">
                 <div class="bg-goool-green px-4 py-3 sm:px-6"><h3 class="text-sm font-bold text-white"><i class="fa-solid fa-truck-fast mr-2"></i>MODALIDAD DE ENTREGA</h3></div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left text-sm">
