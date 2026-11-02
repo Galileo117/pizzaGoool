@@ -45,7 +45,12 @@
                 <div class="p-5 sm:p-6">
                     @php
                         $carrito = session('carrito', []);
-                        $total = 0;
+                        $subtotal = 0;
+                        foreach ($carrito as $item) {
+                            $subtotal += $item['precio'] * $item['cantidad'];
+                        }
+                        // Obtenemos el costo de envío de la base de datos (por defecto 10.00)
+                        $costoEnvio = (float) \App\Models\Configuracion::obtener('costo_envio', '10.00');
                     @endphp
 
                     @if (count($carrito) > 0)
@@ -66,14 +71,26 @@
                                         Bs. {{ number_format($item['precio'] * $item['cantidad'], 2) }}
                                     </span>
                                 </div>
-                                @php $total += $item['precio'] * $item['cantidad']; @endphp
                             @endforeach
 
-                            <div class="flex justify-between items-center pt-4 border-t-2 border-goool-green/20">
-                                <span class="text-lg font-bold text-gray-800">Total</span>
-                                <span class="text-2xl sm:text-3xl font-extrabold text-goool-green">
-                                    Bs. {{ number_format($total, 2) }}
-                                </span>
+                            {{-- Desglose de Totales --}}
+                            <div class="pt-4 border-t-2 border-goool-green/20 space-y-2">
+                                <div class="flex justify-between items-center text-gray-600">
+                                    <span>Subtotal</span>
+                                    <span>Bs. {{ number_format($subtotal, 2) }}</span>
+                                </div>
+
+                                <div id="linea-costo-envio" class="flex justify-between items-center text-gray-600 hidden">
+                                    <span>Costo de envío</span>
+                                    <span>Bs. <span id="monto-envio">{{ number_format($costoEnvio, 2) }}</span></span>
+                                </div>
+
+                                <div class="flex justify-between items-center pt-2 border-t border-gray-200">
+                                    <span class="text-lg font-bold text-gray-800">Total</span>
+                                    <span id="total-visual" class="text-2xl sm:text-3xl font-extrabold text-goool-green">
+                                        Bs. {{ number_format($subtotal, 2) }}
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     @else
@@ -101,7 +118,7 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <label
                             class="relative flex items-start gap-4 p-4 border-2 border-gray-200 rounded-xl cursor-pointer transition-all duration-200 hover:border-goool-green has-[:checked]:border-goool-green has-[:checked]:bg-goool-green/5">
-                            <input type="radio" name="tipo_entrega" value="recoger_local"
+                            <input type="radio" name="tipo_entrega" value="local"
                                 class="mt-1 form-radio text-goool-green focus:ring-goool-green" checked>
                             <div>
                                 <span class="font-semibold text-gray-800 flex items-center gap-2">
@@ -113,7 +130,7 @@
 
                         <label
                             class="relative flex items-start gap-4 p-4 border-2 border-gray-200 rounded-xl cursor-pointer transition-all duration-200 hover:border-goool-green has-[:checked]:border-goool-green has-[:checked]:bg-goool-green/5">
-                            <input type="radio" name="tipo_entrega" value="contraentrega"
+                            <input type="radio" name="tipo_entrega" value="delivery"
                                 class="mt-1 form-radio text-goool-green focus:ring-goool-green">
                             <div>
                                 <span class="font-semibold text-gray-800 flex items-center gap-2">
@@ -248,8 +265,7 @@
                         <label for="direccion" class="block text-sm font-semibold text-gray-700 mb-1.5">
                             Dirección Completa <span class="text-red-500">*</span>
                         </label>
-                        <input type="text" id="direccion" name="direccion"
-                            value="{{ old('direccion') }}"
+                        <input type="text" id="direccion" name="direccion" value="{{ old('direccion') }}"
                             class="w-full border-2 @error('direccion') border-red-500 @else border-gray-200 @enderror rounded-xl p-3 focus:border-goool-green focus:ring-2 focus:ring-goool-green/20 transition-all duration-200"
                             placeholder="Ej: Av. Siempre Viva 123, Zona Norte">
                         @error('direccion')
@@ -278,7 +294,8 @@
                                 <i class="fa-solid fa-location-crosshairs"></i>
                                 Usar ubicación actual
                             </button>
-                            <p id="estado-ubicacion" class="text-sm text-gray-600" role="status" aria-live="polite"></p>
+                            <p id="estado-ubicacion" class="text-sm text-gray-600" role="status" aria-live="polite">
+                            </p>
                         </div>
                         <div id="mapa" class="h-80 w-full rounded-xl border-2 border-gray-200 z-0"></div>
                         <p class="text-xs text-gray-500 mt-2">
@@ -298,8 +315,8 @@
 
                     <div class="flex items-center gap-4">
                         <span class="text-gray-600 text-sm">Total a pagar</span>
-                        <span class="text-2xl sm:text-3xl font-extrabold text-goool-green">
-                            Bs. {{ number_format($total ?? 0, 2) }}
+                        <span id="total-footer" class="text-2xl sm:text-3xl font-extrabold text-goool-green">
+                            Bs. {{ number_format($subtotal, 2) }}
                         </span>
                     </div>
 
@@ -327,6 +344,32 @@
 @push('scripts')
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
+        // --- VARIABLES GLOBALES PARA EL CÁLCULO DEL TOTAL ---
+        const SUBTOTAL = {{ $subtotal ?? 0 }};
+        const COSTO_ENVIO = {{ $costoEnvio ?? 0 }};
+
+        function actualizarTotalVisual() {
+            const selected = document.querySelector('input[name="tipo_entrega"]:checked');
+            const esDelivery = selected && selected.value === 'delivery';
+            const totalFinal = esDelivery ? (SUBTOTAL + COSTO_ENVIO) : SUBTOTAL;
+            const totalFormateado = 'Bs. ' + totalFinal.toFixed(2);
+
+            // Actualizar el total en el resumen
+            const totalSpan = document.getElementById('total-visual');
+            if (totalSpan) totalSpan.innerText = totalFormateado;
+
+            // Actualizar el total en el pie de página (botones)
+            const totalFooter = document.getElementById('total-footer');
+            if (totalFooter) totalFooter.innerText = totalFormateado;
+
+            // Mostrar u ocultar la línea del costo de envío
+            const lineaEnvio = document.getElementById('linea-costo-envio');
+            if (lineaEnvio) {
+                lineaEnvio.classList.toggle('hidden', !esDelivery);
+            }
+        }
+
+        // --- LÓGICA DEL MAPA Y QR (TU CÓDIGO ORIGINAL) ---
         let map, marker, mapaInicializado = false;
 
         function toggleQR(mostrar) {
@@ -512,8 +555,7 @@
                         estadoUbicacion.textContent =
                             `${mensajes[error.code] || 'Ocurrió un error al obtener la ubicación.'} Puedes marcarla manualmente en el mapa.`;
                         botonUbicacion.disabled = false;
-                    },
-                    {
+                    }, {
                         enableHighAccuracy: true,
                         timeout: 15000,
                         maximumAge: 0
@@ -523,7 +565,7 @@
 
             function toggleDireccion() {
                 const selected = document.querySelector('input[name="tipo_entrega"]:checked');
-                if (selected && selected.value === 'contraentrega') {
+                if (selected && selected.value === 'delivery') {
                     divDireccion.classList.remove('hidden');
                     mapaContainer.classList.remove('hidden');
                     setTimeout(inicializarMapa, 100);
@@ -552,14 +594,11 @@
                 if (radio) radio.checked = true;
             }
 
-            // Lógica modificada para priorizar la dirección de la Base de Datos sobre LocalStorage
             const inputDir = document.getElementById('direccion');
 
             if (inputDir.value.trim() !== '') {
-                // Si ya tiene valor (vino de la BD), lo marcamos como auto
                 inputDir.dataset.auto = 'true';
             } else if (direccionGuardada) {
-                // Si está vacío (cliente nuevo), usamos lo que haya en LocalStorage
                 inputDir.value = direccionGuardada;
                 inputDir.dataset.auto = 'true';
             }
@@ -570,6 +609,13 @@
 
             toggleDireccion();
             if (metodoPagoGuardado === 'qr') toggleQR(true);
+
+            // --- LÓGICA DEL COSTO DE ENVÍO ---
+            // Ejecutar al cargar para que si recargó la página y ya era delivery, muestre el total correcto
+            actualizarTotalVisual();
+
+            // Escuchar cambios en los radios para actualizar el total visual
+            radiosEntrega.forEach(r => r.addEventListener('change', actualizarTotalVisual));
 
             radiosEntrega.forEach(r => {
                 r.addEventListener('change', () => localStorage.setItem('checkout_tipo_entrega', r.value));

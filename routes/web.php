@@ -62,8 +62,11 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('reportes', [ReporteController::class, 'index'])->name('reportes.index');
     Route::get('reportes/pdf', [ReporteController::class, 'pdf'])->name('reportes.pdf');
     Route::get('reportes/excel', [ReporteController::class, 'excel'])->name('reportes.excel');
+
+    // Configuración
     Route::get('configuracion', [ConfiguracionController::class, 'index'])->name('configuracion');
     Route::post('configuracion/qr', [ConfiguracionController::class, 'guardarQR'])->name('configuracion.guardar_qr');
+    Route::post('configuracion/costo-envio', [ConfiguracionController::class, 'guardarCostoEnvio'])->name('configuracion.guardar_costo_envio');
 });
 
 // Rutas del Cajero
@@ -91,4 +94,4 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

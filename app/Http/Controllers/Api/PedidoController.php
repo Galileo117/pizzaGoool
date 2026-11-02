@@ -65,11 +65,21 @@ class PedidoController extends Controller
                 ];
             }
 
+            $costoEnvioCentavos = 0;
+            if ($request->tipo_entrega === 'contraentrega' || $request->tipo_entrega === 'delivery') {
+                // Nota: en tu API el valor es 'contraentrega', en web es 'delivery'. Ajusta según corresponda.
+                $costoEnvioDecimal = Configuracion::obtener('costo_envio', '10.00');
+                $costoEnvioCentavos = (int) round((float) $costoEnvioDecimal * 100);
+            }
+
+            $totalCentavos += $costoEnvioCentavos;
             $total = number_format($totalCentavos / 100, 2, '.', '');
+            $costoEnvioFinal = number_format($costoEnvioCentavos / 100, 2, '.', '');
 
             $pedido = Pedido::create([
                 'usuario_id' => $request->user()->id,
                 'total' => $total,
+                'costo_envio' => $costoEnvioFinal, // <-- GUARDADO
                 'estado' => 'pendiente',
                 'metodo_pago' => $request->metodo_pago,
                 'tipo_entrega' => $request->tipo_entrega,

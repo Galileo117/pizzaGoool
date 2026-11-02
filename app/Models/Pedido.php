@@ -14,10 +14,15 @@ class Pedido extends Model
 
     protected $table = 'pedidos';
 
+    protected $casts = [
+        'total'       => 'decimal:2',
+        'costo_envio' => 'decimal:2',
+    ];
     protected $fillable = [
         'usuario_id',
         'repartidor_id',
         'total',
+        'costo_envio',
         'estado',
         'metodo_pago',
         'tipo_entrega',
