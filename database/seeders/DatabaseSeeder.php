@@ -21,7 +21,7 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. Crear Administrador
+        // 1. Crear UN Administrador
         $adminUser = Usuario::create([
             'email' => 'admin@goool.com',
             'password' => Hash::make('12345678'),
@@ -35,7 +35,7 @@ class DatabaseSeeder extends Seeder
             'cargo' => 'Administrador',
         ]);
 
-        // 2. Crear Cajero
+        // 2. Crear UN Cajero
         $cajeroUser = Usuario::create([
             'email' => 'cajero@goool.com',
             'password' => Hash::make('12345678'),
@@ -49,14 +49,14 @@ class DatabaseSeeder extends Seeder
             'cargo' => 'Cajero',
         ]);
 
-        // 3. Crear Repartidores
-        $repartidor1User = Usuario::create([
-            'email' => 'repartidor1@goool.com',
+        // 3. Crear UN Solo Repartidor
+        $repartidorUser = Usuario::create([
+            'email' => 'repartidor@goool.com',
             'password' => Hash::make('12345678'),
             'rol' => 'repartidor',
         ]);
-        $rep1 = Repartidor::create([
-            'usuario_id' => $repartidor1User->id,
+        $repartidor = Repartidor::create([
+            'usuario_id' => $repartidorUser->id,
             'nombres' => 'Carlos',
             'apellidos' => 'Gomez',
             'telefono' => '71234569',
@@ -66,46 +66,18 @@ class DatabaseSeeder extends Seeder
             'licencia_conducir' => 'LIC-123456',
         ]);
 
-        $repartidor2User = Usuario::create([
-            'email' => 'repartidor2@goool.com',
+        // 4. Crear UN Solo Cliente
+        $clienteUser = Usuario::create([
+            'email' => 'cliente@goool.com',
             'password' => Hash::make('12345678'),
-            'rol' => 'repartidor',
+            'rol' => 'cliente',
         ]);
-        $rep2 = Repartidor::create([
-            'usuario_id' => $repartidor2User->id,
-            'nombres' => 'Luis',
-            'apellidos' => 'Mamani',
-            'telefono' => '71234570',
-            'ci' => '7654321-LP',
-            'vehiculo' => 'Moto',
-            'placa' => '5022-XYZ',
-            'licencia_conducir' => 'LIC-654321',
+        $cliente = Cliente::create([
+            'usuario_id' => $clienteUser->id,
+            'nombres' => 'Maria',
+            'apellidos' => 'Lopez',
+            'telefono' => '70000001',
         ]);
-
-        // 4. Crear Clientes
-        $clientes = [];
-        $nombresClientes = [
-            ['Maria', 'Lopez'],
-            ['Pedro', 'Quispe'],
-            ['Ana', 'Flores'],
-            ['Jorge', 'Condori'],
-            ['Lucia', 'Rojas'],
-        ];
-
-        foreach ($nombresClientes as $index => $nombre) {
-            $user = Usuario::create([
-                'email' => 'cliente'.($index + 1).'@goool.com',
-                'password' => Hash::make('12345678'),
-                'rol' => 'cliente',
-            ]);
-
-            $clientes[] = Cliente::create([
-                'usuario_id' => $user->id,
-                'nombres' => $nombre[0],
-                'apellidos' => $nombre[1],
-                'telefono' => '7000000'.$index,
-            ]);
-        }
 
         // 5. Crear Categorias y Productos
         $catPizzas = Categoria::create(['nombre' => 'Pizzas', 'descripcion' => 'Pizzas artesanales']);
@@ -132,9 +104,8 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-        // 6. Crear Pedidos Historicos (Para los reportes)
+        // 6. Crear Pedidos Historicos asignados al único cliente y repartidor disponibles
         for ($i = 0; $i < 40; $i++) {
-            $cliente = $clientes[array_rand($clientes)];
             $esDelivery = rand(0, 1) === 1;
             $metodoPago = rand(0, 1) === 1 ? 'qr' : 'efectivo';
 
@@ -144,13 +115,14 @@ class DatabaseSeeder extends Seeder
             $fechaPedido = now()->subDays(rand(0, 30))->subHours(rand(0, 5));
 
             $pedido = Pedido::create([
-                'usuario_id' => $cliente->usuario_id,
-                'repartidor_id' => ($estado === 'en_reparto' || ($estado === 'entregado' && $esDelivery)) ? (rand(0, 1) ? $rep1->usuario_id : $rep2->usuario_id) : null,
+                'usuario_id' => $cliente->usuario_id, // Siempre el único cliente
+                'repartidor_id' => ($estado === 'en_reparto' || ($estado === 'entregado' && $esDelivery)) ? $repartidor->usuario_id : null, // Siempre el único repartidor si corresponde
                 'total' => 0,
                 'estado' => $estado,
                 'metodo_pago' => $metodoPago,
-                'tipo_entrega' => $esDelivery ? 'contraentrega' : 'recoger_local',
-                'direccion' => $esDelivery ? 'Zona de prueba, Calle '.fake()->numberBetween(1, 20) : null,
+                // AJUSTADO: Se usan cadenas genéricas estándares 'delivery' y 'local' para evitar fallos de ENUM
+                'tipo_entrega' => $esDelivery ? 'delivery' : 'local',
+                'direccion' => $esDelivery ? 'Zona de prueba, Calle ' . fake()->numberBetween(1, 20) : null,
                 'referencia' => $esDelivery ? 'Portón verde' : null,
                 'latitud' => $esDelivery ? -16.5 + (rand(-100, 100) / 1000) : null,
                 'longitud' => $esDelivery ? -68.15 + (rand(-100, 100) / 1000) : null,
