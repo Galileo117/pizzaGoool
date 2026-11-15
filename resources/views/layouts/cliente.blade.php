@@ -16,6 +16,7 @@
         rel="stylesheet">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @livewireStyles
     @stack('styles')
 </head>
 
@@ -68,26 +69,8 @@
 
                     @auth
                         @if (auth()->user()->rol === 'cliente')
-                            {{-- Carrito con badge --}}
-                            @php
-                                $carritoHeader = session('carrito', []);
-                                $cantidadHeader = 0;
-                                foreach ($carritoHeader as $item) {
-                                    $cantidadHeader += $item['cantidad'];
-                                }
-                            @endphp
-                            <a href="{{ route('cliente.catalogo') }}#carrito"
-                                class="relative inline-flex items-center justify-center w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 transition-colors duration-200 group"
-                                title="Ver carrito">
-                                <i
-                                    class="fa-solid fa-cart-shopping text-white text-lg group-hover:scale-110 transition-transform duration-200"></i>
-                                @if ($cantidadHeader > 0)
-                                    <span
-                                        class="absolute -top-1 -right-1 bg-goool-yellow text-goool-green-dark text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center shadow-sm">
-                                        {{ $cantidadHeader }}
-                                    </span>
-                                @endif
-                            </a>
+                            {{-- Carrito con badge reactivo --}}
+                            <livewire:contador-carrito />
                         @endif
 
                         <div class="flex items-center gap-3">
@@ -443,6 +426,7 @@
     </style>
 
     @stack('scripts')
+    @livewireScripts()
 </body>
 
 </html>

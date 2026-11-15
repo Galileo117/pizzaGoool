@@ -2,22 +2,35 @@
 
 namespace App\Livewire;
 
+use App\Models\Categoria;
 use App\Models\Producto;
 use Livewire\Component;
 
 /**
  * Mantiene el carrito de sesión reactivo mientras el usuario ajusta productos.
+ * Carga productos y categorías en render() respetando los filtros del request.
  */
 class CarritoCompras extends Component
 {
     public $carrito = [];
-
     public $total = 0;
+    public $cantidadItems = 0;
+    public $contexto = 'catalogo';
 
-    public function mount()
+    public function mount($contexto = 'catalogo', $carrito = null, $total = 0, $cantidadItems = 0)
     {
-        $this->carrito = session()->get('carrito', []);
-        $this->calcularTotal();
+        $this->contexto      = $contexto;
+        $this->carrito       = $carrito ?? session()->get('carrito', []);
+        $this->total         = $total;
+        $this->cantidadItems = $cantidadItems;
+
+        if (empty($this->total)) {
+            $this->calcularTotal();
+        }
+
+        if (empty($this->cantidadItems)) {
+            $this->cantidadItems = array_sum(array_column($this->carrito, 'cantidad'));
+        }
     }
 
     public function agregarAlCarrito($productoId)
@@ -31,10 +44,11 @@ class CarritoCompras extends Component
         } else {
             $this->carrito[$productoId] = [
                 'producto_id' => $producto->id,
-                'nombre' => $producto->nombre,
-                'precio' => $producto->precio,
-                'cantidad' => 1,
-                'imagen' => $producto->imagen,
+                'nombre'      => $producto->nombre,
+                'descripcion' => $producto->descripcion,
+                'precio'      => $producto->precio,
+                'cantidad'    => 1,
+                'imagen'      => $producto->imagen,
             ];
         }
 
@@ -75,6 +89,7 @@ class CarritoCompras extends Component
     {
         session()->put('carrito', $this->carrito);
         $this->calcularTotal();
+        $this->cantidadItems = array_sum(array_column($this->carrito, 'cantidad'));
         $this->dispatch('carritoActualizado');
     }
 
@@ -88,8 +103,39 @@ class CarritoCompras extends Component
 
     public function render()
     {
+        // Reconstruye la query con los filtros del request, igual que el controlador.
+        $query = Producto::where('disponible', true)->with('categoria');
+
+        if (request()->filled('categoria')) {
+            $query->where('categoria_id', request('categoria'));
+        }
+
+        if (request()->filled('buscar')) {
+            $busqueda = request('buscar');
+            $query->where(function ($q) use ($busqueda) {
+                $q->where('nombre', 'LIKE', "%{$busqueda}%")
+                    ->orWhere('descripcion', 'LIKE', "%{$busqueda}%");
+            });
+        }
+
+        switch (request('orden', 'recientes')) {
+            case 'precio_asc':
+                $query->orderBy('precio', 'asc');
+                break;
+            case 'precio_desc':
+                $query->orderBy('precio', 'desc');
+                break;
+            case 'nombre':
+                $query->orderBy('nombre', 'asc');
+                break;
+            default:
+                $query->orderBy('created_at', 'desc');
+                break;
+        }
+
         return view('livewire.carrito-compras', [
-            'productos' => Producto::where('disponible', true)->paginate(8),
+            'productos'  => $query->paginate(12),
+            'categorias' => Categoria::all(),
         ]);
     }
 }
