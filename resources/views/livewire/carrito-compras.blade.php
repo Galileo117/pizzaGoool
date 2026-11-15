@@ -124,10 +124,11 @@
                                 class="fa-solid fa-pizza-slice text-6xl sm:text-7xl text-goool-green/20 group-hover:scale-110 transition-transform duration-300"></i>
                         @endif
 
-                        @if ($producto->disponible)
+                        {{-- Badge de stock --}}
+                        @if ($producto->stock > 0)
                             <span
-                                class="absolute top-3 right-3 bg-green-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-md flex items-center gap-1">
-                                <i class="fa-solid fa-circle-check"></i> Disponible
+                                class="absolute top-3 right-3 bg-blue-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-md flex items-center gap-1">
+                                <i class="fa-solid fa-box"></i> {{ $producto->stock }} disp.
                             </span>
                         @else
                             <span
@@ -156,38 +157,41 @@
                             </span>
 
                             @auth
-                                @if (auth()->user()->rol === 'cliente' && $producto->disponible)
-                                    <div class="add-control" data-producto-id="{{ $producto->id }}">
-                                        @if (isset($carrito[$producto->id]))
-                                            <div
-                                                class="qty-control flex items-center gap-2 bg-goool-green rounded-xl px-2 py-1">
-                                                <button
-                                                    wire:click="actualizarCantidad({{ $producto->id }}, {{ $carrito[$producto->id]['cantidad'] - 1 }})"
-                                                    class="w-7 h-7 bg-white/20 rounded-lg text-white hover:bg-white/30 transition flex items-center justify-center">
-                                                    <i class="fa-solid fa-minus text-xs"></i>
+                                @if (auth()->user()->rol === 'cliente')
+                                    @if ($producto->stock > 0)
+                                        <div class="add-control" data-producto-id="{{ $producto->id }}">
+                                            @if (isset($carrito[$producto->id]))
+                                                <div
+                                                    class="qty-control flex items-center gap-2 bg-goool-green rounded-xl px-2 py-1">
+                                                    <button
+                                                        wire:click="actualizarCantidad({{ $producto->id }}, {{ $carrito[$producto->id]['cantidad'] - 1 }})"
+                                                        class="w-7 h-7 bg-white/20 rounded-lg text-white hover:bg-white/30 transition flex items-center justify-center">
+                                                        <i class="fa-solid fa-minus text-xs"></i>
+                                                    </button>
+                                                    <span class="text-white font-bold text-sm min-w-[2rem] text-center"
+                                                        id="cantidad-{{ $producto->id }}">
+                                                        {{ $carrito[$producto->id]['cantidad'] }}
+                                                    </span>
+                                                    <button
+                                                        wire:click="actualizarCantidad({{ $producto->id }}, {{ $carrito[$producto->id]['cantidad'] + 1 }})"
+                                                        class="w-7 h-7 bg-white/20 rounded-lg text-white hover:bg-white/30 transition flex items-center justify-center">
+                                                        <i class="fa-solid fa-plus text-xs"></i>
+                                                    </button>
+                                                </div>
+                                            @else
+                                                <button wire:click="agregarAlCarrito({{ $producto->id }})"
+                                                    class="inline-flex items-center gap-2 bg-goool-orange hover:bg-orange-600 text-white px-4 py-2 rounded-xl text-sm font-bold transition-all duration-200 shadow-sm hover:shadow-md active:scale-95">
+                                                    <i class="fa-solid fa-cart-plus"></i>
+                                                    <span class="hidden sm:inline">Agregar</span>
                                                 </button>
-                                                <span class="text-white font-bold text-sm min-w-[2rem] text-center"
-                                                    id="cantidad-{{ $producto->id }}">
-                                                    {{ $carrito[$producto->id]['cantidad'] }}
-                                                </span>
-                                                <button
-                                                    wire:click="actualizarCantidad({{ $producto->id }}, {{ $carrito[$producto->id]['cantidad'] + 1 }})"
-                                                    class="w-7 h-7 bg-white/20 rounded-lg text-white hover:bg-white/30 transition flex items-center justify-center">
-                                                    <i class="fa-solid fa-plus text-xs"></i>
-                                                </button>
-                                            </div>
-                                        @else
-                                            <button wire:click="agregarAlCarrito({{ $producto->id }})"
-                                                class="inline-flex items-center gap-2 bg-goool-orange hover:bg-orange-600 text-white px-4 py-2 rounded-xl text-sm font-bold transition-all duration-200 shadow-sm hover:shadow-md active:scale-95">
-                                                <i class="fa-solid fa-cart-plus"></i>
-                                                <span class="hidden sm:inline">Agregar</span>
-                                            </button>
-                                        @endif
-                                    </div>
-                                @else
-                                    <span class="text-gray-400 text-sm font-medium flex items-center gap-1">
-                                        <i class="fa-regular fa-clock"></i> No disponible
-                                    </span>
+                                            @endif
+                                        </div>
+                                    @else
+                                        <span
+                                            class="inline-flex items-center gap-1 bg-red-100 text-red-700 px-3 py-2 rounded-xl text-xs font-bold">
+                                            <i class="fa-solid fa-circle-xmark"></i> Agotado
+                                        </span>
+                                    @endif
                                 @endif
                             @else
                                 <a href="{{ route('login') }}"
@@ -210,6 +214,8 @@
                 </div>
             @endforelse
         </div>
+
+        {{-- Paginación --}}
 
         @if (method_exists($productos, 'links'))
             <div class="mt-8 sm:mt-10">

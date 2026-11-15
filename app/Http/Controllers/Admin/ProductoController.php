@@ -33,10 +33,11 @@ class ProductoController extends Controller
     {
         $request->validate([
             'categoria_id' => 'required|exists:categorias,id',
-            'nombre' => 'required|string|max:255',
-            'descripcion' => 'nullable|string|max:1000',
-            'precio' => 'required|numeric|min:0|max:999999.99|decimal:0,2',
-            'imagen' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'nombre'       => 'required|string|max:255',
+            'descripcion'  => 'nullable|string|max:1000',
+            'precio'       => 'required|numeric|min:0|max:999999.99|decimal:0,2',
+            'stock'        => 'required|integer|min:0|max:9999',
+            'imagen'       => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
         $data = $request->only([
@@ -44,10 +45,11 @@ class ProductoController extends Controller
             'nombre',
             'descripcion',
             'precio',
+            'stock',
         ]);
 
         $data['descripcion'] = $request->descripcion ?? '';
-        $data['disponible'] = $request->has('disponible');
+        $data['disponible']  = $request->has('disponible');
 
         if ($request->hasFile('imagen')) {
             $data['imagen'] = $request->file('imagen')
@@ -73,35 +75,32 @@ class ProductoController extends Controller
 
     public function update(Request $request, Producto $producto)
     {
-        $request->validate([
+        $validated = $request->validate([
             'categoria_id' => 'required|exists:categorias,id',
-            'nombre' => 'required|string|max:255',
-            'descripcion' => 'nullable|string|max:1000',
-            'precio' => 'required|numeric|min:0|max:999999.99|decimal:0,2',
-            'imagen' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'nombre'       => 'required|string|max:255',
+            'descripcion'  => 'nullable|string|max:1000',
+            'precio'       => 'required|numeric|min:0|max:999999.99|decimal:0,2',
+            'stock'        => 'required|integer|min:0|max:9999',
+            'imagen'       => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
-        $data = $request->only([
-            'categoria_id',
-            'nombre',
-            'descripcion',
-            'precio',
-        ]);
-
-        $data['descripcion'] = $request->descripcion ?? '';
-        $data['disponible'] = $request->has('disponible');
+        $producto->categoria_id = $validated['categoria_id'];
+        $producto->nombre       = $validated['nombre'];
+        $producto->descripcion  = $validated['descripcion'] ?? '';
+        $producto->precio       = $validated['precio'];
+        $producto->stock        = $validated['stock'];
+        $producto->disponible   = $request->boolean('disponible');
 
         if ($request->hasFile('imagen')) {
-
             if ($producto->imagen) {
-                Storage::disk('public')->delete($producto->imagen);
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($producto->imagen);
             }
 
-            $data['imagen'] = $request->file('imagen')
+            $producto->imagen = $request->file('imagen')
                 ->store('productos', 'public');
         }
 
-        $producto->update($data);
+        $producto->save();
 
         return redirect()
             ->route('admin.productos.index')

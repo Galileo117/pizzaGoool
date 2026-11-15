@@ -8,7 +8,7 @@ use Livewire\Component;
 
 /**
  * Mantiene el carrito de sesión reactivo mientras el usuario ajusta productos.
- * Carga productos y categorías en render() respetando los filtros del request.
+ * El límite por producto es el stock real (no 20 fijo).
  */
 class CarritoCompras extends Component
 {
@@ -37,10 +37,20 @@ class CarritoCompras extends Component
     {
         $producto = Producto::findOrFail($productoId);
 
-        if (isset($this->carrito[$productoId])) {
-            if ($this->carrito[$productoId]['cantidad'] < 20) {
-                $this->carrito[$productoId]['cantidad']++;
-            }
+        if (! $producto->disponible || $producto->stock <= 0) {
+            $this->dispatch('stockAlcanzado', mensaje: "Este producto está agotado.");
+            return;
+        }
+
+        $cantidadActual = $this->carrito[$productoId]['cantidad'] ?? 0;
+
+        if ($cantidadActual >= $producto->stock) {
+            $this->dispatch('stockAlcanzado', mensaje: "Solo hay {$producto->stock} unidades disponibles.");
+            return;
+        }
+
+        if ($cantidadActual > 0) {
+            $this->carrito[$productoId]['cantidad']++;
         } else {
             $this->carrito[$productoId] = [
                 'producto_id' => $producto->id,
@@ -57,14 +67,20 @@ class CarritoCompras extends Component
 
     public function actualizarCantidad($productoId, $cantidad)
     {
-        if ($cantidad <= 0) {
-            $this->quitarDelCarrito($productoId);
+        $producto = Producto::find($productoId);
 
+        if (! $producto) {
             return;
         }
 
-        if ($cantidad > 20) {
-            $cantidad = 20;
+        if ($cantidad <= 0) {
+            $this->quitarDelCarrito($productoId);
+            return;
+        }
+
+        if ($cantidad > $producto->stock) {
+            $this->dispatch('stockAlcanzado', mensaje: "Solo hay {$producto->stock} unidades disponibles.");
+            return;
         }
 
         if (isset($this->carrito[$productoId])) {
@@ -103,7 +119,6 @@ class CarritoCompras extends Component
 
     public function render()
     {
-        // Reconstruye la query con los filtros del request, igual que el controlador.
         $query = Producto::where('disponible', true)->with('categoria');
 
         if (request()->filled('categoria')) {

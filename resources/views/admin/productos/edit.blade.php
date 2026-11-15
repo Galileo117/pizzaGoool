@@ -12,6 +12,18 @@
         <h2 class="text-xl font-bold text-goool-green-dark mt-2">Editar Producto: {{ $producto->nombre }}</h2>
     </div>
 
+    {{-- Errores globales (por si algo falla y no se ve en el campo) --}}
+    @if ($errors->any())
+        <div class="mb-4 bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded-r-lg">
+            <p class="font-bold">Corrige los siguientes errores:</p>
+            <ul class="list-disc list-inside text-sm mt-1">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6">
         <form action="{{ route('admin.productos.update', $producto->id) }}" method="POST" enctype="multipart/form-data"
             class="space-y-5" id="form-producto">
@@ -56,7 +68,7 @@
                 @enderror
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Precio (Bs.) <span
                             class="text-red-500">*</span></label>
@@ -64,6 +76,21 @@
                         value="{{ old('precio', $producto->precio) }}" required onwheel="this.blur()"
                         class="w-full border border-gray-300 rounded-lg p-3 focus:border-goool-green focus:outline-none">
                     @error('precio')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Stock disponible <span
+                            class="text-red-500">*</span></label>
+                    <input type="number" min="0" max="9999" name="stock"
+                        value="{{ old('stock', (int) $producto->stock) }}" required onwheel="this.blur()"
+                        class="w-full border border-gray-300 rounded-lg p-3 focus:border-goool-green focus:outline-none">
+                    <p class="text-xs text-gray-500 mt-1">
+                        Actualmente:
+                        <strong class="text-goool-green">{{ (int) $producto->stock }}</strong> unidades.
+                    </p>
+                    @error('stock')
                         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                     @enderror
                 </div>
@@ -115,18 +142,24 @@
                 </div>
             </div>
 
+            {{-- Checkbox disponible con hidden para que siempre viaje 0 o 1 --}}
             <div class="flex items-center gap-2">
+                <input type="hidden" name="disponible" value="0">
                 <input type="checkbox" name="disponible" id="disponible" value="1"
                     {{ old('disponible', $producto->disponible) ? 'checked' : '' }}
                     class="rounded border-gray-300 text-goool-green focus:ring-goool-green">
                 <label for="disponible" class="text-sm font-semibold text-gray-700">Disponible para la venta</label>
             </div>
 
-            <div class="pt-4 border-t border-gray-200">
+            <div class="pt-4 border-t border-gray-200 flex items-center gap-3">
                 <button type="submit"
                     class="bg-goool-green text-white font-bold px-6 py-3 rounded-lg hover:bg-goool-green-dark transition">
                     <i class="fa-solid fa-save"></i> Actualizar Producto
                 </button>
+                <a href="{{ route('admin.productos.index') }}"
+                    class="bg-gray-200 text-gray-700 font-bold px-6 py-3 rounded-lg hover:bg-gray-300 transition">
+                    Cancelar
+                </a>
             </div>
         </form>
     </div>

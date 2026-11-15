@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Cliente;
 
 use App\Http\Controllers\Controller;
-use App\Models\Configuracion; // <-- ESTA LÍNEA FALTABA
+use App\Models\Configuracion;
 use App\Models\DetallePedido;
 use App\Models\Pago;
 use App\Models\Pedido;
@@ -14,12 +14,10 @@ use Illuminate\Validation\ValidationException;
 
 /**
  * Crea pedidos web y ofrece al cliente su historial y cancelación permitida.
+ * El stock se descuenta al confirmar y se devuelve al cancelar.
  */
 class PedidoController extends Controller
 {
-    /**
-     * Revalida catálogo/precios y persiste pedido, líneas y pago en una transacción.
-     */
     public function procesar(Request $request)
     {
         $carrito = session()->get('carrito', []);
@@ -58,9 +56,15 @@ class PedidoController extends Controller
 
                 $cantidad = filter_var($item['cantidad'] ?? null, FILTER_VALIDATE_INT);
 
-                if ($cantidad === false || $cantidad < 1 || $cantidad > 20) {
+                if ($cantidad === false || $cantidad < 1) {
                     throw ValidationException::withMessages([
                         'carrito' => 'La cantidad de un producto del carrito no es válida.',
+                    ]);
+                }
+
+                if ($cantidad > $producto->stock) {
+                    throw ValidationException::withMessages([
+                        'carrito' => "Solo quedan {$producto->stock} unidades de {$producto->nombre}.",
                     ]);
                 }
 
@@ -82,6 +86,10 @@ class PedidoController extends Controller
                     'cantidad' => $cantidad,
                     'precio_unitario' => number_format($precioCentavos / 100, 2, '.', ''),
                 ];
+
+                // Descontar stock dentro de la transacción
+                $producto->stock -= $cantidad;
+                $producto->save();
             }
 
             // --- LÓGICA DE COSTO DE ENVÍO ---
@@ -139,7 +147,7 @@ class PedidoController extends Controller
 
     public function cancelar($pedidoId)
     {
-        $pedido = Pedido::findOrFail($pedidoId);
+        $pedido = Pedido::with('detallePedidos')->findOrFail($pedidoId);
 
         if ($pedido->usuario_id !== auth()->id()) {
             abort(403, 'No tienes permiso para cancelar este pedido.');
@@ -149,10 +157,21 @@ class PedidoController extends Controller
             return redirect()->back()->with('error', 'Este pedido ya no se puede cancelar.');
         }
 
-        $pedido->update(['estado' => 'cancelado']);
+        DB::transaction(function () use ($pedido) {
+            // Devolver stock de cada detalle
+            foreach ($pedido->detallePedidos as $detalle) {
+                $producto = Producto::lockForUpdate()->find($detalle->producto_id);
+                if ($producto) {
+                    $producto->stock += $detalle->cantidad;
+                    $producto->save();
+                }
+            }
+
+            $pedido->update(['estado' => 'cancelado']);
+        });
 
         return redirect()->route('cliente.mis_pedidos')
-            ->with('success', 'Pedido cancelado correctamente.');
+            ->with('success', 'Pedido cancelado correctamente y stock devuelto.');
     }
 
     public function misPedidos()

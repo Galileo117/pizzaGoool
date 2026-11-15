@@ -20,19 +20,46 @@ class Producto extends Model
         'nombre',
         'descripcion',
         'precio',
+        'stock',
         'imagen',
         'disponible',
     ];
 
-    // Relación: Un producto pertenece a una categoría
+    protected $casts = [
+        'stock'      => 'integer',
+        'disponible' => 'boolean',
+        'precio'     => 'decimal:2',
+    ];
+
+    /**
+     * Relación: Un producto pertenece a una categoría
+     */
     public function categoria()
     {
         return $this->belongsTo(Categoria::class);
     }
 
-    // Relación: Un producto puede estar en muchos detalles de pedidos
+    /**
+     * Relación: Un producto puede estar en muchos detalles de pedidos
+     */
     public function detallePedidos()
     {
         return $this->hasMany(DetallePedido::class);
+    }
+
+    /**
+     * Verifica si hay stock suficiente para la cantidad solicitada.
+     */
+    public function tieneStock(int $cantidad = 1): bool
+    {
+        return $this->disponible && $this->stock >= $cantidad;
+    }
+
+    /**
+     * Stock realmente vendible: 0 si el producto está agotado o no disponible.
+     */
+    public function getStockDisponibleAttribute(): int
+    {
+        return $this->disponible ? (int) $this->stock : 0;
     }
 }

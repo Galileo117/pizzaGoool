@@ -12,9 +12,6 @@ use Illuminate\Http\Request;
  */
 class CatalogoController extends Controller
 {
-    /**
-     * Sincroniza el carrito con productos vigentes antes de mostrar el checkout.
-     */
     public function mostrarCheckout()
     {
         $carrito = session()->get('carrito', []);
@@ -35,6 +32,11 @@ class CatalogoController extends Controller
             if (! $producto || ! $producto->disponible) {
                 return redirect()->route('cliente.catalogo')
                     ->with('error', 'El carrito contiene productos que ya no están disponibles.');
+            }
+
+            if ($producto->stock < $item['cantidad']) {
+                return redirect()->route('cliente.catalogo')
+                    ->with('error', "Solo quedan {$producto->stock} unidades de {$producto->nombre}.");
             }
 
             $carrito[$clave]['nombre'] = $producto->nombre;
@@ -63,12 +65,10 @@ class CatalogoController extends Controller
     {
         $query = Producto::where('disponible', true)->with('categoria');
 
-        // Filtro por categoría
         if ($request->filled('categoria')) {
             $query->where('categoria_id', $request->categoria);
         }
 
-        // Búsqueda por nombre o descripción
         if ($request->filled('buscar')) {
             $busqueda = $request->buscar;
             $query->where(function ($q) use ($busqueda) {
@@ -77,7 +77,6 @@ class CatalogoController extends Controller
             });
         }
 
-        // Ordenamiento
         $orden = $request->input('orden', 'recientes');
         switch ($orden) {
             case 'precio_asc':
@@ -116,17 +115,23 @@ class CatalogoController extends Controller
 
         $producto = Producto::findOrFail($productoId);
 
-        if (! $producto->disponible) {
+        if (! $producto->disponible || $producto->stock <= 0) {
             return response()->json([
                 'success' => false,
-                'message' => 'Este producto no está disponible.',
+                'message' => 'Este producto está agotado.',
             ], 422);
         }
 
         $carrito = session()->get('carrito', []);
 
         if (isset($carrito[$productoId])) {
-            $carrito[$productoId]['cantidad'] = min($carrito[$productoId]['cantidad'] + 1, 20);
+            if ($carrito[$productoId]['cantidad'] >= $producto->stock) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "Solo hay {$producto->stock} unidades disponibles.",
+                ], 422);
+            }
+            $carrito[$productoId]['cantidad']++;
         } else {
             $carrito[$productoId] = [
                 'producto_id' => $producto->id,
@@ -161,13 +166,27 @@ class CatalogoController extends Controller
         $productoId = $request->input('producto_id');
         $cantidad = (int) $request->input('cantidad', 0);
 
+        $producto = Producto::find($productoId);
+
+        if (! $producto) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Producto no encontrado.',
+            ], 404);
+        }
+
         $carrito = session()->get('carrito', []);
 
         if (isset($carrito[$productoId])) {
             if ($cantidad <= 0) {
                 unset($carrito[$productoId]);
+            } elseif ($cantidad > $producto->stock) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "Solo hay {$producto->stock} unidades disponibles.",
+                ], 422);
             } else {
-                $carrito[$productoId]['cantidad'] = min($cantidad, 20);
+                $carrito[$productoId]['cantidad'] = $cantidad;
             }
         }
 

@@ -404,6 +404,14 @@
                 setTimeout(() => toast.remove(), 300);
             }, 3000);
         }
+
+        // Listener de Livewire: cuando se intenta superar el stock
+        document.addEventListener('livewire:init', () => {
+            Livewire.on('stockAlcanzado', (event) => {
+                const mensaje = event.mensaje ?? event.detail?.mensaje ?? 'Stock máximo alcanzado.';
+                mostrarToast(mensaje, 'warning');
+            });
+        });
     </script>
 
     <style>
