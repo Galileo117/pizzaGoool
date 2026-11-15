@@ -119,6 +119,20 @@ class CarritoCompras extends Component
 
     public function render()
     {
+        // Contexto "inicio": solo productos destacados (4), sin filtros ni paginación
+        if ($this->contexto === 'inicio') {
+            $productos = Producto::where('disponible', true)
+                ->orderBy('created_at', 'desc')
+                ->take(4)
+                ->get();
+
+            return view('livewire.carrito-compras', [
+                'productos'  => $productos,
+                'categorias' => collect(),
+            ]);
+        }
+
+        // Contexto "catalogo": comportamiento actual (filtros + paginación)
         $query = Producto::where('disponible', true)->with('categoria');
 
         if (request()->filled('categoria')) {
