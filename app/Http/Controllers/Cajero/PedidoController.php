@@ -16,7 +16,7 @@ class PedidoController extends Controller
     {
         // Cargamos las relaciones para optimizar las consultas (Eager Loading)
         $query = Pedido::with(['usuario.cliente', 'detallePedidos.producto', 'repartidor.repartidor'])
-            ->orderBy('created_at', 'asc');
+            ->orderBy('created_at', 'desc');
 
         if ($request->has('estado') && $request->estado !== '') {
             $query->where('estado', $request->estado);
