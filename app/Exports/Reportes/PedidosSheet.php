@@ -26,7 +26,7 @@ class PedidosSheet extends ReporteSheet implements FromQuery, WithColumnFormatti
 
     public function headings(): array
     {
-        return ['Estado del pedido', 'Cantidad de pedidos', 'Monto de pedidos (Bs.)'];
+        return ['Estado actual', 'Pedidos registrados', 'Monto asociado (Bs.)'];
     }
 
     public function columnFormats(): array

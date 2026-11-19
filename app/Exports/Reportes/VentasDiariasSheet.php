@@ -28,7 +28,7 @@ class VentasDiariasSheet extends ReporteSheet implements FromQuery, WithColumnFo
 
     public function headings(): array
     {
-        return ['Fecha de pedido', 'Pedidos entregados', 'Ventas completadas (Bs.)'];
+        return ['Fecha del pedido', 'Pedidos entregados', 'Ventas completadas (Bs.)'];
     }
 
     public function columnFormats(): array

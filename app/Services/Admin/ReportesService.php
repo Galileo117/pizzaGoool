@@ -19,11 +19,13 @@ class ReportesService
         $pedidos = $this->pedidosEnPeriodo($fechaInicio, $fechaFin);
         $totales = (clone $pedidos)
             ->selectRaw('COUNT(*) AS pedidos_registrados')
-            ->selectRaw("SUM(CASE WHEN estado = 'entregado' THEN 1 ELSE 0 END) AS pedidos_completados")
             ->selectRaw("SUM(CASE WHEN estado = 'cancelado' THEN 1 ELSE 0 END) AS pedidos_cancelados")
             ->selectRaw("SUM(CASE WHEN estado NOT IN ('entregado', 'cancelado') THEN 1 ELSE 0 END) AS pedidos_activos")
-            ->selectRaw("SUM(CASE WHEN estado = 'entregado' THEN total ELSE 0 END) AS ventas_completadas")
-            ->selectRaw("SUM(CASE WHEN estado = 'entregado' THEN costo_envio ELSE 0 END) AS costos_envio_completados")
+            ->first();
+        $ventas = $this->pedidosEntregadosEnPeriodo($fechaInicio, $fechaFin)
+            ->selectRaw('COUNT(*) AS pedidos_completados')
+            ->selectRaw('SUM(total) AS ventas_completadas')
+            ->selectRaw('SUM(costo_envio) AS costos_envio_completados')
             ->first();
 
         $duracionEnDias = (int) CarbonImmutable::parse($fechaInicio)
@@ -31,15 +33,15 @@ class ReportesService
         $periodoAnteriorFin = CarbonImmutable::parse($fechaInicio)->subDay()->toDateString();
         $periodoAnteriorInicio = CarbonImmutable::parse($fechaInicio)->subDays($duracionEnDias)->toDateString();
         $ventasAnteriores = $this->ventasCompletadas($periodoAnteriorInicio, $periodoAnteriorFin);
-        $ventasActuales = (float) ($totales->ventas_completadas ?? 0);
+        $ventasActuales = (float) ($ventas->ventas_completadas ?? 0);
 
         return [
             'pedidos_registrados' => (int) ($totales->pedidos_registrados ?? 0),
-            'pedidos_completados' => (int) ($totales->pedidos_completados ?? 0),
+            'pedidos_completados' => (int) ($ventas->pedidos_completados ?? 0),
             'pedidos_cancelados' => (int) ($totales->pedidos_cancelados ?? 0),
             'pedidos_activos' => (int) ($totales->pedidos_activos ?? 0),
             'ventas_completadas' => $ventasActuales,
-            'costos_envio_completados' => (float) ($totales->costos_envio_completados ?? 0),
+            'costos_envio_completados' => (float) ($ventas->costos_envio_completados ?? 0),
             'ticket_promedio' => $this->pedidosEntregadosEnPeriodo($fechaInicio, $fechaFin)->avg('total') ?? 0,
             'ventas_periodo_anterior' => $ventasAnteriores,
             'variacion_porcentual' => $ventasAnteriores > 0
@@ -59,41 +61,59 @@ class ReportesService
             ->orderBy('total_pedidos');
     }
 
+    public function ventasDiariasParaGrafico(string $fechaInicio, string $fechaFin): Collection
+    {
+        $ventasPorFecha = $this->ventasDiarias($fechaInicio, $fechaFin)->get()->keyBy('fecha');
+        $fecha = CarbonImmutable::parse($fechaInicio)->startOfDay();
+        $fechaFin = CarbonImmutable::parse($fechaFin)->startOfDay();
+        $serie = collect();
+
+        while ($fecha->lessThanOrEqualTo($fechaFin)) {
+            $fechaFormateada = $fecha->toDateString();
+            $venta = $ventasPorFecha->get($fechaFormateada);
+
+            $serie->push([
+                'fecha' => $fechaFormateada,
+                'total_pedidos' => (int) ($venta->total_pedidos ?? 0),
+                'total_ventas' => (float) ($venta->total_ventas ?? 0),
+            ]);
+
+            $fecha = $fecha->addDay();
+        }
+
+        return $serie;
+    }
+
     public function productosMasVendidos(string $fechaInicio, string $fechaFin): Builder
     {
         return DB::table('detalle_pedidos')
             ->join('pedidos', 'pedidos.id', '=', 'detalle_pedidos.pedido_id')
-            ->join('productos', 'productos.id', '=', 'detalle_pedidos.producto_id')
-            ->join('categorias', 'categorias.id', '=', 'productos.categoria_id')
             ->where('pedidos.estado', 'entregado')
             ->whereBetween('pedidos.created_at', $this->rangoFecha($fechaInicio, $fechaFin))
             ->select(
-                'productos.id AS producto_id',
-                'productos.nombre AS producto',
-                'categorias.nombre AS categoria',
+                'detalle_pedidos.producto_nombre AS producto',
+                'detalle_pedidos.categoria_nombre AS categoria',
             )
             ->selectRaw('SUM(detalle_pedidos.cantidad) AS unidades_vendidas')
             ->selectRaw('SUM(detalle_pedidos.cantidad * detalle_pedidos.precio_unitario) AS ingresos')
-            ->groupBy('productos.id', 'productos.nombre', 'categorias.nombre')
+            ->groupBy('detalle_pedidos.producto_nombre', 'detalle_pedidos.categoria_nombre')
             ->orderByDesc('unidades_vendidas')
-            ->orderBy('productos.id');
+            ->orderBy('detalle_pedidos.producto_nombre');
     }
 
     public function ventasPorCategoria(string $fechaInicio, string $fechaFin): Builder
     {
         return DB::table('detalle_pedidos')
             ->join('pedidos', 'pedidos.id', '=', 'detalle_pedidos.pedido_id')
-            ->join('productos', 'productos.id', '=', 'detalle_pedidos.producto_id')
-            ->join('categorias', 'categorias.id', '=', 'productos.categoria_id')
             ->where('pedidos.estado', 'entregado')
             ->whereBetween('pedidos.created_at', $this->rangoFecha($fechaInicio, $fechaFin))
-            ->select('categorias.id AS categoria_id', 'categorias.nombre AS categoria')
-            ->selectRaw('COUNT(DISTINCT productos.id) AS productos_vendidos')
+            ->select('detalle_pedidos.categoria_nombre AS categoria')
+            ->selectRaw('COUNT(DISTINCT detalle_pedidos.producto_id) AS productos_vendidos')
             ->selectRaw('SUM(detalle_pedidos.cantidad) AS unidades_vendidas')
             ->selectRaw('SUM(detalle_pedidos.cantidad * detalle_pedidos.precio_unitario) AS ingresos')
-            ->groupBy('categorias.id', 'categorias.nombre')
+            ->groupBy('detalle_pedidos.categoria_nombre')
             ->orderByDesc('ingresos')
-            ->orderBy('categorias.id');
+            ->orderBy('detalle_pedidos.categoria_nombre');
     }
 
     public function pedidosPorEstado(string $fechaInicio, string $fechaFin): Builder
@@ -108,11 +128,11 @@ class ReportesService
 
     public function pedidosPorTipoEntrega(string $fechaInicio, string $fechaFin): Builder
     {
-        return $this->pedidosEnPeriodo($fechaInicio, $fechaFin)
+        return $this->pedidosEntregadosEnPeriodo($fechaInicio, $fechaFin)
             ->selectRaw("CASE WHEN tipo_entrega IN ('delivery', 'contraentrega') THEN 'delivery' ELSE 'local' END AS tipo_entrega")
             ->selectRaw('COUNT(*) AS total_pedidos')
-            ->selectRaw("SUM(CASE WHEN estado = 'entregado' THEN total ELSE 0 END) AS ventas_completadas")
-            ->selectRaw("SUM(CASE WHEN estado = 'entregado' THEN costo_envio ELSE 0 END) AS costos_envio")
+            ->selectRaw('SUM(total) AS ventas_completadas')
+            ->selectRaw('SUM(costo_envio) AS costos_envio')
             ->groupByRaw("CASE WHEN tipo_entrega IN ('delivery', 'contraentrega') THEN 'delivery' ELSE 'local' END")
             ->orderBy('tipo_entrega');
     }
@@ -139,21 +159,16 @@ class ReportesService
 
         return DB::table('pedidos')
             ->join('detalle_pedidos', 'pedidos.id', '=', 'detalle_pedidos.pedido_id')
-            ->join('productos', 'productos.id', '=', 'detalle_pedidos.producto_id')
-            ->join('categorias', 'categorias.id', '=', 'productos.categoria_id')
-            ->leftJoin('clientes', 'clientes.usuario_id', '=', 'pedidos.usuario_id')
-            ->leftJoin('usuarios', 'usuarios.id', '=', 'pedidos.usuario_id')
             ->leftJoinSub($pagosPorPedido, 'pagos_resumen', 'pagos_resumen.pedido_id', '=', 'pedidos.id')
             ->where('pedidos.estado', 'entregado')
             ->whereBetween('pedidos.created_at', $this->rangoFecha($fechaInicio, $fechaFin))
             ->select(
                 'pedidos.id AS pedido_id',
                 'pedidos.created_at AS fecha',
-                'clientes.nombres AS cliente_nombres',
-                'clientes.apellidos AS cliente_apellidos',
-                'usuarios.email AS cliente_email',
-                'productos.nombre AS producto',
-                'categorias.nombre AS categoria',
+                'pedidos.cliente_nombre',
+                'pedidos.cliente_email',
+                'detalle_pedidos.producto_nombre AS producto',
+                'detalle_pedidos.categoria_nombre AS categoria',
                 'detalle_pedidos.cantidad',
                 'detalle_pedidos.precio_unitario',
                 'pedidos.metodo_pago',
@@ -199,7 +214,8 @@ class ReportesService
 
     private function pedidosEntregadosEnPeriodo(string $fechaInicio, string $fechaFin): Builder
     {
-        return $this->pedidosEnPeriodo($fechaInicio, $fechaFin)->where('estado', 'entregado');
+        return $this->pedidosEnPeriodo($fechaInicio, $fechaFin)
+            ->where('estado', 'entregado');
     }
 
     /**

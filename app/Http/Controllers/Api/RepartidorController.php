@@ -84,6 +84,7 @@ class RepartidorController extends Controller
 
         $pedido->update([
             'estado' => 'entregado',
+            'entregado_at' => now(),
         ]);
 
         $pedido->load([

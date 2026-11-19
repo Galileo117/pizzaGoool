@@ -56,7 +56,13 @@ class PedidoController extends Controller
             return redirect()->back()->with('error', 'La transición solicitada no es válida para este pedido.');
         }
 
-        $pedido->update(['estado' => $request->estado]);
+        $datosEstado = ['estado' => $request->estado];
+
+        if ($request->estado === 'entregado') {
+            $datosEstado['entregado_at'] = now();
+        }
+
+        $pedido->update($datosEstado);
 
         return redirect()->back()->with('success', 'Estado del pedido actualizado correctamente.');
     }

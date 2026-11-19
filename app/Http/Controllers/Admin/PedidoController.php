@@ -13,7 +13,7 @@ class PedidoController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Pedido::with('usuario')->orderBy('created_at', 'desc');
+        $query = Pedido::with('usuario.cliente')->orderBy('created_at', 'desc');
 
         if ($request->has('estado') && $request->estado !== '') {
             $query->where('estado', $request->estado);

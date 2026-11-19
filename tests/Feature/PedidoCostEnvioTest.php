@@ -99,6 +99,7 @@ it('shows the saved delivery charge in each order panel', function () {
     $this->actingAs($admin)
         ->get(route('admin.pedidos.index'))
         ->assertOk()
+        ->assertSee('Ana Cliente')
         ->assertSee('Envío: Bs. 7.50');
 
     $this->actingAs($cajero)
@@ -206,6 +207,15 @@ it('adds the configured charge to a web delivery order', function () {
         'tipo_entrega' => 'delivery',
         'total' => '32.50',
         'costo_envio' => '7.50',
+        'cliente_nombre' => $cliente->nombre_completo,
+        'cliente_email' => $cliente->email,
+    ]);
+
+    $this->assertDatabaseHas('detalle_pedidos', [
+        'pedido_id' => $pedido->id,
+        'producto_nombre' => 'Pizza de prueba',
+        'categoria_nombre' => 'Pizzas de prueba',
+        'precio_unitario' => '25.00',
     ]);
 });
 

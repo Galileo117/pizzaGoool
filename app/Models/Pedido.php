@@ -17,14 +17,18 @@ class Pedido extends Model
     protected $casts = [
         'total' => 'decimal:2',
         'costo_envio' => 'decimal:2',
+        'entregado_at' => 'datetime',
     ];
 
     protected $fillable = [
         'usuario_id',
+        'cliente_nombre',
+        'cliente_email',
         'repartidor_id',
         'total',
         'costo_envio',
         'estado',
+        'entregado_at',
         'metodo_pago',
         'tipo_entrega',
         'direccion',

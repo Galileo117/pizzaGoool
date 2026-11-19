@@ -12,16 +12,19 @@
         </div>
 
         <form method="GET" action="{{ route('admin.pedidos.index') }}" class="flex items-center gap-2 w-full sm:w-auto">
-            <select name="estado" class="flex-1 sm:flex-none border border-gray-300 rounded-lg p-2 text-sm focus:border-goool-green focus:outline-none">
+            <select name="estado"
+                class="flex-1 sm:flex-none border border-gray-300 rounded-lg p-2 text-sm focus:border-goool-green focus:outline-none">
                 <option value="">Todos los estados</option>
                 <option value="pendiente" {{ request('estado') == 'pendiente' ? 'selected' : '' }}>Pendiente</option>
-                <option value="preparacion" {{ request('estado') == 'preparacion' ? 'selected' : '' }}>En Preparación</option>
+                <option value="preparacion" {{ request('estado') == 'preparacion' ? 'selected' : '' }}>En Preparación
+                </option>
                 <option value="listo" {{ request('estado') == 'listo' ? 'selected' : '' }}>Listo</option>
                 <option value="en_reparto" {{ request('estado') == 'en_reparto' ? 'selected' : '' }}>En Reparto</option>
                 <option value="entregado" {{ request('estado') == 'entregado' ? 'selected' : '' }}>Entregado</option>
                 <option value="cancelado" {{ request('estado') == 'cancelado' ? 'selected' : '' }}>Cancelado</option>
             </select>
-            <button type="submit" class="bg-goool-green text-white px-4 py-2 rounded-lg text-sm hover:bg-goool-green-dark transition whitespace-nowrap">
+            <button type="submit"
+                class="bg-goool-green text-white px-4 py-2 rounded-lg text-sm hover:bg-goool-green-dark transition whitespace-nowrap">
                 <i class="fa-solid fa-filter"></i> Filtrar
             </button>
         </form>
@@ -43,8 +46,9 @@
             <tbody class="divide-y divide-gray-100">
                 @forelse($pedidos as $pedido)
                     <tr class="hover:bg-gray-50">
-                        <td class="px-4 py-3 font-bold text-goool-green">#{{ str_pad($pedido->id, 6, '0', STR_PAD_LEFT) }}</td>
-                        <td class="px-4 py-3 text-gray-700">{{ $pedido->usuario->nombre ?? 'N/A' }}</td>
+                        <td class="px-4 py-3 font-bold text-goool-green">#{{ str_pad($pedido->id, 6, '0', STR_PAD_LEFT) }}
+                        </td>
+                        <td class="px-4 py-3 text-gray-700">{{ $pedido->usuario->nombre_completo ?? 'N/A' }}</td>
                         <td class="px-4 py-3 font-bold text-gray-800">
                             Bs. {{ number_format($pedido->total, 2) }}
                             @if ($pedido->esDelivery())
@@ -54,7 +58,8 @@
                             @endif
                         </td>
                         <td class="px-4 py-3 text-gray-600">
-                            <i class="fa-solid {{ $pedido->metodo_pago === 'qr' ? 'fa-qrcode' : 'fa-money-bill-wave' }} text-goool-green"></i>
+                            <i
+                                class="fa-solid {{ $pedido->metodo_pago === 'qr' ? 'fa-qrcode' : 'fa-money-bill-wave' }} text-goool-green"></i>
                             {{ ucfirst($pedido->metodo_pago) }}
                         </td>
                         <td class="px-4 py-3 text-center">
@@ -116,7 +121,7 @@
                 <div class="p-4 space-y-2 text-sm">
                     <div class="flex justify-between">
                         <span class="text-gray-500 font-semibold">Cliente</span>
-                        <span class="font-bold text-gray-800">{{ $pedido->usuario->nombre ?? 'N/A' }}</span>
+                        <span class="font-bold text-gray-800">{{ $pedido->usuario->nombre_completo ?? 'N/A' }}</span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-gray-500 font-semibold">Total</span>
@@ -132,7 +137,8 @@
                     <div class="flex justify-between">
                         <span class="text-gray-500 font-semibold">Pago</span>
                         <span class="text-gray-700">
-                            <i class="fa-solid {{ $pedido->metodo_pago === 'qr' ? 'fa-qrcode' : 'fa-money-bill-wave' }} text-goool-green"></i>
+                            <i
+                                class="fa-solid {{ $pedido->metodo_pago === 'qr' ? 'fa-qrcode' : 'fa-money-bill-wave' }} text-goool-green"></i>
                             {{ ucfirst($pedido->metodo_pago) }}
                         </span>
                     </div>

@@ -57,6 +57,16 @@ it('saves the configured delivery fee and keeps the API delivery contract', func
         'tipo_entrega' => 'delivery',
         'total' => '32.50',
         'costo_envio' => '7.50',
+        'cliente_nombre' => 'Cliente API',
+        'cliente_email' => $cliente->email,
+    ]);
+
+    $pedido = Pedido::query()->sole();
+    $this->assertDatabaseHas('detalle_pedidos', [
+        'pedido_id' => $pedido->id,
+        'producto_nombre' => 'Pizza API',
+        'categoria_nombre' => 'Pizzas API',
+        'precio_unitario' => '25.00',
     ]);
 });
 

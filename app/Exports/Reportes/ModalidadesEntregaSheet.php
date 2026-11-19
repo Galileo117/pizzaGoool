@@ -28,7 +28,7 @@ class ModalidadesEntregaSheet extends ReporteSheet implements FromQuery, WithCol
     {
         return [
             'Modalidad de entrega',
-            'Cantidad de pedidos',
+            'Pedidos entregados',
             'Ventas completadas (Bs.)',
             'Envíos cobrados (Bs.)',
         ];

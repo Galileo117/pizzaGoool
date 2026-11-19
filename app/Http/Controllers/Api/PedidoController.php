@@ -38,6 +38,8 @@ class PedidoController extends Controller
             'longitud' => 'nullable|numeric|between:-180,180',
         ]);
 
+        $usuario = $request->user()->loadMissing('cliente');
+
         DB::beginTransaction();
 
         try {
@@ -56,11 +58,15 @@ class PedidoController extends Controller
                     );
                 }
 
+                $producto->loadMissing('categoria');
+
                 $precioCentavos = (int) round((float) $producto->precio * 100);
                 $totalCentavos += $precioCentavos * $item['cantidad'];
 
                 $detalles[] = [
                     'producto_id' => $producto->id,
+                    'producto_nombre' => $producto->nombre,
+                    'categoria_nombre' => $producto->categoria?->nombre,
                     'cantidad' => $item['cantidad'],
                     'precio_unitario' => number_format($precioCentavos / 100, 2, '.', ''),
                 ];
@@ -79,7 +85,9 @@ class PedidoController extends Controller
             $costoEnvioFinal = number_format($costoEnvioCentavos / 100, 2, '.', '');
 
             $pedido = Pedido::create([
-                'usuario_id' => $request->user()->id,
+                'usuario_id' => $usuario->id,
+                'cliente_nombre' => $usuario->nombre_completo,
+                'cliente_email' => $usuario->email,
                 'total' => $total,
                 'costo_envio' => $costoEnvioFinal, // <-- GUARDADO
                 'estado' => 'pendiente',
@@ -95,6 +103,8 @@ class PedidoController extends Controller
                 DetallePedido::create([
                     'pedido_id' => $pedido->id,
                     'producto_id' => $detalle['producto_id'],
+                    'producto_nombre' => $detalle['producto_nombre'],
+                    'categoria_nombre' => $detalle['categoria_nombre'],
                     'cantidad' => $detalle['cantidad'],
                     'precio_unitario' => $detalle['precio_unitario'],
                 ]);

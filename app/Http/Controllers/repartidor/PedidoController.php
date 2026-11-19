@@ -56,7 +56,10 @@ class PedidoController extends Controller
             return redirect()->back()->with('error', 'Este pedido no está en reparto.');
         }
 
-        $pedido->update(['estado' => 'entregado']);
+        $pedido->update([
+            'estado' => 'entregado',
+            'entregado_at' => now(),
+        ]);
 
         return redirect()->route('repartidor.pedidos.index')
             ->with('success', 'Pedido marcado como entregado correctamente.');

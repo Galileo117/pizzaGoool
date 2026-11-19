@@ -38,7 +38,8 @@ class PedidoController extends Controller
 
         $pedido = DB::transaction(function () use ($request, $carrito) {
             $idsProductos = array_column($carrito, 'producto_id');
-            $productos = Producto::whereIn('id', $idsProductos)
+            $productos = Producto::with('categoria')
+                ->whereIn('id', $idsProductos)
                 ->lockForUpdate()
                 ->get()
                 ->keyBy('id');
@@ -83,6 +84,8 @@ class PedidoController extends Controller
                 $totalCentavos += $precioCentavos * $cantidad;
                 $detalles[] = [
                     'producto_id' => $producto->id,
+                    'producto_nombre' => $producto->nombre,
+                    'categoria_nombre' => $producto->categoria?->nombre,
                     'cantidad' => $cantidad,
                     'precio_unitario' => number_format($precioCentavos / 100, 2, '.', ''),
                 ];
@@ -107,6 +110,8 @@ class PedidoController extends Controller
 
             $pedido = Pedido::create([
                 'usuario_id' => auth()->id(),
+                'cliente_nombre' => $request->user()->nombre_completo,
+                'cliente_email' => $request->user()->email,
                 'total' => $total,
                 'costo_envio' => $costoEnvioFinal,
                 'estado' => 'pendiente',
@@ -122,6 +127,8 @@ class PedidoController extends Controller
                 DetallePedido::create([
                     'pedido_id' => $pedido->id,
                     'producto_id' => $detalle['producto_id'],
+                    'producto_nombre' => $detalle['producto_nombre'],
+                    'categoria_nombre' => $detalle['categoria_nombre'],
                     'cantidad' => $detalle['cantidad'],
                     'precio_unitario' => $detalle['precio_unitario'],
                 ]);

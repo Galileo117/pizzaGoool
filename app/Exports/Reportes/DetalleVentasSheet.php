@@ -63,7 +63,7 @@ class DetalleVentasSheet extends ReporteSheet implements FromQuery, WithColumnFo
         return [
             $fila->pedido_id,
             Date::dateTimeToExcel(CarbonImmutable::parse($fila->fecha)),
-            trim(($fila->cliente_nombres ?? '').' '.($fila->cliente_apellidos ?? '')),
+            $fila->cliente_nombre,
             $fila->cliente_email,
             $fila->producto,
             $fila->categoria,

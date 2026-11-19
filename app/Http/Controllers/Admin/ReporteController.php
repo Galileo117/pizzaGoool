@@ -38,6 +38,7 @@ class ReporteController extends Controller
             'resumen' => [
                 'resumen' => $reportes->resumen($fechaInicio, $fechaFin),
                 'ventasPorDia' => $reportes->ventasDiarias($fechaInicio, $fechaFin)->get(),
+                'ventasParaGrafico' => $reportes->ventasDiariasParaGrafico($fechaInicio, $fechaFin),
                 'productosDestacados' => $reportes->productosMasVendidos($fechaInicio, $fechaFin)
                     ->limit(5)
                     ->get(),
@@ -135,7 +136,7 @@ class ReporteController extends Controller
         }
 
         $filtros = $request->validate($reglas);
-        $fechaInicio = $filtros['fecha_inicio'] ?? now()->subDays(30)->toDateString();
+        $fechaInicio = $filtros['fecha_inicio'] ?? now()->startOfYear()->toDateString();
         $fechaFin = $filtros['fecha_fin'] ?? now()->toDateString();
 
         if (CarbonImmutable::parse($fechaInicio)->greaterThan(CarbonImmutable::parse($fechaFin))) {
