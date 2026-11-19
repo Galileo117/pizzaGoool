@@ -11,17 +11,28 @@ use Illuminate\Http\Request;
  */
 class PedidoController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $repartidorId = auth()->id();
+        $estadosDisponibles = [
+            'en_reparto' => 'En reparto',
+            'entregado' => 'Entregado',
+            'cancelado' => 'Cancelado',
+        ];
+        $estado = $request->query('estado', 'en_reparto');
+
+        if (! is_string($estado) || ! array_key_exists($estado, $estadosDisponibles)) {
+            $estado = 'en_reparto';
+        }
 
         $pedidos = Pedido::with(['usuario.cliente', 'detallePedidos.producto'])
             ->where('repartidor_id', $repartidorId)
-            ->whereIn('estado', ['en_reparto', 'entregado', 'cancelado'])
+            ->where('estado', $estado)
             ->orderBy('updated_at', 'desc')
-            ->paginate(10);
+            ->paginate(10)
+            ->withQueryString();
 
-        return view('repartidor.pedidos.index', compact('pedidos'));
+        return view('repartidor.pedidos.index', compact('pedidos', 'estado', 'estadosDisponibles'));
     }
 
     public function show(Pedido $pedido)

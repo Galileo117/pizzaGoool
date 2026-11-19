@@ -7,8 +7,21 @@
 @section('content')
     <div class="mb-6">
         <h2 class="text-xl font-bold text-goool-green-dark">Mis Pedidos Asignados</h2>
-        <p class="text-gray-600 text-sm">Aquí verás los pedidos que debes entregar.</p>
     </div>
+
+    <nav class="mb-6 flex flex-wrap gap-2" aria-label="Filtrar pedidos por estado">
+        @foreach ($estadosDisponibles as $valorEstado => $nombreEstado)
+            <a href="{{ route('repartidor.pedidos.index', ['estado' => $valorEstado]) }}" @class([
+                'rounded-lg px-4 py-2 text-sm font-semibold transition',
+                'bg-goool-green text-white' => $estado === $valorEstado,
+                'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50' =>
+                    $estado !== $valorEstado,
+            ])
+                @if ($estado === $valorEstado) aria-current="page" @endif>
+                {{ $nombreEstado }}
+            </a>
+        @endforeach
+    </nav>
 
     {{-- Vista de tabla (escritorio) --}}
     <div class="hidden md:block bg-white rounded-xl shadow-md overflow-hidden border border-gray-200">
@@ -47,9 +60,13 @@
                                     <span class="bg-purple-100 text-purple-700 text-xs font-bold px-2 py-1 rounded-full">
                                         <i class="fa-solid fa-truck-fast"></i> En Reparto
                                     </span>
-                                @else
+                                @elseif ($pedido->estado === 'entregado')
                                     <span class="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded-full">
                                         <i class="fa-solid fa-check"></i> Entregado
+                                    </span>
+                                @else
+                                    <span class="bg-red-100 text-red-700 text-xs font-bold px-2 py-1 rounded-full">
+                                        <i class="fa-solid fa-xmark"></i> Cancelado
                                     </span>
                                 @endif
                             </td>
@@ -88,8 +105,10 @@
                     @if ($pedido->estado === 'en_reparto')
                         <span class="bg-purple-400 text-purple-900 text-xs font-bold px-2 py-1 rounded-full">En
                             Reparto</span>
-                    @else
+                    @elseif ($pedido->estado === 'entregado')
                         <span class="bg-green-400 text-green-900 text-xs font-bold px-2 py-1 rounded-full">Entregado</span>
+                    @else
+                        <span class="bg-red-400 text-red-900 text-xs font-bold px-2 py-1 rounded-full">Cancelado</span>
                     @endif
                 </div>
 

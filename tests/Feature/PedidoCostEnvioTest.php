@@ -134,6 +134,45 @@ it('shows the saved delivery charge in each order panel', function () {
         ->assertSee('Bs. 7.50');
 });
 
+it('filters courier orders by status and hides failed orders from active deliveries', function () {
+    ['pedido' => $pedido, 'repartidor' => $repartidor] = crearPedidoDeliveryParaPaneles();
+    $pedidoEntregado = Pedido::create([
+        'usuario_id' => $pedido->usuario_id,
+        'repartidor_id' => $repartidor->id,
+        'total' => '32.50',
+        'costo_envio' => '7.50',
+        'estado' => 'entregado',
+        'metodo_pago' => 'efectivo',
+        'tipo_entrega' => 'delivery',
+        'direccion' => 'Calle de prueba 123',
+    ]);
+
+    $this->actingAs($repartidor)
+        ->patch(route('repartidor.pedidos.marcar_fallido', $pedido), ['motivo' => 'Cliente ausente'])
+        ->assertRedirect(route('repartidor.pedidos.index'));
+
+    $this->assertDatabaseHas('pedidos', [
+        'id' => $pedido->id,
+        'estado' => 'cancelado',
+    ]);
+
+    $this->get(route('repartidor.pedidos.index'))
+        ->assertOk()
+        ->assertDontSee('#'.str_pad((string) $pedido->id, 6, '0', STR_PAD_LEFT))
+        ->assertDontSee('#'.str_pad((string) $pedidoEntregado->id, 6, '0', STR_PAD_LEFT));
+
+    $this->get(route('repartidor.pedidos.index', ['estado' => 'cancelado']))
+        ->assertOk()
+        ->assertSee('#'.str_pad((string) $pedido->id, 6, '0', STR_PAD_LEFT))
+        ->assertSee('Cancelado')
+        ->assertDontSee('En Reparto');
+
+    $this->get(route('repartidor.pedidos.index', ['estado' => 'entregado']))
+        ->assertOk()
+        ->assertSee('#'.str_pad((string) $pedidoEntregado->id, 6, '0', STR_PAD_LEFT))
+        ->assertSee('Entregado');
+});
+
 it('adds the configured charge to a web delivery order', function () {
     ['pedido' => $existingOrder, 'cliente' => $cliente] = crearPedidoDeliveryParaPaneles();
     $producto = $existingOrder->detallePedidos()->firstOrFail()->producto;
