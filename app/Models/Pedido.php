@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Registro histórico de una compra, incluyendo su entrega y estado operativo.
@@ -77,5 +78,19 @@ class Pedido extends Model
         ];
 
         return in_array($nuevoEstado, $transiciones[$this->estado] ?? [], true);
+    }
+
+    public function marcarEntregado(): void
+    {
+        DB::transaction(function (): void {
+            $this->update([
+                'estado' => 'entregado',
+                'entregado_at' => now(),
+            ]);
+
+            $this->pago()
+                ->where('estado_pago', 'pendiente')
+                ->update(['estado_pago' => 'pagado']);
+        });
     }
 }

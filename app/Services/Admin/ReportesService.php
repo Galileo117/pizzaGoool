@@ -165,6 +165,7 @@ class ReportesService
             ->select(
                 'pedidos.id AS pedido_id',
                 'pedidos.created_at AS fecha',
+                'pedidos.estado AS estado_pedido',
                 'pedidos.cliente_nombre',
                 'pedidos.cliente_email',
                 'detalle_pedidos.producto_nombre AS producto',
@@ -176,8 +177,8 @@ class ReportesService
                 'pagos_resumen.estados_pago',
             )
             ->selectRaw('(detalle_pedidos.cantidad * detalle_pedidos.precio_unitario) AS subtotal')
-            ->orderBy('pedidos.created_at')
-            ->orderBy('pedidos.id')
+            ->orderByDesc('pedidos.created_at')
+            ->orderByDesc('pedidos.id')
             ->orderBy('detalle_pedidos.id');
     }
 

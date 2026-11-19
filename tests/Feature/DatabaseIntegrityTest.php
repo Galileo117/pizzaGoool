@@ -344,6 +344,15 @@ test('cashiers cannot skip order states', function () {
 
     $this->patch(route('cajero.pedidos.cambiar_estado', $pedido), ['estado' => 'entregado'])
         ->assertSessionHas('success');
+
+    $this->assertDatabaseHas('pedidos', [
+        'id' => $pedido->id,
+        'estado' => 'entregado',
+    ]);
+    $this->assertDatabaseHas('pagos', [
+        'pedido_id' => $pedido->id,
+        'estado_pago' => 'pagado',
+    ]);
 });
 
 test('a pedido can have only one payment and each profile is unique per user', function () {

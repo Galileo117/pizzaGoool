@@ -200,6 +200,17 @@ test('daily sales chart includes days without completed orders as zero', functio
         ->and($serie->pluck('total_ventas')->all())->toBe([50.0, 0.0, 25.0]);
 });
 
+test('admin sales detail shows order status and puts newest orders first', function () {
+    crearPedidoParaReporte('entregado', '50.00', '2026-11-10 12:00:00');
+    crearPedidoParaReporte('entregado', '25.00', '2026-11-12 12:00:00');
+
+    $filas = app(ReportesService::class)->detalleVentas('2026-11-01', '2026-11-30')->get();
+
+    expect($filas->pluck('fecha')->first())->toContain('2026-11-12')
+        ->and($filas->first()->estado_pedido)->toBe('entregado')
+        ->and($filas->first()->estados_pago)->toBe('pendiente');
+});
+
 test('admin product report only includes products from completed orders', function () {
     $completed = crearPedidoParaReporte('entregado', '50.00', '2026-10-15 12:00:00');
     crearPedidoParaReporte('cancelado', '80.00', '2026-10-16 12:00:00');

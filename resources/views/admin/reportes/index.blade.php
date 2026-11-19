@@ -413,7 +413,8 @@
                             <th class="px-4 py-3 text-right">Cantidad</th>
                             <th class="px-4 py-3 text-right">Precio unitario</th>
                             <th class="px-4 py-3 text-right">Subtotal</th>
-                            <th class="px-4 py-3">Pago registrado</th>
+                            <th class="px-4 py-3">Estado del pedido</th>
+                            <th class="px-4 py-3">Estado del pago</th>
                             <th class="px-4 py-3">Entrega</th>
                         </tr>
                     </thead>
@@ -431,6 +432,7 @@
                                 <td class="px-4 py-3 text-right">Bs. {{ number_format($fila->precio_unitario, 2) }}</td>
                                 <td class="px-4 py-3 text-right font-semibold">Bs. {{ number_format($fila->subtotal, 2) }}
                                 </td>
+                                <td class="px-4 py-3">{{ ucfirst(str_replace('_', ' ', $fila->estado_pedido)) }}</td>
                                 <td class="px-4 py-3">
                                     {{ $fila->estados_pago ? str_replace(',', ', ', $fila->estados_pago) : 'Sin registro' }}
                                 </td>
@@ -440,7 +442,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="8" class="px-4 py-8 text-center text-gray-500">No hay ventas completadas
+                                <td colspan="9" class="px-4 py-8 text-center text-gray-500">No hay ventas completadas
                                     en este período.</td>
                             </tr>
                         @endforelse

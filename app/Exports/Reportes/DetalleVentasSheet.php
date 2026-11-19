@@ -38,6 +38,7 @@ class DetalleVentasSheet extends ReporteSheet implements FromQuery, WithColumnFo
             'Cantidad',
             'Precio unitario (Bs.)',
             'Subtotal (Bs.)',
+            'Estado del pedido',
             'Método de pago',
             'Estados de pago',
             'Entrega',
@@ -70,6 +71,7 @@ class DetalleVentasSheet extends ReporteSheet implements FromQuery, WithColumnFo
             (int) $fila->cantidad,
             (float) $fila->precio_unitario,
             (float) $fila->subtotal,
+            ucfirst(str_replace('_', ' ', $fila->estado_pedido)),
             $fila->metodo_pago === 'qr' ? 'Código QR' : ucfirst($fila->metodo_pago),
             $fila->estados_pago === null
                 ? 'Sin registro'
