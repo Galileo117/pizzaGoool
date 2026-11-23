@@ -14,7 +14,7 @@
         <form method="GET" action="{{ route('cajero.pedidos.index') }}" class="flex items-center gap-2 w-full sm:w-auto">
             <select name="estado"
                 class="flex-1 sm:flex-none border border-gray-300 rounded-lg p-2 text-sm focus:border-goool-green focus:outline-none">
-                <option value="">Todos (activos)</option>
+                <option value="">Todos los estados</option>
                 <option value="pendiente" {{ request('estado') == 'pendiente' ? 'selected' : '' }}>Pendientes</option>
                 <option value="preparacion" {{ request('estado') == 'preparacion' ? 'selected' : '' }}>En Preparación
                 </option>

@@ -73,7 +73,7 @@
                                     </div>
                                     <div>
                                         <p class="font-semibold text-gray-800">
-                                            {{ $detalle->producto->nombre ?? 'Producto eliminado' }}</p>
+                                            {{ $detalle->nombre_producto ?? 'Producto eliminado' }}</p>
                                         <p class="text-xs text-gray-500">Cantidad: {{ $detalle->cantidad }}</p>
                                     </div>
                                 </div>

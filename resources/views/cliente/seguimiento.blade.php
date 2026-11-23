@@ -69,7 +69,7 @@
                                         <i class="fa-solid fa-pizza-slice text-goool-green text-sm" aria-hidden="true"></i>
                                     </div>
                                     <div>
-                                        <span class="font-semibold text-gray-800">{{ $detalle->producto->nombre }}</span>
+                                        <span class="font-semibold text-gray-800">{{ $detalle->nombre_producto }}</span>
                                         <span class="text-gray-400 text-sm ml-2">x{{ $detalle->cantidad }}</span>
                                     </div>
                                 </div>

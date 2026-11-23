@@ -13,14 +13,14 @@ class PedidoController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Pedido::with('usuario.cliente')->orderBy('created_at', 'desc');
+        $query = Pedido::with("usuario.cliente")->orderBy("created_at", "desc");
 
-        if ($request->has('estado') && $request->estado !== '') {
-            $query->where('estado', $request->estado);
+        if ($request->filled("estado")) {
+            $query->where("estado", $request->estado);
         }
 
-        $pedidos = $query->paginate(15);
+        $pedidos = $query->paginate(15)->withQueryString();
 
-        return view('admin.pedidos.index', compact('pedidos'));
+        return view("admin.pedidos.index", compact("pedidos"));
     }
 }

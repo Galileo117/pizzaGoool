@@ -12,15 +12,15 @@ class DetallePedido extends Model
 {
     use HasFactory;
 
-    protected $table = 'detalle_pedidos';
+    protected $table = "detalle_pedidos";
 
     protected $fillable = [
-        'pedido_id',
-        'producto_id',
-        'producto_nombre',
-        'categoria_nombre',
-        'cantidad',
-        'precio_unitario',
+        "pedido_id",
+        "producto_id",
+        "producto_nombre",
+        "categoria_nombre",
+        "cantidad",
+        "precio_unitario",
     ];
 
     // Relación: Un detalle pertenece a un pedido
@@ -33,5 +33,21 @@ class DetallePedido extends Model
     public function producto()
     {
         return $this->belongsTo(Producto::class);
+    }
+
+    /**
+     * Devuelve el nombre histórico del producto; si no existe (pedidos viejos),
+     * recurre al nombre actual del producto o un texto por defecto.
+     */
+    public function getNombreProductoAttribute(): string
+    {
+        return $this->producto_nombre ??
+            ($this->producto?->nombre ?? "Producto no disponible");
+    }
+
+    public function getNombreCategoriaAttribute(): string
+    {
+        return $this->categoria_nombre ??
+            ($this->producto?->categoria?->nombre ?? "Sin categoría");
     }
 }

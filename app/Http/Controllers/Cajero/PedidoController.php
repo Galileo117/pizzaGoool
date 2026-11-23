@@ -15,83 +15,119 @@ class PedidoController extends Controller
     public function index(Request $request)
     {
         // Cargamos las relaciones para optimizar las consultas (Eager Loading)
-        $query = Pedido::with(['usuario.cliente', 'detallePedidos.producto', 'repartidor.repartidor'])
-            ->orderBy('created_at', 'desc');
+        $query = Pedido::with([
+            "usuario.cliente",
+            "detallePedidos.producto",
+            "repartidor.repartidor",
+        ])->orderBy("created_at", "desc");
 
-        if ($request->has('estado') && $request->estado !== '') {
-            $query->where('estado', $request->estado);
-        } else {
-            $query->whereNotIn('estado', ['entregado', 'cancelado']);
+        if ($request->filled("estado")) {
+            $query->where("estado", $request->estado);
         }
 
-        $pedidos = $query->paginate(15);
+        $pedidos = $query->paginate(15)->withQueryString();
 
-        return view('cajero.pedidos.index', compact('pedidos'));
+        return view("cajero.pedidos.index", compact("pedidos"));
     }
 
     public function show(Pedido $pedido)
     {
-        $pedido->load(['usuario.cliente', 'detallePedidos.producto', 'pago', 'repartidor.repartidor']);
+        $pedido->load([
+            "usuario.cliente",
+            "detallePedidos.producto",
+            "pago",
+            "repartidor.repartidor",
+        ]);
 
         // Obtenemos a los usuarios que tienen el rol de repartidor y cargamos su perfil
-        $repartidores = Usuario::where('rol', 'repartidor')->with('repartidor')->get();
+        $repartidores = Usuario::where("rol", "repartidor")
+            ->with("repartidor")
+            ->get();
 
-        return view('cajero.pedidos.show', compact('pedido', 'repartidores'));
+        return view("cajero.pedidos.show", compact("pedido", "repartidores"));
     }
 
     public function cambiarEstado(Request $request, Pedido $pedido)
     {
         $request->validate([
-            'estado' => 'required|in:pendiente,preparacion,listo,en_reparto,entregado,cancelado',
+            "estado" =>
+                "required|in:pendiente,preparacion,listo,en_reparto,entregado,cancelado",
         ]);
 
-        if ($request->estado === 'cancelado' && in_array($pedido->estado, ['en_reparto', 'entregado'])) {
-            return redirect()->back()->with('error', 'No puedes cancelar un pedido que ya está en reparto o entregado.');
+        if (
+            $request->estado === "cancelado" &&
+            in_array($pedido->estado, ["en_reparto", "entregado"])
+        ) {
+            return redirect()
+                ->back()
+                ->with(
+                    "error",
+                    "No puedes cancelar un pedido que ya está en reparto o entregado.",
+                );
         }
 
         if (
-            $request->estado === 'en_reparto'
-            || ! $pedido->puedeCambiarEstado($request->estado)
+            $request->estado === "en_reparto" ||
+            !$pedido->puedeCambiarEstado($request->estado)
         ) {
-            return redirect()->back()->with('error', 'La transición solicitada no es válida para este pedido.');
+            return redirect()
+                ->back()
+                ->with(
+                    "error",
+                    "La transición solicitada no es válida para este pedido.",
+                );
         }
 
-        if ($request->estado === 'entregado') {
+        if ($request->estado === "entregado") {
             $pedido->marcarEntregado();
         } else {
-            $pedido->update(['estado' => $request->estado]);
+            $pedido->update(["estado" => $request->estado]);
         }
 
-        return redirect()->back()->with('success', 'Estado del pedido actualizado correctamente.');
+        return redirect()
+            ->back()
+            ->with("success", "Estado del pedido actualizado correctamente.");
     }
 
     public function asignarRepartidor(Request $request, Pedido $pedido)
     {
         $request->validate([
-            'repartidor_id' => 'required|exists:repartidores,usuario_id',
+            "repartidor_id" => "required|exists:repartidores,usuario_id",
         ]);
 
         $esRepartidor = Usuario::whereKey($request->repartidor_id)
-            ->where('rol', 'repartidor')
-            ->whereHas('repartidor')
+            ->where("rol", "repartidor")
+            ->whereHas("repartidor")
             ->exists();
 
-        if (! $esRepartidor) {
-            return redirect()->back()->with('error', 'La cuenta seleccionada no tiene un perfil de repartidor válido.');
+        if (!$esRepartidor) {
+            return redirect()
+                ->back()
+                ->with(
+                    "error",
+                    "La cuenta seleccionada no tiene un perfil de repartidor válido.",
+                );
         }
 
         if (
-            ! $pedido->esDelivery()
-            || ! $pedido->puedeCambiarEstado('en_reparto')
+            !$pedido->esDelivery() ||
+            !$pedido->puedeCambiarEstado("en_reparto")
         ) {
-            return redirect()->back()->with('error', 'Solo se puede asignar un repartidor a un pedido de delivery listo.');
+            return redirect()
+                ->back()
+                ->with(
+                    "error",
+                    "Solo se puede asignar un repartidor a un pedido de delivery listo.",
+                );
         }
 
         $pedido->update([
-            'repartidor_id' => $request->repartidor_id,
-            'estado' => 'en_reparto',
+            "repartidor_id" => $request->repartidor_id,
+            "estado" => "en_reparto",
         ]);
 
-        return redirect()->back()->with('success', 'Repartidor asignado correctamente.');
+        return redirect()
+            ->back()
+            ->with("success", "Repartidor asignado correctamente.");
     }
 }
