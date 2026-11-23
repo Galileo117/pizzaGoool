@@ -375,48 +375,42 @@
                 @endforelse
             </tbody>
         </table>
-    @elseif ($tipoReporte === 'detalle')
-        <h2>Detalle de ventas completadas</h2>
-        <table class="data">
-            <thead>
-                <tr>
-                    <th>Pedido y fecha</th>
-                    <th>Cliente</th>
-                    <th>Producto</th>
-                    <th>Categoría</th>
-                    <th class="right">Cantidad</th>
-                    <th class="right">Precio unitario</th>
-                    <th class="right">Subtotal</th>
-                    <th>Estado del pedido</th>
-                    <th>Estado del pago</th>
-                    <th>Entrega</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse ($detalleVentas as $fila)
+        @elseif ($tipoReporte === 'detalle')
+            <h2>Detalle de ventas completadas</h2>
+            <table class="data">
+                <thead>
                     <tr>
-                        <td>#{{ $fila->pedido_id }}<br>{{ \Carbon\Carbon::parse($fila->fecha)->format('d/m/Y H:i') }}
-                        </td>
-                        <td>{{ $fila->cliente_nombre }}<br>{{ $fila->cliente_email }}</td>
-                        <td>{{ $fila->producto }}</td>
-                        <td>{{ $fila->categoria }}</td>
-                        <td class="right">{{ $fila->cantidad }}</td>
-                        <td class="right">Bs. {{ number_format($fila->precio_unitario, 2) }}</td>
-                        <td class="right">Bs. {{ number_format($fila->subtotal, 2) }}</td>
-                        <td>{{ ucfirst(str_replace('_', ' ', $fila->estado_pedido)) }}</td>
-                        <td>{{ $fila->estados_pago ? str_replace(',', ', ', $fila->estados_pago) : 'Sin registro' }}
-                        </td>
-                        <td>{{ in_array($fila->tipo_entrega, ['delivery', 'contraentrega'], true) ? 'Delivery' : 'Recojo en local' }}
-                        </td>
+                        <th>Pedido y fecha</th>
+                        <th>Cliente</th>
+                        <th>Productos</th>
+                        <th class="right">Total Pedido</th>
+                        <th>Estado del pedido</th>
+                        <th>Estado del pago</th>
+                        <th>Entrega</th>
                     </tr>
-                @empty
-                    <tr>
-                        <td colspan="10" class="empty">No hay ventas completadas en este período.</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-    @endif
+                </thead>
+                <tbody>
+                    @forelse ($detalleVentas as $fila)
+                        <tr>
+                            <td>#{{ $fila->pedido_id }}<br>{{ \Carbon\Carbon::parse($fila->fecha)->format('d/m/Y H:i') }}
+                            </td>
+                            <td>{{ $fila->cliente_nombre }}<br>{{ $fila->cliente_email }}</td>
+                            <td>{!! $fila->productos !!}</td>
+                            <td class="right">Bs. {{ number_format($fila->total_pedido, 2) }}</td>
+                            <td>{{ ucfirst(str_replace('_', ' ', $fila->estado_pedido)) }}</td>
+                            <td>{{ $fila->estados_pago ? str_replace(',', ', ', $fila->estados_pago) : 'Sin registro' }}
+                            </td>
+                            <td>{{ in_array($fila->tipo_entrega, ['delivery', 'contraentrega'], true) ? 'Delivery' : 'Recojo en local' }}
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="7" class="empty">No hay ventas completadas en este período.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        @endif
 
     <footer class="footer">Generado el {{ now()->format('d/m/Y H:i') }} — Sistema web Pizza Goool</footer>
 </body>

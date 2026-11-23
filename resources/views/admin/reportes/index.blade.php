@@ -404,15 +404,13 @@
                 <h3 class="text-sm font-bold text-white"><i class="fa-solid fa-file-lines mr-2"></i>DETALLE DE VENTAS</h3>
             </div>
             <div class="overflow-x-auto">
-                <table class="w-full min-w-[1100px] text-left text-sm">
+                <table class="w-full min-w-[900px] text-left text-sm">
                     <thead class="bg-gray-50 text-xs uppercase text-gray-500">
                         <tr>
                             <th class="px-4 py-3">Pedido / fecha</th>
                             <th class="px-4 py-3">Cliente</th>
-                            <th class="px-4 py-3">Producto</th>
-                            <th class="px-4 py-3 text-right">Cantidad</th>
-                            <th class="px-4 py-3 text-right">Precio unitario</th>
-                            <th class="px-4 py-3 text-right">Subtotal</th>
+                            <th class="px-4 py-3">Productos</th>
+                            <th class="px-4 py-3 text-right">Total Pedido</th>
                             <th class="px-4 py-3">Estado del pedido</th>
                             <th class="px-4 py-3">Estado del pago</th>
                             <th class="px-4 py-3">Entrega</th>
@@ -426,11 +424,8 @@
                                 </td>
                                 <td class="px-4 py-3">{{ $fila->cliente_nombre ?: 'Cliente' }}<br><span
                                         class="text-xs text-gray-500">{{ $fila->cliente_email }}</span></td>
-                                <td class="px-4 py-3">{{ $fila->producto }}<br><span
-                                        class="text-xs text-gray-500">{{ $fila->categoria }}</span></td>
-                                <td class="px-4 py-3 text-right">{{ number_format($fila->cantidad) }}</td>
-                                <td class="px-4 py-3 text-right">Bs. {{ number_format($fila->precio_unitario, 2) }}</td>
-                                <td class="px-4 py-3 text-right font-semibold">Bs. {{ number_format($fila->subtotal, 2) }}
+                                <td class="px-4 py-3">{!! $fila->productos !!}</td>
+                                <td class="px-4 py-3 text-right font-semibold">Bs. {{ number_format($fila->total_pedido, 2) }}
                                 </td>
                                 <td class="px-4 py-3">{{ ucfirst(str_replace('_', ' ', $fila->estado_pedido)) }}</td>
                                 <td class="px-4 py-3">
@@ -442,7 +437,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="9" class="px-4 py-8 text-center text-gray-500">No hay ventas completadas
+                                <td colspan="7" class="px-4 py-8 text-center text-gray-500">No hay ventas completadas
                                     en este período.</td>
                             </tr>
                         @endforelse
