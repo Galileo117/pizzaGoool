@@ -22,7 +22,7 @@
             </div>
         </div>
 
-        <div class="max-w-7xl mx-auto px-4 py-16 sm:py-24 relative z-10">
+        <div class="w-full max-w-7xl mx-auto px-4 py-16 sm:py-24 relative z-10 overflow-hidden">
             <div class="text-center">
                 <div class="inline-block bg-goool-yellow/20 rounded-full px-6 py-2 mb-6">
                     <span class="text-goool-yellow font-semibold text-sm">
@@ -47,8 +47,10 @@
                             <span>¡Hola, {{ auth()->user()->nombre_completo, 0, 1 }}! ¿Qué te gustaría pedir hoy?</span>
                         </div>
 
-                        <div class="mt-4 flex justify-center">
-                            @livewire('contador-carrito')
+                        <div class="mt-4 flex justify-center w-full max-w-full px-2">
+                            <div class="w-full flex justify-center">
+                                <livewire:contador-carrito />
+                            </div>
                         </div>
 
                         <div class="mt-8 flex flex-wrap items-center justify-center gap-4">
@@ -80,7 +82,7 @@
 
     {{-- CATEGORÍAS --}}
     <section class="py-12 sm:py-16 bg-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 overflow-hidden">
             <div class="text-center mb-10">
                 <h2 class="text-3xl sm:text-4xl font-extrabold text-goool-green-dark">
                     Nuestras <span class="text-goool-yellow">Categorías</span>
@@ -124,7 +126,7 @@
             </div>
         </div>
 
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 overflow-hidden">
             <div class="flex items-center justify-between mb-8">
                 <div>
                     <h2 class="text-3xl sm:text-4xl font-extrabold text-goool-green-dark flex items-center gap-3">

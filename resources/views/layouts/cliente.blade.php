@@ -20,12 +20,12 @@
     @stack('styles')
 </head>
 
-<body class="min-h-screen bg-gray-50 font-sans text-gray-900 antialiased flex flex-col">
+<body class="min-h-screen w-full overflow-x-hidden bg-gray-50 font-sans text-gray-900 antialiased flex flex-col">
 
     {{-- HEADER --}}
     <header class="sticky top-0 z-40 bg-goool-green text-white shadow-lg">
-        <div class="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div class="flex h-20 items-center justify-between gap-4">
+        <div class="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 overflow-hidden">
+            <div class="flex min-h-[5rem] py-2 items-center justify-between gap-1 sm:gap-4 w-full">
 
                 {{-- Logo + menú hamburguesa --}}
                 <div class="flex items-center gap-3 flex-shrink-0">
@@ -65,7 +65,7 @@
                 @endif
 
                 {{-- Navegación derecha --}}
-                <nav class="flex items-center gap-3 sm:gap-5 flex-shrink-0" aria-label="Navegación principal">
+                <nav class="flex flex-wrap items-center justify-end gap-2 sm:gap-5 flex-shrink-0" aria-label="Navegación principal">
 
                     @auth
                         @if (auth()->user()->rol === 'cliente')

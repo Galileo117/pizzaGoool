@@ -45,7 +45,7 @@
                             <div class="flex justify-between items-center text-sm border-b border-gray-100 pb-2">
                                 <span class="text-gray-700">
                                     <i class="fa-solid fa-pizza-slice text-goool-green"></i>
-                                    {{ $detalle->producto->nombre ?? 'Producto eliminado' }}
+                                    {{ $detalle->nombre_producto ?? 'Producto eliminado' }}
                                     <span class="text-gray-400">x{{ $detalle->cantidad }}</span>
                                 </span>
                                 <span class="font-semibold text-gray-800">
